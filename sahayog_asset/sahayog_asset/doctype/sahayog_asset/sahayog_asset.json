@@ -1,0 +1,295 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-01-27 17:37:27.791973",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_details_column",
+  "naming_series",
+  "datee",
+  "branch_name",
+  "bm_name",
+  "phone_num",
+  "purchase_owner",
+  "column_break_8",
+  "product__material_details_section",
+  "items",
+  "column_break_app",
+  "rm",
+  "regional_manager_section",
+  "app_rm1",
+  "approve_rm2",
+  "data_28",
+  "it_ex",
+  "approve_it_executive",
+  "it_manager_section",
+  "approve_it_manager",
+  "it_text",
+  "cto_section",
+  "approve_from_cto",
+  "cfo_section",
+  "approve_from_cfo",
+  "ceo_section",
+  "approve_from_ceo",
+  "purchase_department_section",
+  "approve_purchase",
+  "purchase_text",
+  "it_mg_status",
+  "section_break_33",
+  "branch_st"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_details_column",
+   "fieldtype": "Heading",
+   "label": "Basic Details"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "ID",
+   "options": "SASSET.DD.MM.YY.-",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "datee",
+   "fieldtype": "Date",
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "purchase_owner.location",
+   "fieldname": "branch_name",
+   "fieldtype": "Data",
+   "label": "Branch / Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "purchase_owner.full_name",
+   "fieldname": "bm_name",
+   "fieldtype": "Data",
+   "label": "BM / HOD Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "purchase_owner.phone",
+   "fieldname": "phone_num",
+   "fieldtype": "Int",
+   "label": "Phone Number",
+   "length": 15,
+   "read_only": 1
+  },
+  {
+   "default": "__user",
+   "fieldname": "purchase_owner",
+   "fieldtype": "Link",
+   "label": "Email",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Tab Break",
+   "label": "Product Details"
+  },
+  {
+   "fieldname": "product__material_details_section",
+   "fieldtype": "Heading",
+   "label": "Product / Material Details"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Sahayog Material Form"
+  },
+  {
+   "fieldname": "column_break_app",
+   "fieldtype": "Tab Break",
+   "label": "Approval Section"
+  },
+  {
+   "fieldname": "rm",
+   "fieldtype": "Select",
+   "label": "Purchase Request to",
+   "options": "\nRM1\nRM2",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "regional_manager_section",
+   "fieldtype": "Section Break",
+   "label": "Regional Manager"
+  },
+  {
+   "depends_on": "eval:doc.rm==\"RM1\"",
+   "fieldname": "app_rm1",
+   "fieldtype": "Select",
+   "label": "Approve from RM1",
+   "options": "\nApproved\nReject",
+   "permlevel": 2
+  },
+  {
+   "depends_on": "eval:doc.rm==\"RM2\"",
+   "fieldname": "approve_rm2",
+   "fieldtype": "Select",
+   "label": "Approve from RM2",
+   "options": "\nApproved\nRejected",
+   "permlevel": 2
+  },
+  {
+   "fieldname": "data_28",
+   "fieldtype": "Section Break",
+   "label": "IT Executive"
+  },
+  {
+   "depends_on": "eval:doc.approve_rm2 == 'Approved' || doc.app_rm1 == 'Approved' ",
+   "fieldname": "it_ex",
+   "fieldtype": "Select",
+   "label": "IT Excecutive Name",
+   "options": "\nGondia Executive\nBhandara Executive\nNagpur Executive",
+   "permlevel": 3
+  },
+  {
+   "depends_on": "eval:doc.approve_rm2 == 'Approved' || doc.app_rm1 == 'Approved' ||doc.approve_from_agm == 'Approved'",
+   "fieldname": "approve_it_executive",
+   "fieldtype": "Select",
+   "label": "Approve from Executive",
+   "options": "\nApproved\nRejected",
+   "permlevel": 3
+  },
+  {
+   "fieldname": "it_manager_section",
+   "fieldtype": "Section Break",
+   "label": "IT Manager"
+  },
+  {
+   "depends_on": "eval:doc.approve_it_executive == 'Approved'",
+   "fieldname": "approve_it_manager",
+   "fieldtype": "Select",
+   "label": "Approve from IT Manager",
+   "options": "\nApproved\nCTO approval Required\nRejected",
+   "permlevel": 4
+  },
+  {
+   "depends_on": "eval:doc.approve_it_executive == 'Approved'",
+   "fieldname": "it_text",
+   "fieldtype": "Long Text",
+   "label": "Message from IT Manager",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "cto_section",
+   "fieldtype": "Section Break",
+   "label": "CTO"
+  },
+  {
+   "depends_on": "eval:doc.approve_it_manager == 'CTO approval Required'",
+   "fieldname": "approve_from_cto",
+   "fieldtype": "Select",
+   "label": "Approve from CTO",
+   "options": "\nApproved\nCFO Approval Required\nReject",
+   "permlevel": 5
+  },
+  {
+   "fieldname": "cfo_section",
+   "fieldtype": "Section Break",
+   "label": "CFO"
+  },
+  {
+   "depends_on": "eval:doc.approve_from_cto == 'CFO Approval Required'",
+   "fieldname": "approve_from_cfo",
+   "fieldtype": "Select",
+   "label": "Approve from CFO",
+   "options": "\nApproved\nCEO Approval Required\nReject",
+   "permlevel": 6
+  },
+  {
+   "fieldname": "ceo_section",
+   "fieldtype": "Section Break",
+   "label": "CEO"
+  },
+  {
+   "depends_on": "eval:doc.approve_from_cfo == 'CEO Approval Required'",
+   "fieldname": "approve_from_ceo",
+   "fieldtype": "Select",
+   "label": "Approve from CEO",
+   "options": "\nApproved\nReject",
+   "permlevel": 7
+  },
+  {
+   "fieldname": "purchase_department_section",
+   "fieldtype": "Section Break",
+   "label": "Purchase Department"
+  },
+  {
+   "depends_on": "eval:doc.approve_from_cto == 'Approved' || doc.approve_from_cfo == 'Approved' || doc.approve_from_ceo == 'Approved' || doc.approve_it_manager == 'Approved'",
+   "fieldname": "approve_purchase",
+   "fieldtype": "Select",
+   "label": "Approve from Purchase Department",
+   "options": "\nApproved\nReject",
+   "permlevel": 8
+  },
+  {
+   "depends_on": "eval:doc.approve_from_cto == 'Approved' || doc.approve_from_cfo == 'Approved' || doc.approve_from_ceo == 'Approved'",
+   "fieldname": "purchase_text",
+   "fieldtype": "Long Text",
+   "label": "Message from Purchase Department",
+   "permlevel": 8
+  },
+  {
+   "depends_on": "eval:doc.approve_purchase == 'Approved'",
+   "fieldname": "it_mg_status",
+   "fieldtype": "Select",
+   "label": "IT Manager Status",
+   "options": "\nMaterial-Dispatched\nMaterial On Hold\nMaterial Not Recieved",
+   "permlevel": 4
+  },
+  {
+   "fieldname": "section_break_33",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.it_mg_status == 'Material-Dispatched'",
+   "fieldname": "branch_st",
+   "fieldtype": "Select",
+   "label": "branch status",
+   "options": "\nMaterial Received",
+   "permlevel": 1,
+   "set_only_once": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-02-01 15:22:35.221591",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Sahayog Asset",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1
+}
