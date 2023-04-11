@@ -3,5 +3,4 @@
 *.egg-info
 *.swp
 tags
-sahayog_asset/docs/current
-node_modules/
+node_modules

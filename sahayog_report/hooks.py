@@ -1,25 +1,25 @@
 from . import __version__ as app_version
 
-app_name = "sahayog_asset"
-app_title = "Sahayog Asset"
-app_publisher = "Sid"
-app_description = "Assets Management"
-app_email = "siddharth.t@sahayogmultistate.com"
+app_name = "sahayog_report"
+app_title = "Sahayog Report"
+app_publisher = "Talib Sheikh"
+app_description = "Collect daily Reports of branches "
+app_email = "talib.s@sahayogmultistate.com"
 app_license = "MIT"
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/sahayog_asset/css/sahayog_asset.css"
-# app_include_js = "/assets/sahayog_asset/js/sahayog_asset.js"
+# app_include_css = "/assets/sahayog_report/css/sahayog_report.css"
+# app_include_js = "/assets/sahayog_report/js/sahayog_report.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/sahayog_asset/css/sahayog_asset.css"
-# web_include_js = "/assets/sahayog_asset/js/sahayog_asset.js"
+# web_include_css = "/assets/sahayog_report/css/sahayog_report.css"
+# web_include_js = "/assets/sahayog_report/js/sahayog_report.js"
 
 # include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "sahayog_asset/public/scss/website"
+# website_theme_scss = "sahayog_report/public/scss/website"
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
@@ -56,27 +56,27 @@ app_license = "MIT"
 
 # add methods and filters to jinja environment
 # jinja = {
-#	"methods": "sahayog_asset.utils.jinja_methods",
-#	"filters": "sahayog_asset.utils.jinja_filters"
+#	"methods": "sahayog_report.utils.jinja_methods",
+#	"filters": "sahayog_report.utils.jinja_filters"
 # }
 
 # Installation
 # ------------
 
-# before_install = "sahayog_asset.install.before_install"
-# after_install = "sahayog_asset.install.after_install"
+# before_install = "sahayog_report.install.before_install"
+# after_install = "sahayog_report.install.after_install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "sahayog_asset.uninstall.before_uninstall"
-# after_uninstall = "sahayog_asset.uninstall.after_uninstall"
+# before_uninstall = "sahayog_report.uninstall.before_uninstall"
+# after_uninstall = "sahayog_report.uninstall.after_uninstall"
 
 # Desk Notifications
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "sahayog_asset.notifications.get_notification_config"
+# notification_config = "sahayog_report.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -103,11 +103,15 @@ app_license = "MIT"
 # Hook on document methods and events
 
 # doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
+# 	"*": {
+# 		"on_update": "method",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+# 	},
+#  "sahayog_report":{
+#      "validate": "sahayog_report.sahayog_report.doctype.incidence_report.incidence_report.get_linked_doc"
+#  }
+ 
 # }
 
 # Scheduled Tasks
@@ -115,39 +119,39 @@ app_license = "MIT"
 
 # scheduler_events = {
 #	"all": [
-#		"sahayog_asset.tasks.all"
+#		"sahayog_report.tasks.all"
 #	],
 #	"daily": [
-#		"sahayog_asset.tasks.daily"
+#		"sahayog_report.tasks.daily"
 #	],
 #	"hourly": [
-#		"sahayog_asset.tasks.hourly"
+#		"sahayog_report.tasks.hourly"
 #	],
 #	"weekly": [
-#		"sahayog_asset.tasks.weekly"
+#		"sahayog_report.tasks.weekly"
 #	],
 #	"monthly": [
-#		"sahayog_asset.tasks.monthly"
+#		"sahayog_report.tasks.monthly"
 #	],
 # }
 
 # Testing
 # -------
 
-# before_tests = "sahayog_asset.install.before_tests"
+# before_tests = "sahayog_report.install.before_tests"
 
 # Overriding Methods
 # ------------------------------
 #
 # override_whitelisted_methods = {
-#	"frappe.desk.doctype.event.event.get_events": "sahayog_asset.event.get_events"
+#	"frappe.desk.doctype.event.event.get_events": "sahayog_report.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 # override_doctype_dashboards = {
-#	"Task": "sahayog_asset.task.get_dashboard_data"
+#	"Task": "sahayog_report.task.get_dashboard_data"
 # }
 
 # exempt linked doctypes from being automatically cancelled
@@ -159,6 +163,15 @@ app_license = "MIT"
 
 # ignore_links_on_delete = ["Communication", "ToDo"]
 
+# Request Events
+# ----------------
+# before_request = ["sahayog_report.utils.before_request"]
+# after_request = ["sahayog_report.utils.after_request"]
+
+# Job Events
+# ----------
+# before_job = ["sahayog_report.utils.before_job"]
+# after_job = ["sahayog_report.utils.after_job"]
 
 # User Data Protection
 # --------------------
@@ -188,5 +201,5 @@ app_license = "MIT"
 # --------------------------------
 
 # auth_hooks = [
-#	"sahayog_asset.auth.validate"
+#	"sahayog_report.auth.validate"
 # ]

@@ -1,7 +1,7 @@
-## Sahayog Asset
+## Sahayog Report
 
-Assets Management
+Collect daily Reports of branches 
 
 #### License
 
-MIT# sahayog_asset
+MIT# sahayog_report

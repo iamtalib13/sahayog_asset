@@ -1,0 +1,41 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-21 15:58:22.164345",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "planned_action",
+  "person"
+ ],
+ "fields": [
+  {
+   "columns": 4,
+   "fieldname": "planned_action",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Planned Action",
+   "reqd": 1
+  },
+  {
+   "fieldname": "person",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Owner",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-21 16:07:50.849017",
+ "modified_by": "Administrator",
+ "module": "Sahayog Report",
+ "name": "Planned Actions And Owners",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

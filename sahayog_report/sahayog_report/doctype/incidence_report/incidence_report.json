@@ -1,0 +1,208 @@
+{
+ "actions": [],
+ "autoname": "format:SM-{branch}-{DD}{MM}{YY}-{#####}",
+ "creation": "2023-03-21 15:36:42.876115",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employee_id",
+  "enable",
+  "employee_name",
+  "designation",
+  "column_break_fstr",
+  "branch",
+  "division",
+  "date",
+  "section_break_hmxw",
+  "incident_number",
+  "incident_name",
+  "section_break_gjja",
+  "participants",
+  "section_break_hojc",
+  "column_break_skql",
+  "section_break_maes",
+  "summary",
+  "column_break_piod",
+  "impact",
+  "section_break_iktf",
+  "root_cause",
+  "column_break_ebgs",
+  "lessons_learned",
+  "section_break_thuq",
+  "planned_actions_and_owners"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "hidden": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_gjja",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "participants",
+   "fieldtype": "Table",
+   "label": "Participants",
+   "options": "Participants",
+   "reqd": 1
+  },
+  {
+   "fieldname": "incident_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Incident Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_hojc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_skql",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_maes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Summary",
+   "reqd": 1
+  },
+  {
+   "fieldname": "impact",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Impact",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_iktf",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "root_cause",
+   "fieldtype": "Text",
+   "label": "Root Cause",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_piod",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ebgs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lessons_learned",
+   "fieldtype": "Text",
+   "label": "Lessons Learned",
+   "reqd": 1
+  },
+  {
+   "fieldname": "planned_actions_and_owners",
+   "fieldtype": "Table",
+   "label": "Planned Actions And Owners",
+   "options": "Planned Actions And Owners",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_thuq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "employee_id",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Employee ID",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee_id.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "ignore_user_permissions": 1,
+   "label": "Designation"
+  },
+  {
+   "fetch_from": "employee_id.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Recorded By",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee_id.branch",
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Location",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "employee_id.division",
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Division",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_fstr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_hmxw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "incident_number",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Incident Number"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "enable"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-03-23 14:52:23.335656",
+ "modified_by": "Administrator",
+ "module": "Sahayog Report",
+ "name": "Incidence Report",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
