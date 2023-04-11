@@ -1,0 +1,462 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-03-28 11:35:03.078525",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "dispatch_through",
+  "column_break_3",
+  "mode_of_payment",
+  "colss",
+  "terms_of_delivery",
+  "colw",
+  "date",
+  "column_break_5",
+  "day",
+  "invoice_to_section",
+  "inv_party_name",
+  "address",
+  "state",
+  "city",
+  "pincode",
+  "email",
+  "gstuin",
+  "supplier",
+  "vendor",
+  "vendor_name",
+  "vendor_address",
+  "gst_no",
+  "vendor_state",
+  "vendor_city",
+  "vendor_pin_code",
+  "gst_state_code",
+  "vendor_email",
+  "column_break_7",
+  "quotation_ref_no",
+  "sec_despatch_to",
+  "des_party_name",
+  "column_break_11",
+  "branch",
+  "branch_address",
+  "column_break_9",
+  "section_break_7",
+  "remarks",
+  "material_details_tab",
+  "material",
+  "section_break_13",
+  "calculate",
+  "section_break_15",
+  "total_quantity",
+  "total_amount",
+  "column_break_14",
+  "sgst_amount",
+  "cgst_amount",
+  "igst_amount",
+  "column_break_19",
+  "total_amt_with_tax",
+  "other_charges",
+  "order_total_amount",
+  "invoice_details_tab",
+  "prepared_by",
+  "column_break_56",
+  "verified_by",
+  "section_break_57",
+  "subject",
+  "body"
+ ],
+ "fields": [
+  {
+   "description": "Please Select Vendor",
+   "fieldname": "vendor",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vendor",
+   "options": "Vendor",
+   "reqd": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "day",
+   "fieldtype": "Data",
+   "label": "Day"
+  },
+  {
+   "depends_on": "eval:doc.vendor",
+   "fieldname": "material_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Material Details"
+  },
+  {
+   "fieldname": "material",
+   "fieldtype": "Table",
+   "label": "Material ",
+   "options": "PO Material List"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "quotation_ref_no",
+   "fieldtype": "Data",
+   "label": "Quotation Reference No."
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.vendor",
+   "fieldname": "invoice_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Print Setup"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "invoice_to_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice To"
+  },
+  {
+   "fetch_from": "inv_party_name.address",
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Address"
+  },
+  {
+   "fetch_from": "inv_party_name.city",
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "City"
+  },
+  {
+   "fieldname": "column_break_19",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "inv_party_name.pincode",
+   "fieldname": "pincode",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Pincode",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "inv_party_name.gstinuin",
+   "fieldname": "gstuin",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "GST/UIN",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "inv_party_name.state",
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "State"
+  },
+  {
+   "fetch_from": "inv_party_name.email",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inv_party_name",
+   "fieldtype": "Link",
+   "label": "Head Office",
+   "options": "Company Details"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sec_despatch_to",
+   "fieldtype": "Section Break",
+   "label": "Despatch To"
+  },
+  {
+   "fieldname": "des_party_name",
+   "fieldtype": "Data",
+   "label": "Sahayog Branch",
+   "read_only": 1
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_quantity",
+   "fieldtype": "Data",
+   "label": "Total Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Purchase Order No.",
+   "options": "SPO/.DD..MM..YY./.##.",
+   "read_only": 1
+  },
+  {
+   "fieldname": "calculate",
+   "fieldtype": "Button",
+   "label": "Calculate"
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount (INR)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_amt_with_tax",
+   "fieldtype": "Currency",
+   "label": "Total Amount ( Inc Tax )",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sgst_amount",
+   "fieldtype": "Currency",
+   "label": "SGST Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cgst_amount",
+   "fieldtype": "Currency",
+   "label": "CGST Amount",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.total_amt_with_tax",
+   "fieldname": "other_charges",
+   "fieldtype": "Currency",
+   "label": "Other Charges"
+  },
+  {
+   "fieldname": "order_total_amount",
+   "fieldtype": "Currency",
+   "label": "Order Total Amount",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "supplier",
+   "fieldtype": "Section Break",
+   "label": "Supplier"
+  },
+  {
+   "fetch_from": "vendor.vendor_name",
+   "fieldname": "vendor_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Party Name"
+  },
+  {
+   "fetch_from": "vendor.address",
+   "fieldname": "vendor_address",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Address"
+  },
+  {
+   "fetch_from": "vendor.gst_no",
+   "fieldname": "gst_no",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "GSTIN/UIN"
+  },
+  {
+   "fetch_from": "vendor.gst_state_code",
+   "fieldname": "gst_state_code",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "GST state code"
+  },
+  {
+   "fetch_from": "vendor.state",
+   "fieldname": "vendor_state",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "State"
+  },
+  {
+   "fieldname": "igst_amount",
+   "fieldtype": "Currency",
+   "label": "IGST Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "vendor.city",
+   "fieldname": "vendor_city",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "City"
+  },
+  {
+   "fetch_from": "vendor.pincode",
+   "fieldname": "vendor_pin_code",
+   "fieldtype": "Data",
+   "label": "Pincode"
+  },
+  {
+   "fetch_from": "vendor.email_address",
+   "fieldname": "vendor_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fetch_from": "branch.address",
+   "fieldname": "branch_address",
+   "fieldtype": "Data",
+   "label": "Branch Address"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dispatch_through",
+   "fieldtype": "Select",
+   "label": "Dispatch Through",
+   "options": "Transport"
+  },
+  {
+   "fieldname": "colss",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode_of_payment",
+   "fieldtype": "Select",
+   "label": "Mode/Term of Payment",
+   "options": "50% Advance"
+  },
+  {
+   "fieldname": "terms_of_delivery",
+   "fieldtype": "Select",
+   "label": "Terms of Delivery",
+   "options": "4 Weeks"
+  },
+  {
+   "fieldname": "colw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "PO for Supply of Electric Material for our Sahayog Bank",
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "default": "Dear sir,\n\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0With reference to your Quotation & subsequent discussions we had with you, we are pleased to place our Purchase Order\n\ufeff\ufefffor supply of following items as per description, quantity and rates mentioned here under.",
+   "fieldname": "body",
+   "fieldtype": "Text Editor",
+   "label": "Body"
+  },
+  {
+   "fieldname": "prepared_by",
+   "fieldtype": "Select",
+   "label": "Prepared By",
+   "options": "\nSantosh Uke\nHemant Malwande"
+  },
+  {
+   "fieldname": "verified_by",
+   "fieldtype": "Select",
+   "label": "Verified By",
+   "options": "\nSantosh Uke\nHemant Malwande"
+  },
+  {
+   "fieldname": "section_break_57",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_56",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "hide_toolbar": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-04-11 17:33:33.688869",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Sahayog PO",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Purchase Department",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
