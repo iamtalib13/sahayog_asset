@@ -8,7 +8,9 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "category_name"
+  "category_name",
+  "hod",
+  "hod_name"
  ],
  "fields": [
   {
@@ -16,11 +18,23 @@
    "fieldtype": "Data",
    "label": "Category Name",
    "unique": 1
+  },
+  {
+   "fieldname": "hod",
+   "fieldtype": "Link",
+   "label": "Hod id",
+   "options": "User"
+  },
+  {
+   "fetch_from": "hod.full_name",
+   "fieldname": "hod_name",
+   "fieldtype": "Data",
+   "label": "Hod Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-11 17:38:59.244848",
+ "modified": "2023-04-18 12:06:21.355876",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Item Category",
