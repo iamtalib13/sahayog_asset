@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include sahayog_asset *.css
+recursive-include sahayog_asset *.csv
+recursive-include sahayog_asset *.html
+recursive-include sahayog_asset *.ico
+recursive-include sahayog_asset *.js
+recursive-include sahayog_asset *.json
+recursive-include sahayog_asset *.md
+recursive-include sahayog_asset *.png
+recursive-include sahayog_asset *.py
+recursive-include sahayog_asset *.svg
+recursive-include sahayog_asset *.txt
+recursive-exclude sahayog_asset *.pyc
