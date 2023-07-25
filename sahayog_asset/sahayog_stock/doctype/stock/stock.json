@@ -1,0 +1,109 @@
+{
+ "actions": [],
+ "autoname": "field:item_code",
+ "creation": "2023-05-24 17:26:47.182202",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item",
+  "item_code",
+  "column_break_cyqbz",
+  "item_name",
+  "section_break_vozfs",
+  "current_stock",
+  "column_break_3tklx",
+  "item_status",
+  "section_break_29by2",
+  "item_group",
+  "item_unit"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Data",
+   "label": "Item Code",
+   "unique": 1
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "current_stock",
+   "fieldtype": "Data",
+   "label": "Current Stock"
+  },
+  {
+   "fieldname": "item_status",
+   "fieldtype": "Select",
+   "label": "Item Status",
+   "options": "Enabled\nDisabled"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Data",
+   "label": "Item Group"
+  },
+  {
+   "fieldname": "item_unit",
+   "fieldtype": "Data",
+   "label": "Item Unit"
+  },
+  {
+   "fieldname": "column_break_cyqbz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_3tklx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_vozfs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_29by2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "item_name.item_id",
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "no_copy": 1,
+   "options": "Sahayog Item",
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-05-25 17:45:50.752280",
+ "modified_by": "Administrator",
+ "module": "Sahayog Stock",
+ "name": "Stock",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "item_name",
+ "track_changes": 1
+}

@@ -1,44 +1,49 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "field:category_name",
- "creation": "2023-03-27 16:06:51.029727",
+ "autoname": "format:{department}",
+ "creation": "2023-07-03 11:25:42.490233",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "category_name",
-  "hod",
-  "hod_name"
+  "department",
+  "hod_employee_id",
+  "hod_name",
+  "hod_user_id"
  ],
  "fields": [
   {
-   "fieldname": "category_name",
-   "fieldtype": "Data",
-   "label": "Category Name",
-   "unique": 1
+   "fieldname": "department",
+   "fieldtype": "Select",
+   "label": "Department",
+   "options": "\nIT\nAdmin\nStationary"
   },
   {
-   "fieldname": "hod",
-   "fieldtype": "Link",
-   "label": "Hod id",
-   "options": "User"
-  },
-  {
-   "fetch_from": "hod.full_name",
+   "fetch_from": "hod_employee_id.employee_name",
    "fieldname": "hod_name",
    "fieldtype": "Data",
-   "label": "Hod Name"
+   "label": "HOD Name"
+  },
+  {
+   "fieldname": "hod_employee_id",
+   "fieldtype": "Data",
+   "label": "HOD Employee id"
+  },
+  {
+   "fetch_from": "hod_employee_id.user_id",
+   "fieldname": "hod_user_id",
+   "fieldtype": "Data",
+   "label": "HOD User id"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-18 12:06:21.355876",
+ "modified": "2023-07-03 12:44:27.442765",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
- "name": "Item Category",
- "naming_rule": "By fieldname",
+ "name": "Asset Department",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -55,13 +60,13 @@
   },
   {
    "create": 1,
-   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Purchase Department",
+   "role": "Employee",
+   "select": 1,
    "share": 1,
    "write": 1
   }
@@ -69,6 +74,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "category_name",
  "track_changes": 1
 }
