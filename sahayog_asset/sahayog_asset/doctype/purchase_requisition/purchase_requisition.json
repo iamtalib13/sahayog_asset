@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "naming_series:",
  "creation": "2023-04-18 11:23:09.591768",
  "default_view": "List",
@@ -8,64 +7,51 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "employee_other_details_tab",
   "status",
-  "employee_details_section",
-  "employee_id",
-  "emp_user",
-  "column_break_3",
-  "bm_name",
-  "column_break_4",
-  "designation",
   "section_break_xiifo",
+  "emp_user",
   "division",
   "column_break_6",
+  "employee_department",
   "column_break_aed1x",
   "branch",
-  "column_break_5",
   "column_break_8",
   "region",
-  "column_break_ypqzz",
   "date",
   "section_break_7",
+  "section_break_5pufi",
   "select_department",
-  "section_break_hitna",
+  "employee_details_section",
+  "employee_id",
+  "column_break_4",
+  "emp_name",
+  "column_break_edpye",
+  "designation",
+  "column_break_3",
+  "phone",
+  "section_break_asset_adder",
   "list",
   "column_break_y1mfa",
   "quantity",
   "column_break_xogan",
-  "description",
+  "uom",
+  "section_break_qbkdq",
+  "item_description",
   "column_break_fmazx",
-  "as",
+  "item_purpose",
+  "column_break_6aghk",
   "add_item",
   "section_break_crbxo",
   "asset",
   "approval_details_tab",
-  "rm",
-  "rm_approval_status",
-  "rm_user",
-  "column_break_14",
-  "rm_reason",
-  "section_break_16",
-  "it_hod",
-  "it_user",
-  "it_approval_status",
-  "section_break_25",
-  "admin_hod",
-  "admin_user",
-  "admin_approval_status",
-  "section_break_28",
-  "stationary_hod",
-  "stationary_user",
-  "stationary_approval_status",
-  "section_break_31",
   "naming_series",
-  "hod",
-  "hod_name",
-  "hod_approval",
-  "hod_reject_reason",
-  "rm_request",
-  "hod_request",
-  "share_with_hod"
+  "request",
+  "cto_section",
+  "cto_user",
+  "cto_status",
+  "rejection_reason",
+  "cto_request"
  ],
  "fields": [
   {
@@ -88,20 +74,10 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion 1\nRegion 2\nRegion 3\nRegion 4"
-  },
-  {
-   "fetch_from": "employee_id.employee_name",
-   "fieldname": "bm_name",
-   "fieldtype": "Data",
-   "label": "Employee Name"
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
   },
   {
    "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_5",
    "fieldtype": "Column Break"
   },
   {
@@ -133,36 +109,12 @@
    "label": "Approval Details"
   },
   {
-   "fieldname": "rm",
-   "fieldtype": "Data",
-   "label": "RM"
-  },
-  {
-   "fieldname": "column_break_14",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "rm_approval_status",
-   "fieldtype": "Select",
-   "label": "RM Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "fieldname": "section_break_16",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "rm_user",
-   "fieldtype": "Data",
-   "label": "RM user"
-  },
-  {
    "fetch_from": "employee_id.division",
    "fieldname": "division",
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Division",
-   "options": "\nMULTISTATE\nMICROFINANCE\nTWO WHEELER",
+   "options": "\nMultistate\nMicrofinance\nTwo Wheeler",
    "read_only": 1
   },
   {
@@ -175,83 +127,16 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Department",
-   "options": "\nAdmin\nIT\nStationary",
+   "options": "\nAdmin\nIT\nStationery",
    "reqd": 1,
    "set_only_once": 1
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "hidden": 1,
-   "label": "PR_ID",
+   "label": "PR",
    "options": "SPR/.DD..MM..YY./.###."
-  },
-  {
-   "fieldname": "hod",
-   "fieldtype": "Data",
-   "label": "HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_hod",
-   "fieldtype": "Data",
-   "label": "IT HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_user",
-   "fieldtype": "Data",
-   "label": "IT User"
-  },
-  {
-   "fieldname": "section_break_25",
-   "fieldtype": "Section Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_hod",
-   "fieldtype": "Data",
-   "label": "Admin HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_user",
-   "fieldtype": "Data",
-   "label": "Admin User"
-  },
-  {
-   "fieldname": "section_break_28",
-   "fieldtype": "Section Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_hod",
-   "fieldtype": "Data",
-   "label": "Stationary HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_user",
-   "fieldtype": "Data",
-   "label": "Stationary User"
-  },
-  {
-   "fieldname": "section_break_31",
-   "fieldtype": "Section Break"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "rm_request",
-   "fieldtype": "Select",
-   "label": "RM Request",
-   "options": "Pending\nDone"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "hod_request",
-   "fieldtype": "Select",
-   "label": "Hod Request",
-   "options": "Pending\nDone"
   },
   {
    "fetch_from": "employee_id.designation",
@@ -265,43 +150,19 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_approval_status",
-   "fieldtype": "Select",
-   "label": "IT Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fetch_from": "employee_id.user_id",
    "fieldname": "emp_user",
    "fieldtype": "Data",
-   "label": "Emp User"
+   "label": "User",
+   "read_only": 1
   },
   {
    "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "New\nPending from RM\nPending from HOD\nRM Rejected\nRM Approved\nHOD Rejected\nApproved",
+   "options": "Draft\nPending from CTO\nPending from Purchase\nPending from Vendor\nPending from CFO\nDispatched\nReceived\nRejected",
    "read_only": 1
-  },
-  {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_approval_status",
-   "fieldtype": "Select",
-   "label": "Admin Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_approval_status",
-   "fieldtype": "Select",
-   "label": "Stationary Approval Status",
-   "options": "Pending\nReject\nApproved"
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -320,9 +181,10 @@
   {
    "depends_on": "eval:doc.select_department",
    "fieldname": "quantity",
-   "fieldtype": "Int",
+   "fieldtype": "Data",
    "label": "Quantity",
-   "non_negative": 1
+   "non_negative": 1,
+   "precision": "3"
   },
   {
    "fieldname": "column_break_y1mfa",
@@ -331,16 +193,6 @@
   {
    "fieldname": "column_break_xogan",
    "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department",
-   "fieldname": "description",
-   "fieldtype": "Data",
-   "label": "Description (Optional)"
-  },
-  {
-   "fieldname": "section_break_hitna",
-   "fieldtype": "Section Break"
   },
   {
    "fieldname": "section_break_crbxo",
@@ -357,41 +209,7 @@
    "label": "Add Item +"
   },
   {
-   "fieldname": "as",
-   "fieldtype": "Heading",
-   "label": "                                                    "
-  },
-  {
-   "fieldname": "hod_name",
-   "fieldtype": "Data",
-   "label": "HOD Name"
-  },
-  {
-   "depends_on": "eval:doc.rm_approval_status==\"Reject\"",
-   "fieldname": "rm_reason",
-   "fieldtype": "Small Text",
-   "label": "Reason",
-   "mandatory_depends_on": "eval:doc.rm_approval_status==\"Reject\""
-  },
-  {
-   "fieldname": "hod_approval",
-   "fieldtype": "Select",
-   "label": "HOD Approval",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "default": "false",
-   "fieldname": "share_with_hod",
-   "fieldtype": "Select",
-   "label": "share_with_hod",
-   "options": "false\ntrue"
-  },
-  {
-   "fieldname": "hod_reject_reason",
-   "fieldtype": "Small Text",
-   "label": "HOD Reject Reason"
-  },
-  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "section_break_xiifo",
    "fieldtype": "Section Break"
   },
@@ -400,14 +218,112 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "column_break_ypqzz",
+   "fetch_from": "employee_id.department",
+   "fieldname": "employee_department",
+   "fieldtype": "Data",
+   "label": "Employee Department",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "section_break_5pufi",
+   "fieldtype": "Section Break",
+   "label": "Asset Department"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "item_description",
+   "fieldtype": "Data",
+   "label": "Item Description"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "item_purpose",
+   "fieldtype": "Data",
+   "label": "Item Purpose"
+  },
+  {
+   "fieldname": "column_break_6aghk",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_asset_adder",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_edpye",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee_id.cell_number",
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "employee_other_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Employee Other Details"
+  },
+  {
+   "fieldname": "request",
+   "fieldtype": "Select",
+   "label": "Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fetch_from": "employee_id.employee_name",
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "cto_section",
+   "fieldtype": "Section Break",
+   "label": "CTO"
+  },
+  {
+   "default": "1299@sahayog.com",
+   "fieldname": "cto_user",
+   "fieldtype": "Data",
+   "label": "CTO User"
+  },
+  {
+   "fieldname": "cto_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Skip\nPending\nApproved\nReject"
+  },
+  {
+   "fieldname": "rejection_reason",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
+  },
+  {
+   "fieldname": "cto_request",
+   "fieldtype": "Select",
+   "label": "CTO Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "default": "NOS",
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "uom",
+   "fieldtype": "Select",
+   "label": "Unit",
+   "options": "NOS\nKilogram\nGram\nLitre\nMeter\nSquare Meter\nSquare Feet\nCubic Meter\nCentimetre\nMillimetre"
+  },
+  {
+   "fieldname": "section_break_qbkdq",
+   "fieldtype": "Section Break"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-17 17:41:10.819398",
+ "modified": "2023-08-28 17:49:25.559544",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",
@@ -465,6 +381,35 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Draft"
+  },
+  {
+   "color": "Blue",
+   "title": "Pending from Purchase"
+  },
+  {
+   "color": "Yellow",
+   "title": "Pending from Vendor"
+  },
+  {
+   "color": "Purple",
+   "title": "Pending from CFO"
+  },
+  {
+   "color": "Cyan",
+   "title": "Dispatched"
+  },
+  {
+   "color": "Green",
+   "title": "Received"
+  },
+  {
+   "color": "Orange",
+   "title": "Pending from CTO"
+  }
+ ],
  "track_changes": 1
 }

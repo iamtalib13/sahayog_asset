@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "format:STM{####}",
  "creation": "2023-03-27 15:57:49.458144",
@@ -44,6 +45,7 @@
    "fieldname": "category",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Category",
    "options": "Item Category",
    "reqd": 1
@@ -136,7 +138,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-12 10:53:09.930987",
+ "modified": "2023-08-08 15:31:06.429270",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",

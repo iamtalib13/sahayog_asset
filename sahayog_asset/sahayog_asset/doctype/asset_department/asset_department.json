@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "autoname": "format:{department}",
+ "creation": "2023-07-03 11:25:42.490233",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "department",
+  "store_emp_id",
+  "store_emp_name",
+  "store_email"
+ ],
+ "fields": [
+  {
+   "fieldname": "department",
+   "fieldtype": "Select",
+   "label": "Department",
+   "options": "\nIT\nAdmin\nStationery"
+  },
+  {
+   "fetch_from": "hod_employee_id.user_id",
+   "fieldname": "store_emp_id",
+   "fieldtype": "Data",
+   "label": "Store User id"
+  },
+  {
+   "fetch_from": "hod_employee_id.employee_name",
+   "fieldname": "store_emp_name",
+   "fieldtype": "Data",
+   "label": "Store Manager Name"
+  },
+  {
+   "fieldname": "store_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-09-02 11:54:57.413559",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Asset Department",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "select": 1,
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

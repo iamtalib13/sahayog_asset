@@ -1,85 +1,144 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "format:SAR-{DD}{MM}{YYYY}-{###}",
  "creation": "2023-05-31 10:22:21.975347",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "status",
+  "section_break_7",
   "employee_details_section",
-  "employee_id",
-  "emp_user",
-  "column_break_3",
-  "bm_name",
-  "column_break_4",
+  "status",
+  "emp_name",
+  "column_break_jzngo",
   "designation",
-  "section_break_xiifo",
+  "column_break_r9uiq",
+  "phone",
+  "column_break_m6zbu",
+  "employee_department",
+  "column_sbreak_aed1x",
   "division",
   "column_break_6",
-  "column_break_aed1x",
   "branch",
-  "column_break_5",
-  "column_break_8",
-  "region",
-  "column_break_ypqzz",
-  "date",
-  "section_break_7",
+  "asset_department_section",
   "select_department",
   "section_break_hitna",
   "list",
   "column_break_y1mfa",
   "quantity",
+  "column_break_klg9u",
+  "uom",
   "column_break_xogan",
-  "description",
+  "item_description",
   "column_break_fmazx",
-  "as",
+  "item_purpose",
+  "column_break_hlfgf",
   "add_item",
   "section_break_crbxo",
   "asset",
+  "asset_lock",
+  "section_break_kkbo3",
+  "validation_check",
+  "dispatch_check",
+  "purchase_dispatch",
+  "employee_details_tab",
+  "employee_id",
+  "employee_user",
+  "column_break_3",
+  "first_name",
+  "last_name",
+  "column_break_4",
+  "section_break_xiifo",
+  "column_break_5",
+  "column_break_8",
+  "region",
+  "employee_hod",
+  "date",
   "approval_details_tab",
-  "rm",
-  "rm_approval_status",
-  "rm_user",
+  "employee_section",
+  "received_otp",
+  "emp_received_remark",
+  "stage_1_section",
+  "stage_1_emp_name",
+  "stage_1_emp_status",
+  "stage_1_emp_id",
+  "stage_1_emp_email",
+  "rp_designation",
+  "stage_1_request",
   "column_break_14",
-  "rm_reason",
-  "section_break_16",
-  "it_hod",
-  "it_user",
-  "it_approval_status",
-  "section_break_25",
-  "admin_hod",
-  "admin_user",
-  "admin_approval_status",
-  "section_break_28",
-  "stationary_hod",
-  "stationary_user",
-  "stationary_approval_status",
+  "stage_1_emp_rejection",
+  "stage_2_section",
+  "stage_2_emp_id",
+  "stage_2_emp_name",
+  "stage_2_emp_email",
+  "stage_2_emp_status",
+  "stage_2_request",
+  "column_break_rvq7h",
+  "stage_2_emp_rejection",
+  "stage_3_section",
+  "stage_3_emp_id",
+  "stage_3_emp_name",
+  "stage_3_emp_email",
+  "stage_3_emp_status",
+  "stage_3_request",
+  "column_break_1b27l",
+  "stage_3_emp_rejection",
+  "stage_4",
+  "stage_4_emp_id",
+  "stage_4_emp_name",
+  "stage_4_emp_email",
+  "stage_4_emp_status",
+  "stage_4_request",
+  "column_break_io0yo",
+  "stage_4_emp_rejection",
+  "stage_5_section",
+  "stage_5_emp_id",
+  "stage_5_emp_name",
+  "stage_5_emp_email",
+  "stage_5_emp_status",
+  "stage_5_request",
+  "column_break_vkvyi",
+  "stage_5_emp_rejection",
+  "stage_6_section",
+  "stage_6_emp_id",
+  "stage_6_emp_name",
+  "stage_6_emp_email",
+  "stage_6_emp_status",
+  "stage_6_request",
+  "column_break_ikxgq",
+  "stage_6_emp_rejection",
+  "stage_7_section",
+  "stage_7_emp_id",
+  "stage_7_emp_name",
+  "stage_7_emp_email",
+  "stage_7_emp_status",
+  "stage_7_request",
+  "store_otp",
+  "delivered_otp",
+  "delivered_date",
+  "mode_of_transport",
+  "column_break_oh5qb",
+  "stage_7_emp_unavailable_reason",
+  "stage_7_dispatch_remark",
+  "purchase_department_section",
+  "purchase_email",
+  "purchase_request",
+  "purchase_status",
+  "estimated_date",
+  "purchase_remark",
+  "purchase_otp",
   "section_break_31",
-  "naming_series",
-  "hod",
-  "hod_name",
-  "hod_approval",
-  "hod_reject_reason",
-  "rm_request",
-  "hod_request",
+  "first_intro",
   "share_with_hod"
  ],
  "fields": [
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "status",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Status",
-   "options": "New\nPending from RM\nPending from HOD\nRM Rejected\nRM Approved\nHOD Rejected\nApproved",
-   "read_only": 1
-  },
-  {
-   "fieldname": "employee_details_section",
-   "fieldtype": "Section Break",
-   "label": "Employee Details"
+   "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered"
   },
   {
    "fieldname": "employee_id",
@@ -90,21 +149,8 @@
    "set_only_once": 1
   },
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')",
-   "fetch_from": "employee_id.user_id",
-   "fieldname": "emp_user",
-   "fieldtype": "Data",
-   "label": "Emp User"
-  },
-  {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "employee_id.employee_name",
-   "fieldname": "bm_name",
-   "fieldtype": "Data",
-   "label": "Employee Name"
   },
   {
    "fieldname": "column_break_4",
@@ -127,15 +173,11 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Division",
-   "options": "\nMULTISTATE\nMICROFINANCE\nTWO WHEELER",
+   "options": "\nMultistate\nMicrofinance\nTwo Wheeler",
    "read_only": 1
   },
   {
    "fieldname": "column_break_6",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_aed1x",
    "fieldtype": "Column Break"
   },
   {
@@ -158,11 +200,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion 1\nRegion 2\nRegion 3\nRegion 4"
-  },
-  {
-   "fieldname": "column_break_ypqzz",
-   "fieldtype": "Column Break"
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
   },
   {
    "default": "Today",
@@ -180,10 +218,10 @@
   {
    "description": "Please Select Department",
    "fieldname": "select_department",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Department",
-   "options": "\nAdmin\nIT\nStationary",
+   "options": "Asset Department",
    "reqd": 1,
    "set_only_once": 1
   },
@@ -205,28 +243,17 @@
   {
    "depends_on": "eval:doc.select_department",
    "fieldname": "quantity",
-   "fieldtype": "Int",
+   "fieldtype": "Data",
    "label": "Quantity",
    "non_negative": 1
   },
   {
    "fieldname": "column_break_xogan",
-   "fieldtype": "Column Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department",
-   "fieldname": "description",
-   "fieldtype": "Data",
-   "label": "Description (Optional)"
+   "fieldtype": "Section Break"
   },
   {
    "fieldname": "column_break_fmazx",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "as",
-   "fieldtype": "Heading",
-   "label": "                                                    "
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -236,7 +263,8 @@
   },
   {
    "fieldname": "section_break_crbxo",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Asset Details"
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -252,149 +280,15 @@
    "label": "Approval Details"
   },
   {
-   "fieldname": "rm",
-   "fieldtype": "Data",
-   "label": "RM"
-  },
-  {
-   "fieldname": "rm_approval_status",
-   "fieldtype": "Select",
-   "label": "RM Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "fieldname": "rm_user",
-   "fieldtype": "Data",
-   "label": "RM user"
-  },
-  {
    "fieldname": "column_break_14",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.rm_approval_status==\"Reject\"",
-   "fieldname": "rm_reason",
-   "fieldtype": "Small Text",
-   "label": "Reason",
-   "mandatory_depends_on": "eval:doc.rm_approval_status==\"Reject\""
-  },
-  {
-   "fieldname": "section_break_16",
-   "fieldtype": "Section Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_hod",
-   "fieldtype": "Data",
-   "label": "IT HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_user",
-   "fieldtype": "Data",
-   "label": "IT User"
-  },
-  {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"IT\"",
-   "fieldname": "it_approval_status",
-   "fieldtype": "Select",
-   "label": "IT Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "fieldname": "section_break_25",
-   "fieldtype": "Section Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_hod",
-   "fieldtype": "Data",
-   "label": "Admin HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_user",
-   "fieldtype": "Data",
-   "label": "Admin User"
-  },
-  {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"Admin\"",
-   "fieldname": "admin_approval_status",
-   "fieldtype": "Select",
-   "label": "Admin Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "fieldname": "section_break_28",
-   "fieldtype": "Section Break"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_hod",
-   "fieldtype": "Data",
-   "label": "Stationary HOD"
-  },
-  {
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_user",
-   "fieldtype": "Data",
-   "label": "Stationary User"
-  },
-  {
-   "default": "Pending",
-   "depends_on": "eval:doc.select_department==\"Stationary\"",
-   "fieldname": "stationary_approval_status",
-   "fieldtype": "Select",
-   "label": "Stationary Approval Status",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
+   "collapsible": 1,
    "fieldname": "section_break_31",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "naming_series",
-   "fieldtype": "Select",
+   "fieldtype": "Section Break",
    "hidden": 1,
-   "label": "PR_ID",
-   "options": "SPR/.DD..MM..YY./.###."
-  },
-  {
-   "fieldname": "hod",
-   "fieldtype": "Data",
-   "label": "HOD"
-  },
-  {
-   "fieldname": "hod_name",
-   "fieldtype": "Data",
-   "label": "HOD Name"
-  },
-  {
-   "fieldname": "hod_approval",
-   "fieldtype": "Select",
-   "label": "HOD Approval",
-   "options": "Pending\nReject\nApproved"
-  },
-  {
-   "fieldname": "hod_reject_reason",
-   "fieldtype": "Small Text",
-   "label": "HOD Reject Reason"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "rm_request",
-   "fieldtype": "Select",
-   "label": "RM Request",
-   "options": "Pending\nDone"
-  },
-  {
-   "default": "Pending",
-   "fieldname": "hod_request",
-   "fieldtype": "Select",
-   "label": "Hod Request",
-   "options": "Pending\nDone"
+   "label": "Other"
   },
   {
    "default": "false",
@@ -402,16 +296,551 @@
    "fieldtype": "Select",
    "label": "share_with_hod",
    "options": "false\ntrue"
+  },
+  {
+   "fieldname": "employee_details_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Employee Details"
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_hod",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Employee HOD"
+  },
+  {
+   "fetch_from": "employee_id.department",
+   "fieldname": "employee_department",
+   "fieldtype": "Link",
+   "label": "Employee Department",
+   "options": "Department"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_3_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 3"
+  },
+  {
+   "fieldname": "stage_3_emp_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "stage_3_emp_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "fieldname": "stage_3_emp_status",
+   "fieldtype": "Select",
+   "label": "Approval status",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "fieldname": "stage_3_emp_rejection",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_4",
+   "fieldtype": "Section Break",
+   "label": "Stage 4"
+  },
+  {
+   "fieldname": "stage_4_emp_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "stage_4_emp_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "fieldname": "stage_4_emp_status",
+   "fieldtype": "Select",
+   "label": "Approval Status",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "fieldname": "stage_4_emp_rejection",
+   "fieldtype": "Data",
+   "label": "Rejection Reason"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_5_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 5"
+  },
+  {
+   "fieldname": "stage_5_emp_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "stage_5_emp_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "default": "Skip",
+   "fieldname": "stage_5_emp_status",
+   "fieldtype": "Select",
+   "label": "Approval Status",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "fieldname": "stage_5_emp_rejection",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_6_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 6"
+  },
+  {
+   "fieldname": "stage_6_emp_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "stage_6_emp_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "default": "Skip",
+   "fieldname": "stage_6_emp_status",
+   "fieldtype": "Select",
+   "label": "CTO Approval Status",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "fieldname": "stage_6_emp_rejection",
+   "fieldtype": "Small Text",
+   "label": "Rejection Reason"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_7_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 7"
+  },
+  {
+   "fetch_from": "select_department.store_emp_id",
+   "fieldname": "stage_7_emp_id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fetch_from": "select_department.store_emp_name",
+   "fieldname": "stage_7_emp_name",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "fieldname": "stage_7_emp_status",
+   "fieldtype": "Select",
+   "label": "Store Approval Status",
+   "options": "Pending\nDispatched\nPending From Purchase\nPartially Dispatched"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_1_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 1"
+  },
+  {
+   "fetch_from": "employee_id.reporting_employee_user_id",
+   "fieldname": "stage_1_emp_id",
+   "fieldtype": "Data",
+   "label": "RP user"
+  },
+  {
+   "fetch_from": "employee_id.reporting_employee",
+   "fieldname": "stage_1_emp_name",
+   "fieldtype": "Data",
+   "label": "Reporting Person Name"
+  },
+  {
+   "fieldname": "stage_1_emp_status",
+   "fieldtype": "Select",
+   "label": "RP Approval Status",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "stage_2_section",
+   "fieldtype": "Section Break",
+   "label": "Stage 2"
+  },
+  {
+   "fieldname": "stage_2_emp_id",
+   "fieldtype": "Data",
+   "label": "HOD id"
+  },
+  {
+   "fieldname": "stage_2_emp_name",
+   "fieldtype": "Data",
+   "label": "HOD Name"
+  },
+  {
+   "fieldname": "stage_2_emp_status",
+   "fieldtype": "Select",
+   "label": "HOD Approval",
+   "options": "Pending\nReject\nApproved\nSkip"
+  },
+  {
+   "fieldname": "column_break_rvq7h",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "stage_1_request",
+   "fieldtype": "Select",
+   "label": "Stage 1 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "stage_2_request",
+   "fieldtype": "Select",
+   "label": "Stage 2 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "stage_3_request",
+   "fieldtype": "Select",
+   "label": "Stage 3 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "column_break_1b27l",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stage_4_request",
+   "fieldtype": "Select",
+   "label": "Stage 4 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "column_break_io0yo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stage_5_request",
+   "fieldtype": "Select",
+   "label": "Stage 5 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "column_break_vkvyi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stage_6_request",
+   "fieldtype": "Select",
+   "label": "Stage 6 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "column_break_ikxgq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stage_7_request",
+   "fieldtype": "Select",
+   "label": "Stage 7 Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "fieldname": "column_break_oh5qb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee_id.user_id",
+   "fieldname": "employee_user",
+   "fieldtype": "Data",
+   "label": "Emp User"
+  },
+  {
+   "fieldname": "stage_1_emp_rejection",
+   "fieldtype": "Small Text",
+   "label": "Reason",
+   "mandatory_depends_on": "eval:doc.rm_approval_status==\"Reject\""
+  },
+  {
+   "fieldname": "stage_2_emp_rejection",
+   "fieldtype": "Small Text",
+   "label": "HOD Reject Reason"
+  },
+  {
+   "fieldname": "stage_7_emp_unavailable_reason",
+   "fieldtype": "Small Text",
+   "label": "Unavailable Reason"
+  },
+  {
+   "fetch_from": "employee_id.first_name",
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "First Name"
+  },
+  {
+   "fetch_from": "employee_id.last_name",
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Last Name"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "item_description",
+   "fieldtype": "Data",
+   "label": "Item Description"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "item_purpose",
+   "fieldtype": "Data",
+   "label": "Item Purpose"
+  },
+  {
+   "fieldname": "column_break_hlfgf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "False",
+   "fieldname": "asset_lock",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Asset Lock",
+   "options": "False\nTrue"
+  },
+  {
+   "fieldname": "column_break_jzngo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_r9uiq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "employee_id.cell_number",
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_m6zbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_sbreak_aed1x",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.status !== \"Draft\"",
+   "fieldname": "employee_details_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Details"
+  },
+  {
+   "fieldname": "asset_department_section",
+   "fieldtype": "Section Break",
+   "label": "Asset Department"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "first_intro",
+   "fieldtype": "Select",
+   "label": "first intro",
+   "options": "Pending\nDone"
+  },
+  {
+   "fetch_from": "employee_id.reporting_person_designation",
+   "fieldname": "rp_designation",
+   "fieldtype": "Data",
+   "label": "RP Designation"
+  },
+  {
+   "default": "talib.s@sahayogmultistate.com",
+   "fieldname": "stage_1_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "stage_2_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "stage_3_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "stage_4_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "stage_5_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "stage_6_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fetch_from": "select_department.store_email",
+   "fieldname": "stage_7_emp_email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "column_break_klg9u",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "NOS",
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "uom",
+   "fieldtype": "Select",
+   "label": "Unit",
+   "options": "NOS\nKilogram\nGram\nLitre\nMeter\nSquare Meter\nSquare Feet\nCubic Meter\nCentimetre\nMillimetre"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "employee_section",
+   "fieldtype": "Section Break",
+   "label": "Employee"
+  },
+  {
+   "fieldname": "emp_received_remark",
+   "fieldtype": "Small Text",
+   "label": "Received Remark"
+  },
+  {
+   "depends_on": "eval:doc.stage_7_emp_status==\"Approved\"",
+   "fieldname": "stage_7_dispatch_remark",
+   "fieldtype": "Small Text",
+   "label": "Dispatch Remark"
+  },
+  {
+   "fieldname": "mode_of_transport",
+   "fieldtype": "Select",
+   "label": "Mode of Transport",
+   "options": "\nCourier\nBus\nTrain\nTruck\nCar\nBike\nBy Hand"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "purchase_department_section",
+   "fieldtype": "Section Break",
+   "label": "Purchase Department"
+  },
+  {
+   "fieldname": "purchase_remark",
+   "fieldtype": "Small Text",
+   "label": "Purchase Remark"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "purchase_request",
+   "fieldtype": "Select",
+   "label": "Purchase Request",
+   "options": "Pending\nDone"
+  },
+  {
+   "default": "talib.s@sahayogmultistate.com",
+   "fieldname": "purchase_email",
+   "fieldtype": "Data",
+   "label": "Purchase Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "store_otp",
+   "fieldtype": "Data",
+   "label": "Store OTP",
+   "read_only": 1
+  },
+  {
+   "fieldname": "purchase_otp",
+   "fieldtype": "Data",
+   "label": "Purchase OTP"
+  },
+  {
+   "fieldname": "purchase_status",
+   "fieldtype": "Select",
+   "label": "Purchase Status",
+   "options": "Pending\nDelivered To Store"
+  },
+  {
+   "fieldname": "received_otp",
+   "fieldtype": "Data",
+   "label": "Received OTP"
+  },
+  {
+   "fieldname": "delivered_otp",
+   "fieldtype": "Data",
+   "label": "Delivered OTP"
+  },
+  {
+   "fieldname": "delivered_date",
+   "fieldtype": "Datetime",
+   "label": "Delivered Date"
+  },
+  {
+   "fieldname": "estimated_date",
+   "fieldtype": "Date",
+   "label": "Estimated Date"
+  },
+  {
+   "fieldname": "section_break_kkbo3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "validation_check",
+   "fieldtype": "Button",
+   "hidden": 1,
+   "label": "Validation Check"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('Store Manager')",
+   "fieldname": "dispatch_check",
+   "fieldtype": "Button",
+   "label": "Dispatch/Pending"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('Purchase Department')",
+   "fieldname": "purchase_dispatch",
+   "fieldtype": "Button",
+   "label": "Dispatch To Store"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-31 10:22:21.975347",
+ "modified": "2023-09-12 13:56:29.237461",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -423,6 +852,8 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
+   "set_user_permissions": 1,
    "share": 1,
    "write": 1
   },
@@ -431,11 +862,13 @@
    "delete": 1,
    "email": 1,
    "export": 1,
+   "if_owner": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Employee",
    "select": 1,
+   "set_user_permissions": 1,
    "share": 1,
    "write": 1
   },
@@ -465,6 +898,43 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Gray",
+   "title": "Draft"
+  },
+  {
+   "color": "Yellow",
+   "title": "Pending"
+  },
+  {
+   "color": "Green",
+   "title": "Approved"
+  },
+  {
+   "color": "Red",
+   "title": "Rejected"
+  },
+  {
+   "color": "Purple",
+   "title": "Dispatched"
+  },
+  {
+   "color": "Green",
+   "title": "Received"
+  },
+  {
+   "color": "Orange",
+   "title": "Unavailable"
+  },
+  {
+   "color": "Green",
+   "title": "Delivered"
+  },
+  {
+   "color": "Yellow",
+   "title": "Partially Dispatched"
+  }
+ ],
  "track_changes": 1
 }

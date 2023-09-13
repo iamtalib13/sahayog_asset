@@ -1,0 +1,101 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-07-06 15:57:15.446958",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "stage",
+  "employee_id",
+  "approval_employee_user",
+  "approval_employee",
+  "designation",
+  "current_status",
+  "update_field",
+  "update_value",
+  "approval_status"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fetch_from": "stage.employee_id",
+   "fieldname": "employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID"
+  },
+  {
+   "columns": 1,
+   "fetch_from": "stage.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Designation"
+  },
+  {
+   "columns": 1,
+   "fieldname": "stage",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Stage",
+   "options": "Asset Approval Details"
+  },
+  {
+   "columns": 2,
+   "fetch_from": "stage.employee_name",
+   "fieldname": "approval_employee",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Approval Employee"
+  },
+  {
+   "columns": 1,
+   "fieldname": "current_status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Current Status"
+  },
+  {
+   "columns": 1,
+   "fieldname": "update_field",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Update field"
+  },
+  {
+   "columns": 1,
+   "fieldname": "update_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "update value"
+  },
+  {
+   "columns": 1,
+   "fetch_from": "stage.employee_user",
+   "fieldname": "approval_employee_user",
+   "fieldtype": "Data",
+   "label": "Approval Employee User"
+  },
+  {
+   "columns": 1,
+   "default": "Pending",
+   "fieldname": "approval_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "status",
+   "options": "\nPending\nCompleted"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-07-10 17:50:09.497533",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Asset Approval Stages",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -2,41 +2,21 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Purchase Requisition", {
-  // onload: function (frm) {
-  //   if (frm.doc.status == "New") {
-  //     label = "New";
-  //     color = "blue";
-  //   } else if (frm.doc.status == "Pending from RM") {
-  //     label = "Pending from RM";
-  //     color = "orange";
-  //   } else if (frm.doc.status == "Pending from HOD") {
-  //     label = "Pending from HOD";
-  //     color = "orange";
-  //   } else if (frm.doc.status == "RM Rejected") {
-  //     label = "RM Rejected";
-  //     color = "red";
-  //   } else if (frm.doc.status == "HOD Rejected") {
-  //     label = "HOD Rejected";
-  //     color = "red";
-  //   } else if (frm.doc.status == "RM Approved") {
-  //     label = "RM Approved";
-  //     color = "green";
-  //   } else if (frm.doc.status == "Approved") {
-  //     label = "Approved";
-  //     color = "green";
-  //   } else {
-  //     // If the status is not recognized, set a default label and color
-  //     label = frm.doc.status;
-  //     color = "grey";
-  //   }
-  //   frm.page.set_indicator(__(label), color);
-  // },
-
   before_save: function (frm) {
     let user = frappe.session.user;
     if (user === frm.doc.emp_user) {
     } else if (user === frm.doc.rm_user) {
     } else if (user === frm.doc.hod) {
+    }
+  },
+
+  validate: function (frm) {
+    if (!frm.doc.asset) {
+      frappe.throw({
+        title: __("Please Add Asset Item"),
+        indicator: "red",
+        message: __("Please Add At Least One Asset Item"),
+      });
     }
   },
   after_save: function (frm) {
@@ -49,59 +29,164 @@ frappe.ui.form.on("Purchase Requisition", {
   },
 
   refresh: function (frm) {
-    if (frm.doc.status === "RM Rejected") {
-      let rm_reject = frm.doc.rm_reason;
-      frm.set_intro("<b>Reason- </b>" + rm_reject, "red");
-    }
-    if (frm.doc.status === "HOD Rejected") {
-      let hod_reject = frm.doc.hod_reject_reason;
-      frm.set_intro("<b>Reason- </b>" + hod_reject, "red");
+    if (frm.is_new() && frappe.user.has_role("Purchase Department")) {
+      frm.set_read_only();
     }
 
-    if (
-      frm.doc.share_with_hod === "false" &&
-      frm.doc.status === "Pending from HOD"
-    ) {
-      let hod = frm.doc.hod;
-      frappe.call({
-        method: "frappe.share.add",
-        args: {
-          doctype: frm.doctype,
-          name: frm.docname,
-          user: hod,
-          read: 1,
-          write: 1,
-          submit: 0,
-          share: 1,
-          notify: 1,
-        },
-        callback: function (response) {
-          // Check if the document has been modified
-
-          // Set field values
-          frm.set_value("hod_request", "Done");
-          frm.set_value("rm_approval_status", "Approved");
-          frm.set_value("status", "Pending from HOD");
-
-          // Save the form
-          frm.save();
-        },
-      });
-
-      frm.set_value("share_with_hod", "true");
+    if (!frm.is_new()) {
+      if (frm.doc.status !== "Draft") {
+        frm.set_df_property("asset", "read_only", 1);
+        frm.disable_save();
+      }
     }
 
-    if (frm.doc.status !== "New") {
+    if (!frm.is_new()) {
+      let user = frappe.session.user;
+      let store_manager = frm.doc.emp_name;
+      if (frm.doc.status == "Draft") {
+        frm.add_custom_button(__("Submit"), function () {
+          if (frm.doc.status === "Draft") {
+            if (frm.doc.request == "Pending") {
+              if (!frm.doc.asset) {
+                frappe.throw({
+                  title: __("Please Add Asset Item"),
+                  indicator: "red",
+                  message: __("Please Add At Least One Asset Item"),
+                });
+              } else {
+                frappe.confirm(
+                  "<i>Do you want to send to Purchase Department?</i>",
+                  () => {
+                    // action to perform if Yes is selected
+                    if (frm.doc.select_department === "IT") {
+                      frm.trigger("share_with_cto");
+                      frappe.show_alert({
+                        message: "Successfully Sent to CTO",
+                        indicator: "green",
+                      });
+                    } else {
+                      frm.trigger("share_with_purchase_dept");
+                      frappe.show_alert({
+                        message: "Successfully Sent to Purchase Department",
+                        indicator: "green",
+                      });
+                    }
+                  },
+                  () => {
+                    // action to perform if No is selected
+                  }
+                );
+              }
+
+              //</PR is Shared with RM using API Call>
+            } else {
+              frappe.msgprint(" Already Sent");
+            }
+          }
+        });
+        frm.change_custom_button_type("Submit", null, "success");
+      } else if (frm.doc.status == "Pending from CTO") {
+        if (user === "1299@sahayog.com") {
+          frm.add_custom_button(__("Approve"), function () {
+            if (frm.doc.status == "Pending from CTO") {
+              frappe.confirm(
+                "We are assuming that you verified this Purchase Request <br> " +
+                  "<b>Are you sure for Approval?</b>",
+                () => {
+                  //<PR is Shared with RM using API Call>
+                  if (frm.doc.request == "Pending") {
+                    frm.trigger("share_with_purchase_dept");
+                    // Set field values
+                    frm.set_value("request", "Done");
+                    frm.set_value("cto_status", "Approved");
+                    frm.set_value("status", "Pe nding from Purchase");
+
+                    // Save the form
+                    frm.save();
+                  } else {
+                    frappe.msgprint("Approval Already Sent");
+                  }
+                },
+                () => {
+                  // action to perform if No is selected
+                }
+              );
+            } else {
+              frappe.msgprint("Already Approved", "Message", "red");
+            }
+          });
+          frm.add_custom_button(__("Reject"), function () {
+            var d = new frappe.ui.Dialog({
+              title: __("Rejection Reason"),
+              fields: [
+                {
+                  label: __(
+                    "Please Give Reason of Rejection for this Asset Request"
+                  ),
+                  fieldname: "rejection_reason",
+                  fieldtype: "Small Text",
+                  reqd: 1, // Set the rejection reason field as mandatory
+                },
+              ],
+              primary_action_label: __("Reject"),
+              primary_action: function () {
+                // Check if the rejection reason is provided
+                if (!d.fields_dict.rejection_reason.get_value()) {
+                  frappe.msgprint(__("Please provide a rejection reason."));
+                  return;
+                }
+
+                frm.set_value("status", "Reject");
+                frm.set_value(
+                  "rejection_reason",
+                  d.fields_dict.rejection_reason.get_value()
+                );
+                d.hide();
+                frm.set_value("status", "Rejected");
+                cur_frm.save();
+              },
+              secondary_action_label: __("Cancel"),
+              secondary_action: function () {
+                d.hide();
+              },
+            });
+
+            d.show();
+          });
+        }
+      }
+
+      if (
+        frm.doc.cto_status == "Approved" &&
+        frm.doc.status == "Pending from Purchase"
+      ) {
+        frm.set_intro("Approved by CTO", "green");
+      } else if (frm.doc.status == "Dispatched") {
+        frm.set_intro("Dispatched from Purchase Department", "green");
+      } else if (frm.doc.status == "Received") {
+        frm.set_intro("Received by : <b>" + store_manager + "</b>", "green");
+      }
+    }
+
+    if (frm.doc.status !== "Draft") {
       frm.toggle_display("list", 0);
+      frm.toggle_display("uom", 0);
       frm.toggle_display("quantity", 0);
       frm.toggle_display("description", 0);
       frm.toggle_display("add_item", 0);
+      frm.toggle_display("item_description", 0);
+      frm.toggle_display("item_purpose", 0);
 
       frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
       frm.fields_dict["asset"].grid.wrapper
         .find(".grid-remove-all-rows")
         .hide();
       frm.fields_dict["asset"].grid.wrapper.find(".grid-remove-rows").hide();
+    }
+    if (frm.doc.status !== "Draft") {
+      let it_store_manager = "50@sahayog.com";
+      let admin_store_manager = "596@sahayog.com";
+      let stationery_store_manager = "51@sahayog.com";
     }
 
     let user = frappe.session.user;
@@ -118,6 +203,54 @@ frappe.ui.form.on("Purchase Requisition", {
 
     //<Getting Employee Region & Division using API Call>
 
+    if (!frm.is_new()) {
+      let it_store_manager = "50@sahayog.com";
+      let admin_store_manager = "596@sahayog.com";
+      let stationery_store_manager = "51@sahayog.com";
+      if (user === it_store_manager) {
+        //frappe.msgprint("IT Store Manager Matched");
+        if (frm.doc.status == "Dispatched") {
+          frm.trigger("receive_button");
+        }
+      } else if (user === admin_store_manager) {
+        if (frm.doc.status == "Dispatched") {
+          frm.trigger("receive_button");
+        }
+        //frappe.msgprint("Admin Store Manager Matched");
+      } else if (user === stationery_store_manager) {
+        if (frm.doc.status == "Dispatched") {
+          frm.trigger("receive_button");
+        }
+
+        // frappe.msgprint("Stationery Store Manager Matched");
+      } else {
+        if (
+          frm.doc.status !== "Dispatched" &&
+          frm.doc.status !== "Received" &&
+          user !== "1299@sahayog.com"
+        ) {
+          frm.trigger("dispatch");
+        }
+
+        if (
+          (frm.doc.status == "Pending from Purchase" ||
+            frm.doc.status == "Pending from Vendor") &&
+          user !== "1299@sahayog.com"
+        )
+          if (frm.doc.status !== "Pending from Vendor") {
+            frm.trigger("Pending_from_cfo");
+          }
+
+        if (
+          (frm.doc.status == "Pending from CFO" ||
+            frm.doc.status == "Pending from Purchase") &&
+          user !== "1299@sahayog.com"
+        ) {
+          frm.trigger("Pending_from_vendor");
+        }
+      }
+    }
+
     frappe.call({
       method:
         "sahayog_asset.sahayog_asset.doctype.purchase_requisition.division_region_api.check_user_divison_region",
@@ -131,124 +264,44 @@ frappe.ui.form.on("Purchase Requisition", {
           var division = r.message[0].division;
           var region = r.message[0].region;
           var owner_id = r.message[0].user_id;
+          var department = r.message[0].department;
 
           console.log("Division" + division);
           console.log("Region" + region);
+          console.log("Department : " + department);
           frm.set_value("division", division);
           frm.set_value("region", region);
           frm.set_value("emp_user", owner_id);
+          frm.set_value("employee_department", department);
           console.log("Called !!");
-          //<RM for Region 1 Bases on Division>
-
-          if (division == "MULTISTATE" && region == "Region 1") {
-            frm.set_value("rm", "Mangesh Kathane");
-            frm.set_value("rm_user", "26@sahayog.com");
-          } else if (division == "MICROFINANCE" && region == "Region 1") {
-            frm.set_value("rm", "vijay kotriwar");
-            frm.set_value("rm_user", "49@sahayog.com");
-          } else if (division == "TWO WHEELER" && region == "Region 1") {
-            frm.set_value("rm", "Asheesh Chourasia");
-            frm.set_value("rm_user", "326@sahayog.com");
-          } //</RM for Region 1 Bases on Division>
-
-          //<RM for Region 2 Bases on Division>
-          if (division == "MULTISTATE" && region == "Region 2") {
-            frm.set_value("rm", "Nishant Shelare");
-            frm.set_value("rm_user", "145@sahayog.com");
-          } else if (division == "MICROFINANCE" && region == "Region 2") {
-            frm.set_value("rm", "Akash Jambhulkar");
-            frm.set_value("rm_user", "102@sahayog.com");
-          } else if (division == "TWO WHEELER" && region == "Region 2") {
-            frm.set_value("rm", "NA");
-            frm.set_value("rm_user", "NA");
-          } //</RM for Region 2 Bases on Division>
-
-          //<RM for Region 3 Bases on Division>
-          if (division == "MULTISTATE" && region == "Region 3") {
-            frm.set_value("rm", "Amish Tarale");
-            frm.set_value("rm_user", "521@sahayog.com");
-          } else if (division == "MICROFINANCE" && region == "Region 3") {
-            frm.set_value("rm", "NA");
-            frm.set_value("rm_user", "NA");
-          } else if (division == "TWO WHEELER" && region == "Region 3") {
-            frm.set_value("rm", "NA");
-            frm.set_value("rm_user", "NA");
-          } //</RM for Region 3 Bases on Division>
-
-          //<RM for Region 4 Bases on Division>
-          if (division == "MULTISTATE" && region == "Region 4") {
-            frm.set_value("rm", "Manish Patil");
-            frm.set_value("rm_user", "1348@sahayog.com");
-          } else if (division == "MICROFINANCE" && region == "Region 4") {
-            frm.set_value("rm", "NA");
-            frm.set_value("rm_user", "NA");
-          } else if (division == "TWO WHEELER" && region == "Region 4") {
-            frm.set_value("rm", "NA");
-            frm.set_value("rm_user", "NA");
-          } //</RM for Region 4 Bases on Division>
         }
         console.log("Division: " + frm.doc.division);
         console.log("Region: " + frm.doc.region);
         console.log("owner: " + frm.doc.emp_user);
+        let it_store_manager = "50@sahayog.com";
+        let admin_store_manager = "596@sahayog.com";
+        let stationery_store_manager = "51@sahayog.com";
 
-        if (user === frm.doc.emp_user) {
-          //frappe.msgprint("PR Owner Matched");
+        if (user === it_store_manager) {
+          //frappe.msgprint("IT Store Manager Matched");
+          frm.set_value("select_department", "IT");
+        } else if (user === admin_store_manager) {
+          //frappe.msgprint("Admin Store Manager Matched");
+          frm.set_value("select_department", "Admin");
+        } else if (user === stationery_store_manager) {
+          // frappe.msgprint("Stationery Store Manager Matched");
+          frm.set_value("select_department", "Stationery");
+        }
 
+        if (user === it_store_manager) {
           // frm.add_custom_button(__("Add Item"), function () {
           //    frm.trigger("activate_add_item");
           // });
 
           if (!frm.is_new()) {
-            //<Send for Approval , this button is only for PR Owner>
-
-            frm.add_custom_button(__("Send for Approval"), function () {
-              // Add your button's functionality here
-              let rm = frm.doc.rm_user;
-              //<PR is Shared with RM using API Call>
-
-              if (frm.doc.status === "New") {
-                if (frm.doc.rm_request == "Pending") {
-                  frappe.confirm(
-                    "<i>Do you want to send for Approval?</i>",
-                    () => {
-                      // action to perform if Yes is selected
-                      frappe.call({
-                        method: "frappe.share.add",
-                        args: {
-                          doctype: frm.doctype,
-                          name: frm.docname,
-                          user: rm,
-                          read: 1,
-                          write: 1,
-                          submit: 0,
-                          share: 1,
-                          notify: 1,
-                        },
-                        callback: function (response) {
-                          //Display a message to the user
-                          frappe.show_alert({
-                            message: "Your Asset Request Sent Successfully ",
-                            indicator: "green",
-                          });
-                          frm.set_value("rm_request", "Done");
-                          if (frm.doc.status === "New") {
-                            frm.set_value("status", "Pending from RM");
-                          }
-                          frm.save();
-                        },
-                      });
-                    },
-                    () => {
-                      // action to perform if No is selected
-                    }
-                  );
-
-                  //</PR is Shared with RM using API Call>
-                } else {
-                  frappe.msgprint("Approval Already Sent");
-                }
-              }
-            }); //</Send for Approval , this button is only for PR Owner>
+            if (frm.doc.status !== "Draft") {
+              frm.set_df_property("asset", "read_only", 1);
+            }
           }
 
           //<Set_Intro>
@@ -314,314 +367,184 @@ frappe.ui.form.on("Purchase Requisition", {
 
           //</Set_Intro>
         } //</PR Owner>
-        //<RM Owner>
-        else if (user === frm.doc.rm_user) {
-          // frappe.msgprint("RM Matched");
-          frm.disable_save();
-          //<Send for Approval , this button is only for PR Owner>
-          // Check if the page has already been reloaded
-
-          //<Set_Intro>
-          if (frm.doc.status === "Pending from RM") {
-            let rm = frm.doc.rm;
-            let bm = frm.doc.bm_name;
-            let branch = frm.doc.branch;
-
-            var intro_html =
-              "<span id='intro-text'>Please Verify Purchase Request & give your Approval to <b><i>" +
-              bm +
-              " - " +
-              branch;
-            ("</i></b></span>");
-            frm.set_intro(intro_html, "red");
-
-            var intro_text = document.getElementById("intro-text");
-            var opacity = 1.0;
-            var fadeInterval = setInterval(function () {
-              opacity = opacity === 1.0 ? 0.5 : 1.0;
-              intro_text.style.opacity = opacity;
-            }, 1000);
-          } else if (frm.doc.status === "Pending from HOD") {
-            let rm = frm.doc.rm;
-            let hod = frm.doc.hod_name;
-            var intro1 =
-              '<span style="color: green;">Approved from RM - <b>' +
-              rm +
-              "</b></span>";
-            var intro2 =
-              '<span style="color: red;" id="intro-text">Pending from HOD - <b>' +
-              hod +
-              "</b></span>";
-
-            frm.set_intro(intro1);
-            frm.set_intro(intro2);
-
-            var intro_text = document.getElementById("intro-text");
-            var opacity = 1.0;
-            var fadeInterval = setInterval(function () {
-              opacity = opacity === 1.0 ? 0.5 : 1.0;
-              intro_text.style.opacity = opacity;
-            }, 1000);
-          }
-          //</Set_Intro>
-          if (frm.doc.status === "Pending from RM") {
-            frm.add_custom_button(
-              __("Approved"),
-              function () {
-                if (frm.doc.status !== "Pending from HOD") {
-                  frappe.confirm(
-                    "We are assuming that you verified this Purchase Requisition. <br> " +
-                      "<b>Are you sure for Approval?</b>",
-                    () => {
-                      // action to perform if Yes is selected
-                      // Add your button's functionality here
-                      let hod = frm.doc.hod;
-                      //<PR is Shared with RM using API Call>
-                      if (frm.doc.hod_request == "Pending") {
-                        frappe.call({
-                          method: "frappe.share.add",
-                          args: {
-                            doctype: frm.doctype,
-                            name: frm.docname,
-                            user: hod,
-                            read: 1,
-                            write: 1,
-                            submit: 0,
-                            share: 1,
-                            notify: 1,
-                          },
-                          callback: function (response) {
-                            // Check if the document has been modified
-
-                            // Document share was successful
-                            frappe.show_alert({
-                              message: "Your Asset Request Sent Successfully",
-                              indicator: "green",
-                            });
-
-                            // Set field values
-                            frm.set_value("hod_request", "Done");
-                            frm.set_value("rm_approval_status", "Approved");
-                            frm.set_value("status", "Pending from HOD");
-
-                            // Save the form
-                            frm.save();
-                          },
-                        });
-
-                        //</PR is Shared with RM using API Call>
-                      } else {
-                        frappe.msgprint("Approval Already Sent");
-                      }
-                    },
-                    () => {
-                      // action to perform if No is selected
-                    }
-                  );
-                } else {
-                  frappe.msgprint("Already Approved", "Message", "red");
-                }
-              },
-              __("Approval")
-            );
-
-            //</Send for Approval , this button is only for PR Owner>
-
-            frm.add_custom_button(
-              __("Reject"),
-              function () {
-                var d = new frappe.ui.Dialog({
-                  title: __("Rejection Reason"),
-                  fields: [
-                    {
-                      label: __("Please Give Reason of Rejection of this PR"),
-                      fieldname: "rm_reason",
-                      fieldtype: "Small Text",
-                    },
-                  ],
-                  primary_action_label: __("Reject"),
-                  primary_action: function () {
-                    frm.set_value("rm_approval_status", "Reject");
-                    frm.set_value(
-                      "rm_reason",
-                      d.fields_dict.rm_reason.get_value()
-                    );
-                    d.hide();
-                    frm.set_value("status", "RM Rejected");
-                    cur_frm.save();
-                  },
-                  secondary_action_label: __("Cancel"),
-                  secondary_action: function () {
-                    d.hide();
-                  },
-                });
-
-                d.show();
-              },
-              __("Approval")
-            );
-          }
-
-          //<Getting Employee Region & Division using API Call>
-        } //</RM Owner>
-        //<HOD Owner>
-        else if (user === frm.doc.hod) {
-          //frappe.msgprint("HOD Matched");
-
-          if (frm.doc.rm_approval_status === "Approved") {
-            if (frm.doc.status === "Pending from HOD") {
-              frm.add_custom_button(
-                __("Approved"),
-                function () {
-                  frappe.confirm(
-                    "We are assuming that you verified this Purchase Requisition. <br> " +
-                      "<b>Are you sure for Approval?</b>",
-                    () => {
-                      // action to perform if Yes is selected
-                      // Add your button's functionality here
-                      let hod = frm.doc.hod;
-                      //<PR is Shared with RM using API Call>
-                      if (frm.doc.status === "Pending from HOD") {
-                        frm.set_value("status", "Approved");
-                        frm.set_value("hod_approval", "Approved");
-                        cur_frm.save();
-                      } else {
-                        frappe.msgprint("Already Approved ");
-                      }
-                    },
-                    () => {
-                      // action to perform if No is selected
-                    }
-                  );
-                },
-                __("Approval")
-              );
-
-              //</Send for Approval , this button is only for PR Owner>
-              frm.add_custom_button(
-                __("Reject"),
-                function () {
-                  var d = new frappe.ui.Dialog({
-                    title: __("Rejection Reason"),
-                    fields: [
-                      {
-                        label: __("Please Give Reason of Rejection of this PR"),
-                        fieldname: "hod_reject_reason",
-                        fieldtype: "Small Text",
-                      },
-                    ],
-                    primary_action_label: __("Reject"),
-                    primary_action: function () {
-                      frm.set_value("hod_approval", "Reject");
-                      frm.set_value(
-                        "hod_reject_reason",
-                        d.fields_dict.hod_reject_reason.get_value()
-                      );
-                      d.hide();
-                      frm.set_value("status", "HOD Rejected");
-                      cur_frm.save();
-                    },
-                    secondary_action_label: __("Cancel"),
-                    secondary_action: function () {
-                      d.hide();
-                    },
-                  });
-
-                  d.show();
-
-                  // frm.set_value("rm_approval_status", "Reject");
-                },
-                __("Approval")
-              );
-            }
-          }
-
-          if (frm.doc.status === "Pending from HOD") {
-            let rm = frm.doc.rm;
-            let bm = frm.doc.bm_name;
-            let branch = frm.doc.branch;
-            var intro1 =
-              '<span style="color: green;">Approved from RM - <b><i>' +
-              rm +
-              "</i></b></span>";
-
-            var intro2 =
-              "<span id='intro-text' style='color: #dc3545;'>Please Verify Purchase Request & give your Approval to <b><i>" +
-              bm +
-              " - " +
-              branch +
-              "</i></b></span>";
-
-            frm.set_intro(intro1);
-            frm.set_intro(intro2);
-
-            var intro_text = document.getElementById("intro-text");
-            var opacity = 1.0;
-            var fadeInterval = setInterval(function () {
-              opacity = opacity === 1.0 ? 0.5 : 1.0;
-              intro_text.style.opacity = opacity;
-            }, 1000);
-
-            // Change the background color of the form message to white
-            document.querySelector(".form-message").style.backgroundColor =
-              "white";
-
-            // Add a 3D shadow to the form message
-            document.querySelector(".form-message").style.boxShadow =
-              "0 0 3px 0 rgba(0, 0, 0, 0.2)";
-          } else if (frm.doc.status === "Pending from HOD") {
-            let rm = frm.doc.rm;
-            let hod = frm.doc.hod_name;
-            var intro1 =
-              '<span style="color: green;">Approved from RM - <b>' +
-              rm +
-              "</b></span>";
-            var intro2 =
-              '<span style="color: red;" id="intro-text">Pending from HOD - <b>' +
-              hod +
-              "</b></span>";
-
-            frm.set_intro(intro1);
-            frm.set_intro(intro2);
-
-            var intro_text = document.getElementById("intro-text");
-            var opacity = 1.0;
-            var fadeInterval = setInterval(function () {
-              opacity = opacity === 1.0 ? 0.5 : 1.0;
-              intro_text.style.opacity = opacity;
-            }, 1000);
-          }
-        } //</HOD Owner>
       },
     }); //</Getting Employee Region & Division using API Call>
 
     //<PR Owner>
+
+    let addButton = frm.get_field("add_item").$input;
+    addButton.addClass("btn btn-outline-success"); // Add Bootstrap class
+    addButton.css({
+      width: "100%", // Adjust width as needed
+      height: "calc(1.5em + .75rem + 2px)", // Adjust height as needed
+      padding: "5px", // Adjust padding as needed
+      "font-size": "14px", // Adjust font size as needed
+      "margin-top": "23px", // Add top margin of 5 pixels
+      "background-color": "#a0d170", // Set the background color
+    });
+    // Change the background color on hover
+    addButton.hover(
+      function () {
+        $(this).css("background-color", "#86c44c");
+      },
+      function () {
+        $(this).css("background-color", "#a0d170");
+      }
+    );
+  },
+  onload_post_render: function (frm) {
+    frm.fields_dict.quantity.$input.on("input", function (evt) {
+      // Get the value of the input field
+      var input_value = evt.target.value;
+
+      // Define a regular expression that matches alphabets, special characters, and spaces
+      var invalid_input_regex =
+        /[a-zA-Z`!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?~\s]/;
+
+      // Check if the input value contains invalid characters
+      if (invalid_input_regex.test(input_value)) {
+        // Remove the invalid characters from the input field
+        var cleaned_input_value = input_value.replace(invalid_input_regex, "");
+
+        // Set the cleaned value back into the input field
+        evt.target.value = cleaned_input_value;
+
+        // Display an alert message
+        frappe.msgprint({
+          title: __("Alert"),
+          indicator: "red",
+          message: __(
+            "Alphabets, Special Characters, and Spaces are not Allowed in Quantity."
+          ),
+        });
+      }
+    });
+  },
+  dispatch: function (frm) {
+    frm.add_custom_button(__("Dispatch"), function () {
+      if (
+        frm.doc.status == "Pending from Purchase" ||
+        frm.doc.status == "Pending from CFO" ||
+        frm.doc.status == "Pending from Vendor"
+      ) {
+        frappe.confirm(
+          "We are assuming that you verified this Purchase Request <br> " +
+            "<b>Are you sure for Dispatch</b>",
+          () => {
+            //<PR is Shared with RM using API Call>
+            if (frm.doc.status !== "Dispatched") {
+              // Document share was successful
+              frappe.show_alert({
+                message: " Dispatched Saved Successfully",
+                indicator: "green",
+              });
+
+              // Set field values
+
+              frm.set_value("status", "Dispatched");
+
+              // Save the form
+              frm.save();
+
+              //</PR is Shared with RM using API Call>
+            } else {
+              frappe.msgprint("Already Dispatched");
+            }
+          },
+          () => {
+            // action to perform if No is selected
+          }
+        );
+      } else {
+        frappe.msgprint("Already dispatched", "Message", "red");
+      }
+    });
+    frm.change_custom_button_type("Dispatch", null, "success");
+  },
+  Pending_from_vendor: function (frm) {
+    frm.add_custom_button(__("Pending from Vendor"), function () {
+      if (frm.doc.status == "Pending from Vendor") {
+        frappe.msgprint("Already Pending From Vendor");
+      } else if (
+        frm.doc.status == "Pending from Purchase" ||
+        frm.doc.status == "Pending from Vendor" ||
+        frm.doc.status == "Pending from CFO"
+      ) {
+        frappe.confirm(
+          "This will Notify -> Pending from Vendor <br> " +
+            "<b>Are you sure ?</b>",
+          () => {
+            frm.set_value("status", "Pending from Vendor");
+
+            // Save the form
+            frm.save();
+          },
+          () => {
+            // action to perform if No is selected
+          }
+        );
+      } else {
+        frappe.msgprint("Pending from Vendor", "Message", "red");
+      }
+    });
+    frm.change_custom_button_type("Receive", null, "success");
+  },
+  Pending_from_cfo: function (frm) {
+    frm.add_custom_button(__("Pending from CFO"), function () {
+      if (frm.doc.status == "Pending from CFO") {
+        frappe, msgprint("Already Pending From CFO");
+      } else if (
+        frm.doc.status == "Pending from Purchase" ||
+        frm.doc.status == "Pending from Vendor" ||
+        frm.doc.status == "Pending from CFO"
+      ) {
+        frappe.confirm(
+          "This will Notify -> Pending from CFO <br> " +
+            "<b>Are you sure ?</b>",
+          () => {
+            frm.set_value("status", "Pending from CFO");
+
+            // Save the form
+            frm.save();
+          },
+          () => {
+            // action to perform if No is selected
+          }
+        );
+      } else {
+        frappe.msgprint("Pending from CFO", "Message", "red");
+      }
+    });
+    frm.change_custom_button_type("Receive", null, "success");
   },
 
+  receive_button: function (frm) {
+    frm.add_custom_button(__("Receive"), function () {
+      if (frm.doc.status == "Dispatched") {
+        frappe.confirm(
+          "We are assuming that you Received this Asset  <br> " +
+            "<b>Are you sure ?</b>",
+          () => {
+            if (frm.doc.status == "Dispatched") {
+              frm.set_value("status", "Received");
+
+              // Save the form
+              frm.save();
+            } else {
+              frappe.msgprint("Already Received");
+            }
+          },
+          () => {
+            // action to perform if No is selected
+          }
+        );
+      } else {
+        frappe.msgprint("Already Recieved", "Message", "red");
+      }
+    });
+    frm.change_custom_button_type("Receive", null, "success");
+  },
   select_department: function (frm) {
-    frm.set_value("it_hod", null);
-    frm.set_value("it_user", null);
-
-    frm.set_value("admin_hod", null);
-    frm.set_value("admin_user", null);
-
-    frm.set_value("stationary_hod", null);
-    frm.set_value("stationary_user", null);
-
-    if (frm.doc.select_department === "IT") {
-      //frappe.show_alert("IT");
-      frm.set_value("it_hod", "Kamlesh Waghmare");
-      frm.set_value("it_user", "1299@sahayog.com");
-    } else if (frm.doc.select_department === "Admin") {
-      // frappe.show_alert("Admin");
-      frm.set_value("admin_hod", "Omair Khan");
-      frm.set_value("admin_user", "596@sahayog.com");
-    } else if (frm.doc.select_department === "Stationary") {
-      // frappe.show_alert("Stationary");
-      frm.set_value("stationary_hod", "Sunil Kale");
-      frm.set_value("stationary_user", "51@sahayog.com");
-    }
-
     if (frm.doc.select_department == "IT") {
       frm.set_query("list", function () {
         return {
@@ -638,11 +561,11 @@ frappe.ui.form.on("Purchase Requisition", {
           },
         };
       });
-    } else if (frm.doc.select_department == "Stationary") {
+    } else if (frm.doc.select_department == "Stationery") {
       frm.set_query("list", function () {
         return {
           filters: {
-            category: "Stationary",
+            category: "Stationery",
           },
         };
       });
@@ -651,88 +574,67 @@ frappe.ui.form.on("Purchase Requisition", {
     }
   },
 
-  rm_approval_status: function (frm) {
-    frm.set_value("hod", null);
-    if (frm.doc.rm_approval_status == "Approved") {
-      let HOD;
-      let HOD_NAME;
-      if (frm.doc.it_user) {
-        HOD = frm.doc.it_user;
-        HOD_NAME = frm.doc.it_hod;
-        frm.set_value("hod", HOD);
-        frm.set_value("hod_name", HOD_NAME);
-      }
-
-      if (frm.doc.admin_user) {
-        HOD = frm.doc.admin_user;
-        HOD_NAME = frm.doc.admin_hod;
-        frm.set_value("hod", HOD);
-        frm.set_value("hod_name", HOD_NAME);
-      }
-      if (frm.doc.stationary_user) {
-        HOD = frm.doc.stationary_user;
-        HOD_NAME = frm.doc.stationary_hod;
-        frm.set_value("hod", HOD);
-        frm.set_value("hod_name", HOD_NAME);
-      }
-      console.log("HOD: " + HOD);
-      console.log("HOD Name: " + HOD_NAME);
-    }
-  },
   add_item: function (frm) {
     let item_docname = frm.doc.list;
     let item_name;
+
     if (!frm.doc.list) {
       frappe.msgprint("Please Select Item ");
     } else if (!frm.doc.quantity) {
       frappe.msgprint("Please Give Quantity");
+    } else if (!frm.doc.item_description) {
+      frappe.msgprint("Please Give Item Description");
+    } else if (!frm.doc.item_purpose) {
+      frappe.msgprint("Please Give Item Purpose");
     } else {
       frappe.model.with_doc("Sahayog Item", item_docname, function () {
         let item = frappe.model.get_doc("Sahayog Item", item_docname);
         item_name = item.item_name;
         let qty = frm.doc.quantity;
-        let description = frm.doc.description;
-        //console.log(item_name, qty, description);
+        let description = frm.doc.item_description;
+        let item_purpose = frm.doc.item_purpose;
+        let uom = frm.doc.uom;
+
+        let assetTable = frm.doc.asset || [];
+
+        // Check for duplicate entry only if the table is not empty
+        if (assetTable.length > 0) {
+          let duplicateFound = false;
+          assetTable.forEach(function (row) {
+            if (row.item_name === item_name) {
+              frappe.msgprint(
+                `You have already added <b>'${item_name}'</b> You can adjust the quantity.`
+              );
+
+              duplicateFound = true;
+              return false; // Break the loop
+            }
+          });
+
+          if (duplicateFound) {
+            return; // Exit the function
+          }
+        }
+
         let row = frm.add_child("asset", {
           item_name: item_name,
           quantity: qty,
-          description: description,
+          uom: uom,
+          item_description: description,
+          item_purpose: item_purpose,
         });
         frm.set_value("list", null);
         frm.set_value("quantity", null);
-
-        frm.set_value("description", null);
+        frm.set_value("item_description", null);
+        frm.set_value("item_purpose", null);
+        frm.set_value("uom", "NOS");
 
         frm.refresh_field("asset");
+        frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
+        frm.set_df_property("select_department", "read_only", 1);
       });
     }
   },
-
-  // activate_add_item: function (frm) {
-  //   let d = new frappe.ui.Dialog({
-  //     title: "Add Your Item",
-  //     fields: [
-  //       {
-  //         label: "Item",
-  //         fieldname: "list",
-  //         reqd: 1,
-  //         fieldtype: "Link",
-  //         options: "Sahayog Item",
-  //       },
-  //     ],
-  //     primary_action_label: "Add Item",
-  //     primary_action: function (values) {
-  //       let item_docname = d.get_value("list");
-  //       if (item_docname) {
-  //         // TODO: Add code to perform the desired action after adding the item
-  //         d.hide();
-  //       } else {
-  //         frappe.msgprint("Please select an item");
-  //       }
-  //     },
-  //   });
-  //   d.show();
-  // },
 
   share_with_hod: function (frm) {
     let hod = frm.doc.hod;
@@ -775,6 +677,102 @@ frappe.ui.form.on("Purchase Requisition", {
       },
     });
   },
+
+  share_with_cto: function (frm) {
+    frappe.call({
+      method: "frappe.share.add",
+      args: {
+        doctype: frm.doctype,
+        name: frm.docname,
+        user: "1299@sahayog.com",
+        read: 1,
+        write: 1,
+        submit: 0,
+        share: 1,
+        notify: 1,
+      },
+      callback: function (response) {
+        //Display a message to the user
+        frappe.show_alert({
+          message: "Your Purchase Request Sent To CTO Successfully ",
+          indicator: "green",
+        });
+        frm.set_value("cto_request", "Done");
+        frm.set_value("cto_status", "Pending");
+
+        frm.set_value("status", "Pending from CTO");
+
+        frm.save();
+      },
+    });
+  },
+
+  share_with_purchase_dept: function (frm) {
+    frappe.call({
+      method: "frappe.share.add",
+      args: {
+        doctype: frm.doctype,
+        name: frm.docname,
+        user: "689@sahayog.com",
+        read: 1,
+        write: 1,
+        submit: 0,
+        share: 1,
+        notify: 1,
+      },
+      callback: function (response) {
+        //Display a message to the user
+        frappe.show_alert({
+          message: "Your Purchase Request Sent Successfully ",
+          indicator: "green",
+        });
+      },
+    });
+    frappe.call({
+      method: "frappe.share.add",
+      args: {
+        doctype: frm.doctype,
+        name: frm.docname,
+        user: "40@sahayog.com",
+        read: 1,
+        write: 1,
+        submit: 0,
+        share: 1,
+        notify: 1,
+      },
+      callback: function (response) {
+        //Display a message to the user
+        frappe.show_alert({
+          message: "Your Purchase Request Sent Successfully ",
+          indicator: "green",
+        });
+      },
+    });
+    frappe.call({
+      method: "frappe.share.add",
+      args: {
+        doctype: frm.doctype,
+        name: frm.docname,
+        user: "2481@sahayog.com",
+        read: 1,
+        write: 1,
+        submit: 0,
+        share: 1,
+        notify: 1,
+      },
+      callback: function (response) {
+        //Display a message to the user
+        frappe.show_alert({
+          message: "Your Purchase Request Sent Successfully ",
+          indicator: "green",
+        });
+        frm.set_value("request", "Done");
+        frm.set_value("status", "Pending from Purchase");
+
+        frm.save();
+      },
+    });
+  },
 });
 
 frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
@@ -794,11 +792,11 @@ frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
         },
       };
     });
-  } else if (frm.doc.select_department == "Stationary") {
+  } else if (frm.doc.select_department == "Stationery") {
     frm.set_query("list", function () {
       return {
         filters: {
-          category: "Stationary",
+          category: "Stationery",
         },
       };
     });
