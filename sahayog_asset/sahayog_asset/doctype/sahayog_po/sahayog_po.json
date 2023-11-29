@@ -195,7 +195,7 @@
    "collapsible": 1,
    "fieldname": "sec_despatch_to",
    "fieldtype": "Section Break",
-   "label": "Despatch To"
+   "label": "Dispatch To"
   },
   {
    "fieldname": "des_party_name",
@@ -424,7 +424,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-11 17:33:33.688869",
+ "modified": "2023-10-26 15:22:12.250904",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog PO",

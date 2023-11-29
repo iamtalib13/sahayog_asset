@@ -21,7 +21,8 @@
   "column_break_hf2no",
   "transport_remark",
   "purchase_manager",
-  "purchase"
+  "purchase",
+  "item_level"
  ],
  "fields": [
   {
@@ -44,7 +45,7 @@
   {
    "columns": 1,
    "fieldname": "item_description",
-   "fieldtype": "Small Text",
+   "fieldtype": "Text",
    "label": "Item Description",
    "read_only_depends_on": "eval:frappe.user.has_role('Store Manager') || frappe.user.has_role('Purchase Department')"
   },
@@ -135,15 +136,21 @@
    "fetch_from": "item_name.asset_id",
    "fieldname": "asset_id",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Asset ID",
    "read_only": 1,
    "read_only_depends_on": "eval:frappe.user.has_role('Store Manager') || frappe.user.has_role('Purchase Department')"
+  },
+  {
+   "fieldname": "item_level",
+   "fieldtype": "Data",
+   "label": "Item Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-09-12 16:39:35.104990",
+ "modified": "2023-11-25 15:52:09.999013",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset List",

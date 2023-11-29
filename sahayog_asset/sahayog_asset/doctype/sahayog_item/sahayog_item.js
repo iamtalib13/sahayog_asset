@@ -2,6 +2,90 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Sahayog Item", {
+  level_1_approval: function (frm) {
+    if (frm.doc.level_1_approval) {
+      frm.set_value("approval_levels", "1");
+      frm.doc.level_2_approval = false;
+      frm.doc.level_3_approval = false;
+      frm.doc.level_4_approval = false;
+    } else {
+      frm.set_value("approval_levels", "0");
+      frm.doc.level_2_approval = false;
+      frm.doc.level_3_approval = false;
+      frm.doc.level_4_approval = false;
+    }
+    frm.refresh_fields([
+      "level_1_approval",
+      "level_2_approval",
+      "level_3_approval",
+      "level_4_approval",
+      "approval_levels",
+    ]);
+
+    frm.save();
+  },
+
+  level_2_approval: function (frm) {
+    if (frm.doc.level_2_approval) {
+      frm.set_value("approval_levels", "2");
+      frm.doc.level_1_approval = true;
+      frm.doc.level_3_approval = false;
+      frm.doc.level_4_approval = false;
+    } else {
+      frm.set_value("approval_levels", "1");
+      frm.doc.level_3_approval = false;
+      frm.doc.level_4_approval = false;
+    }
+    frm.refresh_fields([
+      "level_1_approval",
+      "level_2_approval",
+      "level_3_approval",
+      "level_4_approval",
+      "approval_levels",
+    ]);
+    frm.save();
+  },
+
+  level_3_approval: function (frm) {
+    if (frm.doc.level_3_approval) {
+      frm.set_value("approval_levels", "3");
+      frm.doc.level_1_approval = true;
+      frm.doc.level_2_approval = true;
+
+      frm.doc.level_4_approval = false;
+    } else {
+      frm.set_value("approval_levels", "2");
+      frm.doc.level_4_approval = false;
+    }
+    frm.refresh_fields([
+      "level_1_approval",
+      "level_2_approval",
+      "level_3_approval",
+      "level_4_approval",
+      "approval_levels",
+    ]);
+    frm.save();
+  },
+
+  level_4_approval: function (frm) {
+    if (frm.doc.level_4_approval) {
+      frm.set_value("approval_levels", "4");
+      frm.doc.level_1_approval = true;
+      frm.doc.level_2_approval = true;
+      frm.doc.level_3_approval = true;
+    } else {
+      frm.set_value("approval_levels", "3");
+    }
+    frm.refresh_fields([
+      "level_1_approval",
+      "level_2_approval",
+      "level_3_approval",
+      "level_4_approval",
+      "approval_levels",
+    ]);
+    frm.save();
+  },
+
   after_save: function (frm) {
     frm.set_value("item_id", frm.doc.name);
     frm.save();

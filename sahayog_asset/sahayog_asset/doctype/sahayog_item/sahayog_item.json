@@ -26,7 +26,14 @@
   "igst",
   "hsnsac",
   "hod_id",
-  "hod_name"
+  "hod_name",
+  "approval_tab",
+  "note",
+  "level_1_approval",
+  "level_2_approval",
+  "level_3_approval",
+  "level_4_approval",
+  "approval_levels"
  ],
  "fields": [
   {
@@ -134,11 +141,52 @@
    "fieldname": "hod_name",
    "fieldtype": "Data",
    "label": "Hod Name"
+  },
+  {
+   "fieldname": "approval_tab",
+   "fieldtype": "Tab Break",
+   "label": "Approval"
+  },
+  {
+   "default": "0",
+   "fieldname": "level_1_approval",
+   "fieldtype": "Check",
+   "label": "Level 1 - Reporting Person "
+  },
+  {
+   "default": "0",
+   "fieldname": "level_2_approval",
+   "fieldtype": "Check",
+   "label": "Level 2 - HOD"
+  },
+  {
+   "default": "0",
+   "fieldname": "level_3_approval",
+   "fieldtype": "Check",
+   "label": "Level 3 - Naresh Lulani"
+  },
+  {
+   "default": "0",
+   "fieldname": "level_4_approval",
+   "fieldtype": "Check",
+   "label": "Level 4 - Sandeep Bhatia"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "HTML",
+   "options": "  <div style=\"padding: 8px 20px; background-color: #e6f7ff; border: 2px solid #3399ff; color: #0066cc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: left; margin-bottom: 20px; max-width: 700px;\">\n        <p style=\"margin: 0;\"><strong>NOTE:</strong> When you select the highest level of approval, the previous levels are automatically selected.</p>\n    </div>"
+  },
+  {
+   "default": "0",
+   "fieldname": "approval_levels",
+   "fieldtype": "Select",
+   "label": "Approval level",
+   "options": "0\n1\n2\n3\n4"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-08 15:31:06.429270",
+ "modified": "2023-11-25 15:09:46.991912",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",
