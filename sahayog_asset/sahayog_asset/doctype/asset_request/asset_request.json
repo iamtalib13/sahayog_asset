@@ -142,7 +142,7 @@
    "hidden": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered"
+   "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered\nCancelled"
   },
   {
    "fieldname": "employee_id",
@@ -827,13 +827,13 @@
    "label": "Validation Check"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('Store Manager')",
+   "depends_on": "eval:frappe.user.has_role('Store Manager') && (doc.status == \"Pending\" || doc.status == \"Pending From Store Manager\")\n",
    "fieldname": "dispatch_check",
    "fieldtype": "Button",
    "label": "Dispatch/Pending"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('Purchase Department')",
+   "depends_on": "eval:frappe.user.has_role('Purchase Department') && doc.status == \"Pending From Purchase\"\n",
    "fieldname": "purchase_dispatch",
    "fieldtype": "Button",
    "label": "Dispatch To Store"
@@ -858,7 +858,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-25 15:17:41.097866",
+ "modified": "2023-12-07 17:22:48.805376",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
@@ -958,7 +958,5 @@
    "title": "Partially Dispatched"
   }
  ],
- "track_changes": 1,
- "track_seen": 1,
- "track_views": 1
+ "track_changes": 1
 }

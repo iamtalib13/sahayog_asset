@@ -1,6 +1,14 @@
 // Copyright (c) 2023, Sid and contributors
 // For license information, please see license.txt
-
+frappe.ui.form.on("Asset List", {
+  // quantity: function (frm, cdt, cdn) {
+  //   var child = locals[cdt][cdn];
+  //   console.log("qty : ", child.quantity);
+  //   if (child.quantity == 0) {
+  //     child.dispatched_status = "Cancelled";
+  //   }
+  // },
+});
 frappe.ui.form.on("Asset Request", {
   test: function (frm) {
     frm.call({
@@ -17,115 +25,6 @@ frappe.ui.form.on("Asset Request", {
       },
     });
   },
-
-  // setup: function (frm) {
-  //   let user = frappe.session.user;
-
-  //   if (frm.doc.status == "Delivered") {
-  //     frm.set_df_property("asset", "read_only", 1);
-  //   }
-  //   var item_name = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "item_name",
-  //     cur_frm.doc.name
-  //   );
-  //   var qty = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "quantity",
-  //     cur_frm.doc.name
-  //   );
-  //   var uom = frappe.meta.get_docfield("Asset List", "uom", cur_frm.doc.name);
-  //   var item_description = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "item_description",
-  //     cur_frm.doc.name
-  //   );
-  //   var item_purpose = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "item_purpose",
-  //     cur_frm.doc.name
-  //   );
-
-  //   var dispatched_status = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "dispatched_status",
-  //     cur_frm.doc.name
-  //   );
-
-  //   var purchase_status = frappe.meta.get_docfield(
-  //     "Asset List",
-  //     "purchase",
-  //     cur_frm.doc.name
-  //   );
-
-  //   let p1 = "689@sahayog.com";
-  //   let p2 = "40@sahayog.com";
-  //   let p3 = "2481@sahayog.com";
-  //   let p4 = "2946@sahayog.com";
-
-  //   if (user === frm.doc.employee_user) {
-  //     dispatch_btn.hidden = 1;
-
-  //     if (frm.doc.status !== "Draft") {
-  //       //frm.set_df_property("asset", "read_only", 1);
-  //       // item_name.read_only = 1;
-  //       // qty.read_only = 1;
-  //       // uom.read_only = 1;
-  //       // item_description.read_only = 1;
-  //       // item_purpose.read_only = 1;
-  //       // dispatched_status.read_only = 1;
-  //       // purchase_status.read_only = 1;
-  //     }
-
-  //     if (frm.doc.status == "Draft") {
-  //       item_name.read_only = 1;
-  //       dispatched_status.read_only = 1;
-  //       purchase_status.read_only = 1;
-  //     } else if (
-  //       frm.doc.status == "Partially Dispatched" ||
-  //       frm.doc.status == "Pending From Purchase"
-  //     ) {
-  //       frm.set_df_property("asset", "read_only", 1);
-  //     }
-  //   } else if (user === frm.doc.stage_7_emp_id) {
-  //     if (frm.doc.status == "Pending") {
-  //       item_name.read_only = 1;
-  //       qty.read_only = 1;
-  //       uom.read_only = 1;
-  //       item_description.read_only = 1;
-  //       item_purpose.read_only = 1;
-  //       dispatched_status.read_only = 0;
-  //       purchase_status.read_only = 1;
-  //     } else if (frm.doc.status == "Pending From Purchase") {
-  //       item_name.read_only = 1;
-  //       qty.read_only = 1;
-  //       uom.read_only = 1;
-  //       item_description.read_only = 1;
-  //       item_purpose.read_only = 1;
-  //       dispatched_status.read_only = 0;
-  //       purchase_status.read_only = 1;
-  //     }
-  //   } else if (user === p1 || user === p2 || user === p3 || user === p4) {
-  //     if (frm.doc.status == "Pending From Purchase") {
-  //       item_name.read_only = 1;
-  //       qty.read_only = 1;
-  //       uom.read_only = 1;
-  //       item_description.read_only = 1;
-  //       item_purpose.read_only = 1;
-  //       dispatched_status.read_only = 1;
-  //       purchase_status.read_only = 0;
-  //     }
-  //   } else {
-  //     frm.set_df_property("asset", "read_only", 1);
-  //     item_name.read_only = 1;
-  //     qty.read_only = 1;
-  //     uom.read_only = 1;
-  //     item_description.read_only = 1;
-  //     item_purpose.read_only = 1;
-  //     dispatched_status.read_only = 1;
-  //     purchase_status.read_only = 1;
-  //   }
-  // },
 
   admin_save: function (frm) {
     if (frappe.user.has_role("Administrator")) {
@@ -226,6 +125,18 @@ frappe.ui.form.on("Asset Request", {
     }
 
     frm.set_value("first_intro", "Done");
+
+    // if (frm.doc.status === "Pending From Store Manager") {
+    //   if (frm.doc.asset.every((row) => row.dispatched_status === "Cancelled")) {
+    //     frm.set_value("status", "Cancelled");
+    //   }
+    // }
+
+    // if (frm.doc.status === "Pending From Store Manager") {
+    //   if (frm.doc.asset.some((row) => row.dispatched_status === "Cancelled")) {
+    //     frappe.throw("Some Cancelled");
+    //   }
+    // }
   },
   rejection_intro: function (frm) {
     let stages = [
@@ -292,7 +203,7 @@ frappe.ui.form.on("Asset Request", {
 
   refresh: function (frm) {
     if (frappe.user.has_role("Analytics")) {
-      frm.set_df_property("asset", "read_only", 1);
+      // frm.set_df_property("asset", "read_only", 1);
     }
 
     if (frappe.user.has_role("Administrator")) {
@@ -1041,7 +952,7 @@ frappe.ui.form.on("Asset Request", {
         cur_frm.doc.name
       );
       item_name.read_only = 1;
-      dispatched_status.read_only = 1;
+      dispatched_status.read_only = 0;
       purchase_status.read_only = 1;
     }
 
@@ -2565,6 +2476,17 @@ frappe.ui.form.on("Asset Request", {
       purchase_status.read_only = 1;
 
       console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
+      if (
+        frm.doc.status === "Dispatched" ||
+        frm.doc.status === "Recieved" ||
+        frm.doc.status === "Delivered" ||
+        frm.doc.status === "Pending From Purchase "
+      ) {
+        frm.set_df_property("asset", "read_only", 1);
+      } else {
+        frm.set_df_property("asset", "read_only", 0);
+      }
+
       if (frm.doc.status == "Received") {
         frm.trigger("Asset_Delivered");
       }
@@ -2788,15 +2710,11 @@ frappe.ui.form.on("Asset Request", {
     // Create a new intro for the dispatch details
     let dispatchIntro = "<b><u>Dispatch Details</u></b>";
     let dispatchedBy = frm.doc.stage_7_emp_name;
-    let modeOfTransport = frm.doc.mode_of_transport;
-    let dispatchedRemark = frm.doc.stage_7_dispatch_remark;
 
     // Create the dispatch intro message
     let dispatchMessage = `
-  Dispatched By: <span style="font-weight: bold;">${dispatchedBy}</span><br>
-  Mode of Transport: <span style="font-weight: bold;">${modeOfTransport}</span><br>
-  Dispatched Remark: <span style="font-weight: bold;">${dispatchedRemark}</span><br>
-`;
+      Dispatched By: <span style="font-weight: bold;">${dispatchedBy}</span><br>
+    `;
 
     // Add a separator line without any gap space
     let separator = '<hr style="margin: 0;">';
@@ -2810,23 +2728,24 @@ frappe.ui.form.on("Asset Request", {
     // Check the status and choose the appropriate received message
     let receivedMessage = "";
     if (frm.doc.status === "Received") {
-      receivedMessage = `
-    Received By: <span style="font-weight: bold;">${receivedBy}</span><br>
-    Received Remark: <span style="font-weight: bold;">${receivedRemark}</span><br>
-   
-  `;
+      // receivedMessage = `
+      //   Received By: <span style="font-weight: bold;">${receivedBy}</span><br>
+      //   Received Remark: <span style="font-weight: bold;">${receivedRemark}</span><br>
+      // `;
     } else {
       receivedMessage = `
-    <strong>Pending from Receiver</strong>
-  `;
+        <strong>Pending from Receiver</strong>
+      `;
     }
+
+    // Assuming 'user' is a variable you've declared elsewhere
+    let user = frappe.session.user;
     if (frm.doc.status === "Received" && user === frm.doc.employee_user) {
-      receivedMessage = `
-      Received By: <span style="font-weight: bold;">${receivedBy}</span><br>
-      Received Remark: <span style="font-weight: bold;">${receivedRemark}</span><br>
-    
-    OTP : <span style="font-weight: bold;">${received_otp}</span><br>
-  `;
+      receivedMessage += `
+        Received By: <span style="font-weight: bold;">${receivedBy}</span><br>
+        Received Remark: <span style="font-weight: bold;">${receivedRemark}</span><br>
+        OTP : <span style="font-weight: bold;">${received_otp}</span><br>
+      `;
     }
 
     // Set the intros with the custom messages, separator, and blue color
@@ -3480,8 +3399,8 @@ frappe.ui.form.on("Asset Request", {
         return row.purchase === "Dispatch" || !row.purchase;
       });
 
-      const all_dispatched_from_purchase = assetTable.some(function (row) {
-        return row.purchase !== "Pending";
+      const all_dispatched_from_purchase = assetTable.every(function (row) {
+        return row.purchase == "Dispatch";
       });
 
       const check_store = assetTable.some(function (row) {
@@ -3505,11 +3424,17 @@ frappe.ui.form.on("Asset Request", {
             // Add your code for the "Send to Purchase" action here
 
             frm.doc.asset.forEach(function (row) {
-              if (row.dispatched_status == "Pending" && !row.purchase) {
+              if (
+                row.dispatched_status == "Pending" &&
+                (row.quantity == 0 || row.quantity == null)
+              ) {
                 row.purchase = "Pending";
-                frm.refresh_field("asset");
+                console.log("Setting only Pending");
               }
             });
+
+            // Refresh the field outside the loop to avoid unnecessary refreshes
+            frm.refresh_field("asset");
 
             frm.set_value("status", "Pending From Purchase");
             frm.set_value("purchase_status", "Pending");
