@@ -11,6 +11,7 @@
  "field_order": [
   "item_details",
   "item_id",
+  "enable",
   "item_name",
   "item_description",
   "category",
@@ -182,11 +183,17 @@
    "fieldtype": "Select",
    "label": "Approval level",
    "options": "0\n1\n2\n3\n4"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-25 15:09:46.991912",
+ "modified": "2023-12-08 11:29:36.587397",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",

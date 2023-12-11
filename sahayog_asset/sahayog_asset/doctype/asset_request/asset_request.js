@@ -574,10 +574,24 @@ frappe.ui.form.on("Asset Request", {
     let user = frappe.session.user;
 
     if (frm.is_new()) {
-      let user = frappe.session.user;
+      // Get the numeric part of the user string
       let eid = user.match(/\d+/)[0];
-      frm.set_value("employee_id", eid);
-      let empid = frm.doc.employee_id;
+
+      // Initialize the modified employee_id
+      let modifiedEmployeeId = "";
+
+      // Check if the user string contains "ABPS" or "MCPS"
+      if (user.includes("ABPS")) {
+        modifiedEmployeeId = "ABPS" + eid;
+      } else if (user.includes("MCPS")) {
+        modifiedEmployeeId = "MCPS" + eid;
+      } else {
+        // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
+        modifiedEmployeeId = eid;
+      }
+
+      // Set the "employee_id" field with the modified value
+      frm.set_value("employee_id", modifiedEmployeeId);
 
       frappe.call({
         method:
@@ -2649,7 +2663,10 @@ frappe.ui.form.on("Asset Request", {
     if (department) {
       frm.set_query("list", function () {
         return {
-          filters: [["category", "=", department]],
+          filters: [
+            ["category", "=", department],
+            ["enable", "=", "1"], // Additional filter for "enable"
+          ],
         };
       });
 
@@ -2660,7 +2677,6 @@ frappe.ui.form.on("Asset Request", {
         ) {
           frm.set_value("stage_6_emp_status", "Skip");
         } else if (department === "IT") {
-          console;
           frm.set_value("stage_6_emp_status", "Pending");
         } else {
           frm.set_value("stage_6_emp_status", "Skip");
@@ -2670,7 +2686,9 @@ frappe.ui.form.on("Asset Request", {
       // Reset the filter when no department is selected
       frm.set_query("list", function () {
         return {
-          filters: {},
+          filters: [
+            ["enable", "=", "1"], // Additional filter for "enable"
+          ],
         };
       });
       // Reset stage_6_emp_status when no department is selected
@@ -3424,10 +3442,7 @@ frappe.ui.form.on("Asset Request", {
             // Add your code for the "Send to Purchase" action here
 
             frm.doc.asset.forEach(function (row) {
-              if (
-                row.dispatched_status == "Pending" &&
-                (row.quantity == 0 || row.quantity == null)
-              ) {
+              if (row.dispatched_status == "Pending" && 0 < row.quantity) {
                 row.purchase = "Pending";
                 console.log("Setting only Pending");
               }
@@ -3484,8 +3499,12 @@ frappe.ui.form.on("Asset Request", {
 
               frm.doc.asset.forEach(function (row) {
                 if (
+                  // row.dispatched_status === "Pending" &&
+                  // (row.purchase !== "Dispatch" || !row.purchase)
+                  //below condition added for some dispatched and check qty , if 0 then cancelled
+
                   row.dispatched_status === "Pending" &&
-                  (row.purchase !== "Dispatch" || !row.purchase)
+                  0 < row.quantity
                 ) {
                   row.purchase = "Pending";
                   frm.refresh_field("asset");
