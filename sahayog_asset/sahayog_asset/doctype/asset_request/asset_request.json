@@ -841,6 +841,7 @@
   {
    "fieldname": "approval_levels",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Approval Levels"
   },
   {
@@ -853,12 +854,13 @@
    "fetch_from": "list.approval_levels",
    "fieldname": "item_level",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Item Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-07 17:22:48.805376",
+ "modified": "2023-12-11 17:39:11.077877",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
