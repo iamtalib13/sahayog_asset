@@ -445,7 +445,27 @@ frappe.ui.form.on("Asset Request", {
     } else if (frm.doc.status === "Delivered") {
       frm.trigger("Delivered_Intro");
     }
+
     if (!frm.is_new()) {
+      //<Arshad Task>
+      frm.add_custom_button(__("Print"), function () {
+        var printUrl = frappe.urllib.get_full_url(
+          "/api/method/frappe.utils.weasyprint.download_pdf?" +
+            "doctype=" +
+            encodeURIComponent("Asset Request") +
+            "&name=" +
+            encodeURIComponent(frm.doc.name) +
+            "&print_format=Asset Requisition Print" +
+            "&letterhead=Sahayog"
+        );
+        var newWindow = window.open(printUrl);
+        console.log(printUrl); // Log the URL to the console
+
+        // The rest of your code
+      });
+
+      //</Arshad Task>
+
       if (frm.doc.status !== "Draft")
         frm.toggle_display("section_break_hitna", 0);
     }
@@ -927,6 +947,8 @@ frappe.ui.form.on("Asset Request", {
                   rm_stage_status = frm.doc.stage_5_emp_status;
                 }
                 console.log(rm_stage_status);
+                let self = frm.doc.name;
+                let level = 0;
 
                 if (rm_stage_status == "Pending") {
                   if (!frm.doc.asset || frm.doc.asset.length === 0) {
@@ -940,32 +962,40 @@ frappe.ui.form.on("Asset Request", {
                     frappe.confirm(
                       "<i>Do you want to send for Approval?</i>",
                       () => {
-                        // action to perform if Yes is selected
-                        frappe.call({
-                          method: "frappe.share.add",
+                        // FIRST Set Value THEN Share doc with next User
+
+                        frm.call({
+                          method: "set_level",
                           args: {
-                            doctype: frm.doctype,
-                            name: frm.docname,
-                            user: rm_stage,
-                            read: 1,
-                            write: 1,
-                            submit: 0,
-                            share: 1,
-                            notify: 1,
-                            send_email: 0, // Set this to 0 to prevent sending email notifications
+                            level: level, // ex - 1
+                            self: self, //ex - SAR-17112023-2145
+                            rm_stage_status: rm_stage_status, // Pass the variable value here
+                            rm_stage: rm_stage,
+                            rm_stage_request: rm_stage_request,
+                            stage_status: "None",
                           },
-                          callback: function (response) {
-                            //Display a message to the user
-                            frappe.show_alert({
-                              message: "Your Asset Request Sent Successfully ",
-                              indicator: "green",
-                            });
-                            frm.set_value(rm_stage_request, "Done");
-                            if (frm.doc.status === "Draft") {
+                          callback: function (r) {
+                            // Check if the server-side function returned True
+                            if (r.message === true) {
+                              // Display a success message
                               frm.set_value("status", "Pending");
-                              frm.set_value("asset_lock", "True");
+                              console.log("Response Value : ", r.message);
+                              frappe.show_alert({
+                                message:
+                                  "Your Asset Request Sent Successfully ",
+                                indicator: "green",
+                              });
+
+                              frm.save();
+                              frm.reload_doc();
+                            } else {
+                              // Display an alert for other cases
+                              frappe.msgprint({
+                                title: __("Server Down"),
+                                indicator: "red",
+                                message: __("Please Try Again"),
+                              });
                             }
-                            frm.save();
                           },
                         });
                       },
@@ -1086,39 +1116,86 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage2 = emp_stage2;
+                let self = frm.doc.name;
+                let level = "1";
+                let stage_status = "stage_1_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (frm.doc.stage_1_emp_status == "Pending") {
-                  frappe.call({
-                    method: "frappe.share.add",
+                  frm.call({
+                    method: "set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage2,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage2_status, // Pass the variable value here
+                      rm_stage: stage2,
+                      rm_stage_request: emp_stage2_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
+                        //frm.set_value("stage_1_emp_status", "Approved");
+                        frm
+                          .set_value("stage_1_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        // Display a success message
+                        // Set field values
+                        //frm.set_value(emp_stage2_request, "Done");
+                        //
+                        // frm.set_value("status", "Pending");
 
-                      // Set field values
-                      frm.set_value(emp_stage2_request, "Done");
-                      frm.set_value("stage_1_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
-
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Your Asset Request Sent Successfully ",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage2,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage2_request, "Done");
+                  //     frm.set_value("stage_1_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1227,39 +1304,86 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage = emp_stage;
+                let level = "2";
+                let self = frm.doc.name;
+                let stage_status = "stage_2_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (frm.doc.stage_2_emp_status == "Pending") {
                   frappe.call({
-                    method: "frappe.share.add",
+                    method:
+                      "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage_status, // Pass the variable value here
+                      rm_stage: stage,
+                      rm_stage_request: emp_stage_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        frm
+                          .set_value("stage_2_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_2_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
+                        // Display a success message
+                        // Set field values
+                        //frm.set_value(emp_stage2_request, "Done");
+                        //
+                        // frm.set_value("status", "Pending");
 
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Sent Successfully",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_2_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1364,39 +1488,86 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage = emp_stage;
+                let level = "3";
+                let self = frm.doc.name;
+                let stage_status = "stage_3_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
                   frappe.call({
-                    method: "frappe.share.add",
+                    method:
+                      "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage_status, // Pass the variable value here
+                      rm_stage: stage,
+                      rm_stage_request: emp_stage_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
+                        frm.set_value(emp_stage_request, "Done");
+                        frm
+                          .set_value("stage_3_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        // Display a success message
+                        // Set field values
+                        //frm.set_value(emp_stage2_request, "Done");
+                        //
+                        // frm.set_value("status", "Pending");
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_3_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
-
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Successfully Approved",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_3_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1520,39 +1691,80 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage = emp_stage;
+                let level = "4";
+                let self = frm.doc.name;
+                let stage_status = "stage_4_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
                   frappe.call({
-                    method: "frappe.share.add",
+                    method:
+                      "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage_status, // Pass the variable value here
+                      rm_stage: stage,
+                      rm_stage_request: emp_stage_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        frm
+                          .set_value("stage_4_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_4_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
-
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Successfully Approved",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_4_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1632,39 +1844,80 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage = emp_stage;
+                let level = "4";
+                let self = frm.doc.name;
+                let stage_status = "stage_4_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
                   frappe.call({
-                    method: "frappe.share.add",
+                    method:
+                      "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage_status, // Pass the variable value here
+                      rm_stage: stage,
+                      rm_stage_request: emp_stage_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        frm
+                          .set_value("stage_4_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_4_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
-
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Successfully Approved",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_4_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1746,39 +1999,80 @@ frappe.ui.form.on("Asset Request", {
                 // action to perform if Yes is selected
                 // Add your button's functionality here
                 let stage = emp_stage;
+                let level = "5";
+                let self = frm.doc.name;
+                let stage_status = "stage_5_emp_status";
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
                   frappe.call({
-                    method: "frappe.share.add",
+                    method:
+                      "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                     args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
+                      level: level, // ex - 1
+                      self: self, //ex - SAR-17112023-2145
+                      rm_stage_status: emp_stage_status, // Pass the variable value here
+                      rm_stage: stage,
+                      rm_stage_request: emp_stage_request,
+                      stage_status: stage_status,
                     },
-                    callback: function (response) {
-                      // Check if the document has been modified
+                    callback: function (r) {
+                      // Check if the server-side function returned True
+                      if (r.message === true) {
+                        console.log("Response Value : ", r.message);
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                        frm
+                          .set_value("stage_5_emp_status", "Approved")
+                          .then(() => {
+                            // do something after value is set
+                            //console.log("True");
+                          });
+                        frm.save();
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_5_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
-
-                      // Save the form
-                      frm.save();
+                        frappe.show_alert({
+                          message: "Successfully Approved",
+                          indicator: "green",
+                        });
+                      } else {
+                        // Display an alert for other cases
+                        frappe.msgprint({
+                          title: __("Server Down"),
+                          indicator: "red",
+                          message: __("Please Try Again"),
+                        });
+                      }
                     },
                   });
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
+
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_5_emp_status", "Approved");
+                  //     frm.set_value("status", "Pending");
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1882,39 +2176,80 @@ frappe.ui.form.on("Asset Request", {
                   // action to perform if Yes is selected
                   // Add your button's functionality here
                   let stage = emp_stage;
+                  let level = "6";
+                  let self = frm.doc.name;
+                  let stage_status = "stage_6_emp_status";
                   //<PR is Shared with RM using API Call>
                   if (emp_stage_status == "Pending") {
                     frappe.call({
-                      method: "frappe.share.add",
+                      method:
+                        "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.set_level",
                       args: {
-                        doctype: frm.doctype,
-                        name: frm.docname,
-                        user: stage,
-                        read: 1,
-                        write: 1,
-                        submit: 0,
-                        share: 1,
-                        notify: 1,
-                        send_email: 0, // Set this to 0 to prevent sending email notifications
+                        level: level, // ex - 1
+                        self: self, //ex - SAR-17112023-2145
+                        rm_stage_status: emp_stage_status, // Pass the variable value here
+                        rm_stage: stage,
+                        rm_stage_request: emp_stage_request,
+                        stage_status: stage_status,
                       },
-                      callback: function (response) {
-                        // Check if the document has been modified
+                      callback: function (r) {
+                        // Check if the server-side function returned True
+                        if (r.message === true) {
+                          console.log("Response Value : ", r.message);
 
-                        // Document share was successful
-                        frappe.show_alert({
-                          message: "Your Asset Request Sent Successfully",
-                          indicator: "green",
-                        });
+                          frm
+                            .set_value("stage_6_emp_status", "Approved")
+                            .then(() => {
+                              // do something after value is set
+                              //console.log("True");
+                            });
+                          frm.save();
 
-                        // Set field values
-                        frm.set_value(emp_stage_request, "Done");
-                        frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending");
-
-                        // Save the form
-                        frm.save();
+                          frappe.show_alert({
+                            message: "Successfully Approved",
+                            indicator: "green",
+                          });
+                        } else {
+                          // Display an alert for other cases
+                          frappe.msgprint({
+                            title: __("Server Down"),
+                            indicator: "red",
+                            message: __("Please Try Again"),
+                          });
+                        }
                       },
                     });
+                    // frappe.call({
+                    //   method: "frappe.share.add",
+                    //   args: {
+                    //     doctype: frm.doctype,
+                    //     name: frm.docname,
+                    //     user: stage,
+                    //     read: 1,
+                    //     write: 1,
+                    //     submit: 0,
+                    //     share: 1,
+                    //     notify: 1,
+                    //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                    //   },
+                    //   callback: function (response) {
+                    //     // Check if the document has been modified
+
+                    //     // Document share was successful
+                    //     frappe.show_alert({
+                    //       message: "Your Asset Request Sent Successfully",
+                    //       indicator: "green",
+                    //     });
+
+                    //     // Set field values
+                    //     frm.set_value(emp_stage_request, "Done");
+                    //     frm.set_value("stage_6_emp_status", "Approved");
+                    //     frm.set_value("status", "Pending");
+
+                    //     // Save the form
+                    //     frm.save();
+                    //   },
+                    // });
 
                     //</PR is Shared with RM using API Call>
                   } else {
