@@ -448,27 +448,37 @@ frappe.ui.form.on("Asset Request", {
 
     if (!frm.is_new()) {
       //<Arshad Task>
-      frm.add_custom_button(__("Print"), function () {
-        var printUrl = frappe.urllib.get_full_url(
-          "/api/method/frappe.utils.weasyprint.download_pdf?" +
-            "doctype=" +
-            encodeURIComponent("Asset Request") +
-            "&name=" +
-            encodeURIComponent(frm.doc.name) +
-            "&print_format=Asset Requisition Print" +
-            "&letterhead=Sahayog"
-        );
-        var newWindow = window.open(printUrl);
-        console.log(printUrl); // Log the URL to the console
+      if (frm.doc.status !== "Draft") {
+        frm.add_custom_button(__("Print"), function () {
+          var printUrl = frappe.urllib.get_full_url(
+            "/api/method/frappe.utils.weasyprint.download_pdf?" +
+              "doctype=" +
+              encodeURIComponent("Asset Request") +
+              "&name=" +
+              encodeURIComponent(frm.doc.name) +
+              "&print_format=Asset Requisition Print" +
+              "&letterhead=Sahayog"
+          );
+          var newWindow = window.open(printUrl);
+          console.log(printUrl); // Log the URL to the console
 
-        // The rest of your code
-      });
-
+          // The rest of your code
+        });
+      }
       //</Arshad Task>
 
-      if (frm.doc.status !== "Draft")
+      if (frm.doc.status !== "Draft") {
         frm.toggle_display("section_break_hitna", 0);
+      }
+      if (
+        frm.doc.status === "Dispatched" ||
+        frm.doc.status === "Delivered" ||
+        frm.doc.status === "Received"
+      ) {
+        frm.set_df_property("asset", "read_only", 1);
+      }
     }
+
     if (frm.is_new()) {
       if (frm.doc.select_department) {
         frm.toggle_display("section_break_hitna", 1);
@@ -1016,38 +1026,70 @@ frappe.ui.form.on("Asset Request", {
           frm.change_custom_button_type("Send for Approval", null, "primary");
           //</Send for Approval , this button is only for Asset Requester Owner>
         } else if (frm.doc.status == "Dispatched") {
+          var d; // Declare d outside the function
+
           frm.add_custom_button(__("Receive"), function () {
-            var d = new frappe.ui.Dialog({
+            d = new frappe.ui.Dialog({
               title: __("Received Remark"),
               fields: [
                 {
                   label: __("Please Give Received Remark for this Asset"),
                   fieldname: "emp_received_remark",
                   fieldtype: "Small Text",
-                  reqd: 1, // Set the rejection reason field as mandatory
+                  reqd: 1,
                   description: __(
-                    "Wrtie Courier Name & Builty No / Vehicle No. / Mode of Transport"
-                  ), // Description for the field
+                    "Write Courier Name & Builty No / Vehicle No. / Mode of Transport"
+                  ),
                 },
               ],
               primary_action_label: __("Receive"),
               primary_action: function () {
-                // Check if the rejection reason is provided
-                if (!d.fields_dict.emp_received_remark.get_value()) {
-                  frappe.msgprint(__("Please provide a Received Remark."));
+                var empReceivedRemark =
+                  d.fields_dict.emp_received_remark.get_value();
+
+                if (!empReceivedRemark) {
+                  frappe.msgprint(
+                    __("Please provide a Received Remark."),
+                    __("Validation Error")
+                  );
                   return;
                 }
-                // Generate a random 4-digit number
+
                 var randomOTP = Math.floor(1000 + Math.random() * 9000);
 
-                frm.set_value(
-                  "emp_received_remark",
-                  d.fields_dict.emp_received_remark.get_value()
-                );
-                d.hide();
-                frm.set_value("status", "Received");
-                frm.set_value("received_otp", randomOTP); // Set the random number to store_otp
-                cur_frm.save();
+                frm.call({
+                  method: "set_otp",
+                  args: {
+                    self: frm.doc.name,
+                    otp: randomOTP,
+                    remark: empReceivedRemark,
+                  },
+                  callback: function (r) {
+                    if (r.message === true) {
+                      console.log(r.message);
+                      frm.set_value("status", "Received");
+                      frappe.show_alert({
+                        message: __("Successfully Received"),
+                        indicator: "green",
+                      });
+                      frm.refresh_field("status");
+                      frm.refresh_field("received_otp");
+
+                      frm.refresh_field("emp_received_remark");
+                      cur_frm.save();
+                      frm.reload_doc();
+                    } else {
+                      frappe.msgprint({
+                        title: __("Server Down"),
+                        indicator: "red",
+                        message: __("Please Try Again"),
+                      });
+                    }
+
+                    // Hide the dialog after processing
+                    d.hide();
+                  },
+                });
               },
               secondary_action_label: __("Cancel"),
               secondary_action: function () {
@@ -2372,6 +2414,7 @@ frappe.ui.form.on("Asset Request", {
 
       console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
       if (frm.doc.status == "Received") {
+        console.log("Store Manager can Delivered");
         frm.trigger("Asset_Delivered");
       }
       if (
@@ -2595,6 +2638,7 @@ frappe.ui.form.on("Asset Request", {
   // },
 
   Dispatched_Received_intro: function (frm) {
+    let user = frappe.session.user;
     // Create a new intro for the dispatch details
     let dispatchIntro = "<b><u>Dispatch Details</u></b>";
     let dispatchedBy = frm.doc.stage_7_emp_name;
@@ -2604,8 +2648,7 @@ frappe.ui.form.on("Asset Request", {
     // Create the dispatch intro message
     let dispatchMessage = `
   Dispatched By: <span style="font-weight: bold;">${dispatchedBy}</span><br>
-  Mode of Transport: <span style="font-weight: bold;">${modeOfTransport}</span><br>
-  Dispatched Remark: <span style="font-weight: bold;">${dispatchedRemark}</span><br>
+
 `;
 
     // Add a separator line without any gap space
@@ -3115,13 +3158,14 @@ frappe.ui.form.on("Asset Request", {
   },
 
   Asset_Delivered: function (frm) {
-    let employee = frm.doc.emp_name;
+    const employee = frm.doc.emp_name;
+
     frm.add_custom_button(__("Deliver To Employee"), function () {
       var d = new frappe.ui.Dialog({
-        title: __("Please Enter OTP Given By: <b>" + employee + "</b>"),
+        title: __("Deliver Asset to Employee: <b>{0}</b>", [employee]),
         fields: [
           {
-            label: __("OTP"),
+            label: __("Enter OTP"),
             fieldname: "delivered_otp",
             fieldtype: "Data",
             reqd: 1, // Make the field mandatory
@@ -3129,39 +3173,51 @@ frappe.ui.form.on("Asset Request", {
         ],
         primary_action_label: __("Submit"),
         primary_action: function () {
-          if (!d.fields_dict.delivered_otp.get_value()) {
-            frappe.msgprint(
-              __("Please enter the OTP Given by :<b>" + employee + "</b>")
-            );
+          console.log("Entered primary_action function");
+
+          var enteredOTP = d.fields_dict.delivered_otp.get_value();
+          console.log("Entered OTP: ", enteredOTP);
+
+          if (!enteredOTP) {
+            frappe.msgprint(__("Please enter the OTP."));
             return;
           }
 
-          // Check if the entered OTP matches the store OTP
-          if (
-            frm.doc.received_otp === d.fields_dict.delivered_otp.get_value()
-          ) {
-            frm.set_value("status", "Delivered");
-
+          // Check if the entered OTP matches the stored OTP
+          if (frm.doc.received_otp === enteredOTP) {
             frappe.call({
               method:
                 "sahayog_asset.sahayog_asset.doctype.asset_request.server_date_api.get_server_datetime",
               callback: function (r) {
+                console.log("Callback response: ", r);
                 frm.set_value("delivered_date", r.message);
-                frm.save();
-                d.hide();
+                frm.set_value("status", "Delivered");
+                frm.refresh_field("delivered_date");
+                frm.refresh_field("status");
+                cur_frm.save();
+                frm.reload_doc();
+                console.log(
+                  "Delivered by store manager. Status set to Delivered"
+                );
               },
             });
           } else {
             frappe.msgprint(__("Invalid OTP. Please try again."));
           }
+
+          // Hide the dialog after processing
+          d.hide();
+          console.log("Dialog hidden");
         },
         secondary_action_label: __("Cancel"),
         secondary_action: function () {
           d.hide();
+          console.log("Secondary action: Dialog hidden");
         },
       });
 
       d.show();
+      console.log("Dialog shown");
     });
   },
 

@@ -68,3 +68,29 @@ def set_level(level, self, rm_stage_status, rm_stage, rm_stage_request, stage_st
         return check_conditions(self, rm_stage_request)
     except Exception as e:
         return False
+
+
+@frappe.whitelist()
+def set_otp(self, otp, remark):
+    frappe.db.set_value("Asset Request", self, "emp_received_remark", remark)
+    frappe.db.set_value("Asset Request", self, "received_otp", otp)
+    frappe.db.set_value("Asset Request", self, "status", "Received")
+    
+    
+
+    # Use quotes around field names to avoid NameError
+    emp_remark = frappe.db.get_value("Asset Request", self, "emp_received_remark")
+    emp_otp = frappe.db.get_value("Asset Request", self, "received_otp")
+
+ # Check if both fields have values
+    if emp_remark and emp_otp:
+        #frappe.msgprint("Both fields have values!")  # Display a message if True
+        return True
+    else:
+        return False
+
+
+        
+    
+    
+    
