@@ -2,6 +2,13 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Purchase Requisition", {
+  admin_save: function (frm) {
+    if (frappe.user.has_role("Administrator")) {
+      frm.save();
+      return;
+    }
+  },
+
   before_save: function (frm) {
     let user = frappe.session.user;
     if (user === frm.doc.emp_user) {
@@ -26,6 +33,71 @@ frappe.ui.form.on("Purchase Requisition", {
     } else if (user === frm.doc.rm_user) {
     } else if (user === frm.doc.hod) {
     }
+  },
+
+  Approval_and_Fullfillment_Tracker: function (frm) {
+    // Initialize the custom intro message with the heading in bold and black
+
+    let status;
+    let CTO = "Kamlesh Waghmare";
+    if (
+      frm.doc.status == "Pending" ||
+      frm.doc.status == "Pending from Purchase"
+    ) {
+      status = "Pending";
+    } else if (frm.doc.status == "Pending from CFO") {
+      status = "Pending from CFO";
+    } else if (frm.doc.status == "Pending from Vendor") {
+      status = "Pending from Vendor";
+    } else if (frm.doc.status == "Dispatched") {
+      status = "Dispatched";
+    } else if (frm.doc.status == "Pending from CTO") {
+      status = "Waiting for CTO Approval";
+    }
+
+    let ctoStatusColor =
+      frm.doc.cto_status === "Pending"
+        ? "#FF5733" // Use a shade of red
+        : frm.doc.cto_status === "Approved"
+        ? "#4CAF50" // Use a shade of green
+        : "black";
+
+    // Add conditional color to cto_name
+    let ctoNameColor =
+      frm.doc.cto_status === "Pending"
+        ? "#FF5733" // Use a shade of red
+        : frm.doc.cto_status === "Approved"
+        ? "#4CAF50" // Use a shade of green
+        : "black";
+
+    let customIntroMessage = ""; // Initialize an empty message
+
+    if (frm.doc.cto_status !== "Skip") {
+      customIntroMessage = `<b style="color: black;">Approval Tracker:</b> <span style="color: ${ctoStatusColor};">${frm.doc.cto_status}</span><br>`;
+
+      // Add cto_name with the dynamically determined color
+      customIntroMessage += `<span style="color: ${ctoNameColor};">${CTO}</span><br>`;
+
+      // Add a separator line using <hr>
+      customIntroMessage += "<hr>";
+    }
+    // Add the "Fullfillment Tracker" heading
+    customIntroMessage += "<b style='color: black;'>Purchase Department: </b>";
+
+    // Determine the color for Fulfillment Tracker based on frm.doc.status
+    let fullfillment_color =
+      frm.doc.status === "Dispatched" || frm.doc.status === "Received"
+        ? "#4CAF50" // Green for "Dispatched" and "Received"
+        : "#FF5733"; // Red for other statuses
+
+    // Add additional content to the message, for example, frm.doc.status
+    customIntroMessage += `<span style="color: ${fullfillment_color};">${status}</span><br>`;
+
+    // You can customize the style and color here
+    let customIntroStyle = "color: blue; font-size: 16px;";
+
+    // Set the intro message
+    frm.set_intro(customIntroMessage, customIntroStyle);
   },
 
   refresh: function (frm) {
@@ -86,7 +158,10 @@ frappe.ui.form.on("Purchase Requisition", {
         });
         frm.change_custom_button_type("Submit", null, "success");
       } else if (frm.doc.status == "Pending from CTO") {
-        if (user === "1299@sahayog.com") {
+        if (
+          user === "1299@sahayog.com" ||
+          frappe.user.has_role("Administrator")
+        ) {
           frm.add_custom_button(__("Approve"), function () {
             if (frm.doc.status == "Pending from CTO") {
               frappe.confirm(
@@ -157,14 +232,18 @@ frappe.ui.form.on("Purchase Requisition", {
       }
 
       if (
-        frm.doc.cto_status == "Approved" &&
-        frm.doc.status == "Pending from Purchase"
+        frm.doc.status == "Pending" ||
+        frm.doc.status == "Pending from CTO" ||
+        frm.doc.status == "Pending from Purchase" ||
+        frm.doc.status == "Pending from Vendor" ||
+        frm.doc.status == "Pending from CFO"
       ) {
-        frm.set_intro("Approved by CTO", "green");
+        frm.trigger("Approval_and_Fullfillment_Tracker");
       } else if (frm.doc.status == "Dispatched") {
         frm.set_intro("Dispatched from Purchase Department", "green");
       } else if (frm.doc.status == "Received") {
-        frm.set_intro("Received by : <b>" + store_manager + "</b>", "green");
+        //frm.set_intro("Received by : <b>" + store_manager + "</b>", "green");
+        frm.trigger("Approval_and_Fullfillment_Tracker");
       }
     }
 

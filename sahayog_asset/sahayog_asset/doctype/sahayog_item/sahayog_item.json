@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "item_details",
+  "enable",
   "item_id",
   "item_name",
   "item_description",
@@ -134,11 +135,17 @@
    "fieldname": "hod_name",
    "fieldtype": "Data",
    "label": "Hod Name"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-08 15:31:06.429270",
+ "modified": "2023-12-08 11:38:57.703182",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",

@@ -9,7 +9,6 @@
  "field_order": [
   "section_break_7",
   "employee_details_section",
-  "status",
   "emp_name",
   "column_break_jzngo",
   "designation",
@@ -42,6 +41,7 @@
   "validation_check",
   "dispatch_check",
   "purchase_dispatch",
+  "admin_save",
   "employee_details_tab",
   "employee_id",
   "employee_user",
@@ -56,6 +56,7 @@
   "employee_hod",
   "date",
   "approval_details_tab",
+  "status",
   "employee_section",
   "received_otp",
   "emp_received_remark",
@@ -136,7 +137,7 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
-   "hidden": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered"
   },
@@ -173,7 +174,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Division",
-   "options": "\nMultistate\nMicrofinance\nTwo Wheeler",
+   "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool",
    "read_only": 1
   },
   {
@@ -184,6 +185,7 @@
    "fetch_from": "employee_id.branch",
    "fieldname": "branch",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Branch"
   },
   {
@@ -220,7 +222,7 @@
    "fieldname": "select_department",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Department",
+   "label": "Request To",
    "options": "Asset Department",
    "reqd": 1,
    "set_only_once": 1
@@ -368,7 +370,7 @@
   {
    "fieldname": "stage_4_emp_status",
    "fieldtype": "Select",
-   "label": "Approval Status",
+   "label": "CFO Approval Status",
    "options": "Pending\nReject\nApproved\nSkip"
   },
   {
@@ -677,7 +679,7 @@
    "label": "RP Designation"
   },
   {
-   "default": "talib.s@sahayogmultistate.com",
+   "fetch_from": "employee_id.reporting_employee_email",
    "fieldname": "stage_1_emp_email",
    "fieldtype": "Data",
    "label": "Email"
@@ -693,11 +695,13 @@
    "label": "Email"
   },
   {
+   "default": "cfo@sahayogmultistate.com",
    "fieldname": "stage_4_emp_email",
    "fieldtype": "Data",
    "label": "Email"
   },
   {
+   "default": "ceo@sahayogmultistate.com",
    "fieldname": "stage_5_emp_email",
    "fieldtype": "Data",
    "label": "Email"
@@ -831,12 +835,17 @@
    "fieldname": "purchase_dispatch",
    "fieldtype": "Button",
    "label": "Dispatch To Store"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "admin_save",
+   "fieldtype": "Button",
+   "label": "Admin Save"
   }
  ],
- "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-12 13:56:29.237461",
+ "modified": "2023-12-12 17:20:56.818817",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
@@ -936,5 +945,7 @@
    "title": "Partially Dispatched"
   }
  ],
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

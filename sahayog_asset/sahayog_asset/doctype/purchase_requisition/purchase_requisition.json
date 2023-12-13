@@ -23,6 +23,7 @@
   "section_break_5pufi",
   "select_department",
   "employee_details_section",
+  "admin_save",
   "employee_id",
   "column_break_4",
   "emp_name",
@@ -318,12 +319,16 @@
   {
    "fieldname": "section_break_qbkdq",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "admin_save",
+   "fieldtype": "Button",
+   "label": "Admin Save"
   }
  ],
- "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-28 17:49:25.559544",
+ "modified": "2023-11-24 15:08:10.236157",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",

@@ -207,8 +207,7 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
-   "options": "Branch",
-   "reqd": 1
+   "options": "Branch"
   },
   {
    "fieldname": "total_quantity",
@@ -353,7 +352,6 @@
    "label": "Email"
   },
   {
-   "fetch_from": "branch.address",
    "fieldname": "branch_address",
    "fieldtype": "Data",
    "label": "Branch Address"
@@ -424,7 +422,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-04-11 17:33:33.688869",
+ "modified": "2023-12-02 11:26:42.866666",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog PO",

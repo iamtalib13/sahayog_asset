@@ -1,0 +1,87 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": "name",
+   "fieldtype": "Link",
+   "label": "ID",
+   "options": "Asset Request",
+   "width": 0
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Request Date",
+   "width": 0
+  },
+  {
+   "fieldname": "Elapsed_Day",
+   "fieldtype": "Data",
+   "label": "Elapsed Days",
+   "width": 0
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee",
+   "width": 0
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "label": "Division",
+   "width": 0
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Branch",
+   "width": 0
+  },
+  {
+   "fieldname": "select_department",
+   "fieldtype": "Data",
+   "label": "Request To",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_3_emp_status",
+   "fieldtype": "Data",
+   "label": "GM Status",
+   "width": 0
+  }
+ ],
+ "creation": "2023-10-17 14:02:20.611035",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Sahayog",
+ "modified": "2023-10-17 14:02:20.611035",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Pending Asset Request From - Naresh Lulani",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n    name,\n    date,\n  DATEDIFF(CURDATE(), date) AS Elapsed_Days,\n    emp_name,\n    division,\n    branch,\n    select_department,\n    stage_3_emp_status\nFROM `tabAsset Request`\nWHERE status IN ('Pending From Purchase', 'Pending From Store Manager', 'Pending')\nAND stage_1_emp_status IN ('Approved', 'Skip')\nAND stage_2_emp_status IN ('Approved', 'Skip')\nAND stage_3_emp_status = 'Pending'\n ORDER BY\n        Elapsed_Days DESC;",
+ "ref_doctype": "Asset Request",
+ "report_name": "Pending Asset Request From - Naresh Lulani",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Regional Manager"
+  },
+  {
+   "role": "Analytics"
+  }
+ ]
+}
