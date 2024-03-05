@@ -1,0 +1,86 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": " name",
+   "fieldtype": "Data",
+   "label": "ID",
+   "width": 0
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Request Date",
+   "width": 0
+  },
+  {
+   "fieldname": "Elapsed_Days",
+   "fieldtype": "Data",
+   "label": "Elapsed Days",
+   "width": 0
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee",
+   "width": 0
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "label": "Division",
+   "width": 0
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Branch",
+   "width": 0
+  },
+  {
+   "fieldname": "select_department",
+   "fieldtype": "Data",
+   "label": "Request To",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_2_emp_status",
+   "fieldtype": "Data",
+   "label": "HOD Status",
+   "width": 0
+  }
+ ],
+ "creation": "2023-10-27 11:52:17.172523",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Sahayog",
+ "modified": "2023-10-27 11:52:17.172523",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Pending Asset Request From - Nishant Shelare",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\n    name,\n    date,\n  DATEDIFF(CURDATE(), date) AS Elapsed_Days,\n    emp_name,\n    division,\n    branch,\n    select_department,\n    stage_2_emp_status\nFROM `tabAsset Request`\nWHERE status IN ('Pending From Purchase', 'Pending From Store Manager', 'Pending')\n    AND stage_1_emp_status IN ('Approved', 'Skip')\n    AND stage_2_emp_status = 'Pending'\n    AND stage_2_emp_name = 'Nishant Shelare'\n ORDER BY\n        Elapsed_Days DESC;",
+ "ref_doctype": "Asset Request",
+ "report_name": "Pending Asset Request From - Nishant Shelare",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Regional Manager"
+  },
+  {
+   "role": "Analytics"
+  }
+ ]
+}

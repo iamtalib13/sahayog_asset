@@ -2,90 +2,6 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Sahayog Item", {
-  level_1_approval: function (frm) {
-    if (frm.doc.level_1_approval) {
-      frm.set_value("approval_levels", "1");
-      frm.doc.level_2_approval = false;
-      frm.doc.level_3_approval = false;
-      frm.doc.level_4_approval = false;
-    } else {
-      frm.set_value("approval_levels", "0");
-      frm.doc.level_2_approval = false;
-      frm.doc.level_3_approval = false;
-      frm.doc.level_4_approval = false;
-    }
-    frm.refresh_fields([
-      "level_1_approval",
-      "level_2_approval",
-      "level_3_approval",
-      "level_4_approval",
-      "approval_levels",
-    ]);
-
-    frm.save();
-  },
-
-  level_2_approval: function (frm) {
-    if (frm.doc.level_2_approval) {
-      frm.set_value("approval_levels", "2");
-      frm.doc.level_1_approval = true;
-      frm.doc.level_3_approval = false;
-      frm.doc.level_4_approval = false;
-    } else {
-      frm.set_value("approval_levels", "1");
-      frm.doc.level_3_approval = false;
-      frm.doc.level_4_approval = false;
-    }
-    frm.refresh_fields([
-      "level_1_approval",
-      "level_2_approval",
-      "level_3_approval",
-      "level_4_approval",
-      "approval_levels",
-    ]);
-    frm.save();
-  },
-
-  level_3_approval: function (frm) {
-    if (frm.doc.level_3_approval) {
-      frm.set_value("approval_levels", "3");
-      frm.doc.level_1_approval = true;
-      frm.doc.level_2_approval = true;
-
-      frm.doc.level_4_approval = false;
-    } else {
-      frm.set_value("approval_levels", "2");
-      frm.doc.level_4_approval = false;
-    }
-    frm.refresh_fields([
-      "level_1_approval",
-      "level_2_approval",
-      "level_3_approval",
-      "level_4_approval",
-      "approval_levels",
-    ]);
-    frm.save();
-  },
-
-  level_4_approval: function (frm) {
-    if (frm.doc.level_4_approval) {
-      frm.set_value("approval_levels", "4");
-      frm.doc.level_1_approval = true;
-      frm.doc.level_2_approval = true;
-      frm.doc.level_3_approval = true;
-    } else {
-      frm.set_value("approval_levels", "3");
-    }
-    frm.refresh_fields([
-      "level_1_approval",
-      "level_2_approval",
-      "level_3_approval",
-      "level_4_approval",
-      "approval_levels",
-    ]);
-    frm.save();
-  },
-
   after_save: function (frm) {
     frm.set_value("item_id", frm.doc.name);
     frm.save();
@@ -155,5 +71,29 @@ frappe.ui.form.on("Sahayog Item", {
     //   frm.set_value("sgst", "9%");
     //   frm.set_value("cgst", "9%");
     // }
+  },
+
+  refresh: function (frm) {
+    if (frappe.user.has_role("Stationery Asset Admin")) {
+      if (frm.is_new()) {
+        console.log("Stationery Asset");
+        frm.set_value("category", "Stationery");
+        frm.set_df_property("category", "read_only", 1);
+        frm.set_df_property("other", "hidden", 1);
+        frm.set_value("enable", 1);
+      } else {
+        frm.set_df_property("category", "read_only", 1);
+      }
+    } else if (frappe.user.has_role("IT Asset Admin")) {
+      if (frm.is_new()) {
+        console.log("IT Asset");
+        frm.set_value("category", "IT");
+        frm.set_df_property("category", "read_only", 1);
+        // frm.set_df_property("category", "hidden", 1);
+        frm.set_value("enable", 1);
+      } else {
+        frm.set_df_property("category", "read_only", 1);
+      }
+    }
   },
 });

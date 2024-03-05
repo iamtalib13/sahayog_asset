@@ -2,6 +2,13 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Purchase Requisition", {
+  admin_save: function (frm) {
+    if (frappe.user.has_role("Administrator")) {
+      frm.save();
+      return;
+    }
+  },
+
   before_save: function (frm) {
     let user = frappe.session.user;
     if (user === frm.doc.emp_user) {
@@ -151,7 +158,10 @@ frappe.ui.form.on("Purchase Requisition", {
         });
         frm.change_custom_button_type("Submit", null, "success");
       } else if (frm.doc.status == "Pending from CTO") {
-        if (user === "1299@sahayog.com") {
+        if (
+          user === "1299@sahayog.com" ||
+          frappe.user.has_role("Administrator")
+        ) {
           frm.add_custom_button(__("Approve"), function () {
             if (frm.doc.status == "Pending from CTO") {
               frappe.confirm(

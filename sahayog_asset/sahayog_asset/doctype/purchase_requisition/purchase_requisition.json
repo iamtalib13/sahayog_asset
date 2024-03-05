@@ -23,6 +23,7 @@
   "section_break_5pufi",
   "select_department",
   "employee_details_section",
+  "admin_save",
   "employee_id",
   "column_break_4",
   "emp_name",
@@ -49,7 +50,6 @@
   "request",
   "cto_section",
   "cto_user",
-  "cto_name",
   "cto_status",
   "rejection_reason",
   "cto_request"
@@ -162,8 +162,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nPending from CTO\nPending from Purchase\nPending from Vendor\nPending from CFO\nDispatched\nReceived\nRejected",
-   "read_only": 1
+   "options": "Draft\nPending from CTO\nPending from Purchase\nPending from Vendor\nPending from CFO\nDispatched\nReceived\nRejected"
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -321,16 +320,14 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "Kamlesh Waghmare",
-   "fieldname": "cto_name",
-   "fieldtype": "Data",
-   "label": "CTO Name"
+   "fieldname": "admin_save",
+   "fieldtype": "Button",
+   "label": "Admin Save"
   }
  ],
- "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-10-20 17:12:03.903528",
+ "modified": "2024-02-13 11:32:28.201071",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",

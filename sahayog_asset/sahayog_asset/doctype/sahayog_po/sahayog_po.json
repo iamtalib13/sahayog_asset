@@ -43,6 +43,7 @@
   "column_break_11",
   "branch",
   "branch_address",
+  "column_break_9",
   "section_break_7",
   "remarks",
   "material_details_tab",
@@ -120,6 +121,10 @@
    "label": "Remarks"
   },
   {
+   "fieldname": "column_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
    "depends_on": "eval:doc.vendor",
    "fieldname": "invoice_details_tab",
    "fieldtype": "Tab Break",
@@ -190,7 +195,7 @@
    "collapsible": 1,
    "fieldname": "sec_despatch_to",
    "fieldtype": "Section Break",
-   "label": "Dispatch To"
+   "label": "Despatch To"
   },
   {
    "fieldname": "des_party_name",
@@ -347,7 +352,6 @@
    "label": "Email"
   },
   {
-   "fetch_from": "branch.address",
    "fieldname": "branch_address",
    "fieldtype": "Data",
    "label": "Branch Address"
@@ -418,7 +422,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-29 13:21:37.280428",
+ "modified": "2023-12-02 11:26:42.866666",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog PO",

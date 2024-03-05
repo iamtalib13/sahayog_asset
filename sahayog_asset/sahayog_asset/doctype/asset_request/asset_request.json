@@ -9,7 +9,6 @@
  "field_order": [
   "section_break_7",
   "employee_details_section",
-  "status",
   "emp_name",
   "column_break_jzngo",
   "designation",
@@ -35,8 +34,6 @@
   "item_purpose",
   "column_break_hlfgf",
   "add_item",
-  "item_level",
-  "approval_levels",
   "section_break_crbxo",
   "asset",
   "asset_lock",
@@ -59,6 +56,7 @@
   "employee_hod",
   "date",
   "approval_details_tab",
+  "status",
   "employee_section",
   "received_otp",
   "emp_received_remark",
@@ -139,10 +137,9 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
-   "hidden": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered\nCancelled"
+   "options": "Draft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered"
   },
   {
    "fieldname": "employee_id",
@@ -188,6 +185,7 @@
    "fetch_from": "employee_id.branch",
    "fieldname": "branch",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Branch"
   },
   {
@@ -612,7 +610,7 @@
   {
    "depends_on": "eval:doc.select_department",
    "fieldname": "item_description",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Item Description"
   },
   {
@@ -827,38 +825,27 @@
    "label": "Validation Check"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('Store Manager') && (doc.status == \"Pending\" || doc.status == \"Pending From Store Manager\")\n",
+   "depends_on": "eval:frappe.user.has_role('Store Manager')",
    "fieldname": "dispatch_check",
    "fieldtype": "Button",
    "label": "Dispatch/Pending"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('Purchase Department') && doc.status == \"Pending From Purchase\"\n",
+   "depends_on": "eval:frappe.user.has_role('Purchase Department')",
    "fieldname": "purchase_dispatch",
    "fieldtype": "Button",
    "label": "Dispatch To Store"
-  },
-  {
-   "fieldname": "approval_levels",
-   "fieldtype": "Data",
-   "label": "Approval Levels"
   },
   {
    "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "admin_save",
    "fieldtype": "Button",
    "label": "Admin Save"
-  },
-  {
-   "fetch_from": "list.approval_levels",
-   "fieldname": "item_level",
-   "fieldtype": "Data",
-   "label": "Item Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-07 17:22:48.805376",
+ "modified": "2024-01-06 12:19:28.888095",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
@@ -958,5 +945,7 @@
    "title": "Partially Dispatched"
   }
  ],
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }

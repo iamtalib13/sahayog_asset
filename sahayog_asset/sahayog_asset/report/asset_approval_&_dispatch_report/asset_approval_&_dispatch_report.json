@@ -1,0 +1,99 @@
+{
+ "add_total_row": 1,
+ "columns": [
+  {
+   "fieldname": "name",
+   "fieldtype": "Link",
+   "label": "ID",
+   "options": "Asset Request",
+   "width": 0
+  },
+  {
+   "fieldname": "emp_name",
+   "fieldtype": "Data",
+   "label": "Employee",
+   "width": 0
+  },
+  {
+   "fieldname": "select_department",
+   "fieldtype": "Data",
+   "label": "Request To",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_1_emp_status",
+   "fieldtype": "Data",
+   "label": "Reporting Person",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_2_emp_status",
+   "fieldtype": "Data",
+   "label": "HOD",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_3_emp_status",
+   "fieldtype": "Data",
+   "label": "BH",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_4_emp_status",
+   "fieldtype": "Data",
+   "label": "CFO",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_5_emp_status",
+   "fieldtype": "Data",
+   "label": "CEO",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_6_emp_status",
+   "fieldtype": "Data",
+   "label": "CTO",
+   "width": 0
+  },
+  {
+   "fieldname": "stage_7_emp_status",
+   "fieldtype": "Data",
+   "label": "Store Manager",
+   "width": 0
+  }
+ ],
+ "creation": "2023-09-16 12:23:30.511718",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Sahayog",
+ "modified": "2023-09-16 12:45:36.481053",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Asset Approval & Dispatch Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT name,emp_name,select_department as Request_To,stage_1_emp_status,stage_2_emp_status,stage_3_emp_status,\nstage_4_emp_status,stage_5_emp_status,stage_6_emp_status,stage_7_emp_status\nFROM `tabAsset Request`\nWHERE status IN ('Pending From Purchase', 'Pending From Store Manager', 'Pending');\n",
+ "ref_doctype": "Asset Request",
+ "report_name": "Asset Approval & Dispatch Report",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Regional Manager"
+  },
+  {
+   "role": "Analytics"
+  }
+ ]
+}

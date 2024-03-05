@@ -9,11 +9,15 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "add_item_form_tab",
   "item_details",
-  "item_id",
-  "item_name",
-  "item_description",
   "category",
+  "item_name",
+  "enable",
+  "other",
+  "other_details_tab",
+  "item_id",
+  "item_description",
   "unit",
   "type_of_supply",
   "description",
@@ -26,14 +30,7 @@
   "igst",
   "hsnsac",
   "hod_id",
-  "hod_name",
-  "approval_tab",
-  "note",
-  "level_1_approval",
-  "level_2_approval",
-  "level_3_approval",
-  "level_4_approval",
-  "approval_levels"
+  "hod_name"
  ],
  "fields": [
   {
@@ -143,50 +140,32 @@
    "label": "Hod Name"
   },
   {
-   "fieldname": "approval_tab",
+   "default": "0",
+   "fieldname": "enable",
+   "fieldtype": "Check",
+   "label": "Enable"
+  },
+  {
+   "default": "0",
+   "fieldname": "other",
+   "fieldtype": "Check",
+   "label": "Visibile for IT Employee Only ?"
+  },
+  {
+   "fieldname": "add_item_form_tab",
    "fieldtype": "Tab Break",
-   "label": "Approval"
+   "label": "Add Item Form"
   },
   {
-   "default": "0",
-   "fieldname": "level_1_approval",
-   "fieldtype": "Check",
-   "label": "Level 1 - Reporting Person "
-  },
-  {
-   "default": "0",
-   "fieldname": "level_2_approval",
-   "fieldtype": "Check",
-   "label": "Level 2 - HOD"
-  },
-  {
-   "default": "0",
-   "fieldname": "level_3_approval",
-   "fieldtype": "Check",
-   "label": "Level 3 - Naresh Lulani"
-  },
-  {
-   "default": "0",
-   "fieldname": "level_4_approval",
-   "fieldtype": "Check",
-   "label": "Level 4 - Sandeep Bhatia"
-  },
-  {
-   "fieldname": "note",
-   "fieldtype": "HTML",
-   "options": "  <div style=\"padding: 8px 20px; background-color: #e6f7ff; border: 2px solid #3399ff; color: #0066cc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); text-align: left; margin-bottom: 20px; max-width: 700px;\">\n        <p style=\"margin: 0;\"><strong>NOTE:</strong> When you select the highest level of approval, the previous levels are automatically selected.</p>\n    </div>"
-  },
-  {
-   "default": "0",
-   "fieldname": "approval_levels",
-   "fieldtype": "Select",
-   "label": "Approval level",
-   "options": "0\n1\n2\n3\n4"
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "other_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Other Details"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-11-25 15:09:46.991912",
+ "modified": "2024-02-13 12:20:02.656028",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",
@@ -232,7 +211,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
