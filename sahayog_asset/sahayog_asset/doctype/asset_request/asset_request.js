@@ -527,6 +527,8 @@ frappe.ui.form.on("Asset Request", {
             frm.set_value("region", r.message[0].region);
             frm.set_value("employee_user", r.message[0].user_id);
             frm.set_value("branch", r.message[0].branch);
+            frm.set_value("district", r.message[0].district);
+
             //<Email Setup>
 
             if (frm.doc.division === "Microfinance") {
@@ -545,12 +547,21 @@ frappe.ui.form.on("Asset Request", {
                   "akash.j@sahayogmultistate.com"
                 );
               } else if (frm.doc.region === "Region-3") {
-                frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "sachin.c@sahayogmultistate.co.in"
-                );
+                if (frm.doc.district === "Chandrapur") {
+                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "vijay.k@sahayogmultistate.com"
+                  );
+                } else {
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "sachin.c@sahayogmultistate.co.in"
+                  );
+                }
               } else if (frm.doc.region === "Region-4") {
                 frm.set_value("stage_2_emp_id", "3261@sahayog.com");
                 frm.set_value("stage_2_emp_name", "Sachin Chandewar");
@@ -1943,6 +1954,72 @@ frappe.ui.form.on("Asset Request", {
                         frm.save();
                       },
                     });
+                    frappe.call({
+                      method: "frappe.share.add",
+                      freeze: true, // Set to true to freeze the UI
+                      freeze_message: "Internet Not Stable, Please Wait...",
+                      args: {
+                        doctype: frm.doctype,
+                        name: frm.docname,
+                        user: "3991@sahayog.com",
+                        read: 1,
+                        write: 1,
+                        submit: 0,
+                        share: 1,
+                        notify: 1,
+                        send_email: 0, // Set this to 0 to prevent sending email notifications
+                      },
+                      callback: function (response) {
+                        // Check if the document has been modified
+
+                        // Document share was successful
+                        frappe.show_alert({
+                          message: "Your Asset Request Sent Successfully",
+                          indicator: "green",
+                        });
+
+                        // Set field values
+                        frm.set_value(emp_stage_request, "Done");
+                        frm.set_value("stage_6_emp_status", "Approved");
+                        frm.set_value("status", "Pending");
+
+                        // Save the form
+                        frm.save();
+                      },
+                    });
+                    frappe.call({
+                      method: "frappe.share.add",
+                      freeze: true, // Set to true to freeze the UI
+                      freeze_message: "Internet Not Stable, Please Wait...",
+                      args: {
+                        doctype: frm.doctype,
+                        name: frm.docname,
+                        user: "3511@sahayog.com",
+                        read: 1,
+                        write: 1,
+                        submit: 0,
+                        share: 1,
+                        notify: 1,
+                        send_email: 0, // Set this to 0 to prevent sending email notifications
+                      },
+                      callback: function (response) {
+                        // Check if the document has been modified
+
+                        // Document share was successful
+                        frappe.show_alert({
+                          message: "Your Asset Request Sent Successfully",
+                          indicator: "green",
+                        });
+
+                        // Set field values
+                        frm.set_value(emp_stage_request, "Done");
+                        frm.set_value("stage_6_emp_status", "Approved");
+                        frm.set_value("status", "Pending");
+
+                        // Save the form
+                        frm.save();
+                      },
+                    });
 
                     //</PR is Shared with RM using API Call>
                   } else {
@@ -2051,11 +2128,17 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 7>
     else if (
-      (user === frm.doc.stage_7_emp_id &&
+      ((user === frm.doc.stage_7_emp_id ||
+        user === "3991@sahayog.com" ||
+        user === "3511@sahayog.com") &&
         frm.doc.stage_4_emp_status == "Approved") ||
-      (user === frm.doc.stage_7_emp_id &&
+      ((user === frm.doc.stage_7_emp_id ||
+        user === "3991@sahayog.com" ||
+        user === "3511@sahayog.com") &&
         frm.doc.stage_5_emp_status == "Approved") ||
-      (user === frm.doc.stage_7_emp_id &&
+      ((user === frm.doc.stage_7_emp_id ||
+        user === "3991@sahayog.com" ||
+        user === "3511@sahayog.com") &&
         frm.doc.stage_6_emp_status == "Approved")
     ) {
       var purchase_status = frappe.meta.get_docfield(
@@ -2955,7 +3038,12 @@ frappe.ui.form.on("Asset Request", {
   },
   dispatch_check: function (frm) {
     let user = frappe.session.user;
-    if (user === frm.doc.stage_7_emp_id) {
+
+    if (
+      user === frm.doc.stage_7_emp_id ||
+      user === "3511@sahayog.com" ||
+      user === "3991@sahayog.com"
+    ) {
       const assetTable = frm.doc.asset;
       let conditionMet = false; // Initialize a variable to track condition status
 

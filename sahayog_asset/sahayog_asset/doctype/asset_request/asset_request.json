@@ -10,15 +10,15 @@
   "section_break_7",
   "employee_details_section",
   "emp_name",
-  "column_break_jzngo",
   "designation",
-  "column_break_r9uiq",
+  "column_break_jzngo",
   "phone",
-  "column_break_m6zbu",
   "employee_department",
+  "column_break_r9uiq",
+  "region",
+  "district",
   "column_sbreak_aed1x",
   "division",
-  "column_break_6",
   "branch",
   "asset_department_section",
   "select_department",
@@ -52,7 +52,6 @@
   "section_break_xiifo",
   "column_break_5",
   "column_break_8",
-  "region",
   "employee_hod",
   "date",
   "approval_details_tab",
@@ -176,10 +175,6 @@
    "label": "Division",
    "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool",
    "read_only": 1
-  },
-  {
-   "fieldname": "column_break_6",
-   "fieldtype": "Column Break"
   },
   {
    "fetch_from": "employee_id.branch",
@@ -647,10 +642,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_m6zbu",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "column_sbreak_aed1x",
    "fieldtype": "Column Break"
   },
@@ -841,11 +832,17 @@
    "fieldname": "admin_save",
    "fieldtype": "Button",
    "label": "Admin Save"
+  },
+  {
+   "fetch_from": "employee_id.district",
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-01-06 12:19:28.888095",
+ "modified": "2024-03-22 11:35:04.528262",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
