@@ -172,6 +172,18 @@ frappe.ui.form.on("Asset Request", {
 
     if (frappe.user.has_role("Administrator")) {
       frm.enable_save();
+
+      frm.add_custom_button(__("Employee Correct"), function () {
+        //perform desired action such as routing to new form or fetching etc.
+
+        let employee_id = frm.doc.employee_id;
+        console.log("checking Id-", employee_id);
+
+        frm.set_value("employee_id", null);
+        frm.set_value("employee_id", employee_id);
+
+        frm.save();
+      });
     }
 
     frm.trigger("select_department");
