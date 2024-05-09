@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "add_item_form_tab",
+  "approval_level",
   "item_details",
   "category",
   "item_name",
@@ -161,11 +162,17 @@
    "fieldname": "other_details_tab",
    "fieldtype": "Tab Break",
    "label": "Other Details"
+  },
+  {
+   "fieldname": "approval_level",
+   "fieldtype": "Select",
+   "label": "Approval Level",
+   "options": "\nReporting-Person\nHOD/RM\nGM\nCFO"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-13 12:20:02.656028",
+ "modified": "2024-04-25 15:38:23.231130",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",

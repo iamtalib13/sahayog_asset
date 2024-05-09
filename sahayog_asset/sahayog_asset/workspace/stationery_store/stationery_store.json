@@ -1,0 +1,96 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"X5XPydKEAk\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Stationery Store Management</b></span>\",\"col\":12}},{\"id\":\"MN6e5Ye1bx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"vX2hR5YFLc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\"><b>Status-Wise</b></span>\",\"col\":12}},{\"id\":\"ZWS6DHb5AR\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval Pending\",\"col\":3}},{\"id\":\"KsXwi6-Jiy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"FKcVxGW98K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"pJ8nZT3KCD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"nhlJcK5RWy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"siXl6dPJCg\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hoy1FTH7VQ\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Recent Stationery Requests\",\"col\":12}}]",
+ "creation": "2024-05-02 15:53:16.363412",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "review",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Stationery Store",
+ "links": [],
+ "modified": "2024-05-09 17:29:35.135193",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Stationery Store",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Asset Request",
+   "label": "Recent Stationery Requests",
+   "quick_list_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Stationery Store Executive"
+  },
+  {
+   "role": "Stationery Store Manager"
+  }
+ ],
+ "sequence_id": 42.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Store Approval",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Pending\",false],[\"Asset Request\",\"status\",\"in\",[\"Pending From Store Manager\",null],false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Approval Pending",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Pending\",false],[\"Asset Request\",\"status\",\"in\",[\"Draft\",\"Pending\",null],false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Purchase",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"status\",\"=\",\"Pending From Purchase\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Delivered",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Dispatched",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Dispatched\",false],[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "OTP",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Received\",false],[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Stationery Store"
+}

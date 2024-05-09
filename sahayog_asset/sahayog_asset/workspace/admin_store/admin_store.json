@@ -1,0 +1,96 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"tm99hSXduL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Admin Store Management</b></span>\",\"col\":12}},{\"id\":\"ExIIL0RADC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"qsmjUOvX2Q\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"R7zP7_XxmW\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\"><b>Status-Wise</b></span>\",\"col\":12}},{\"id\":\"jkcvDmCEgC\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval\",\"col\":3}},{\"id\":\"wojFgkOhv1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"Cud6nhk0Ij\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"ZjLz54Wzto\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"r29ez1dqDq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"hHikUO8rW7\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"HGIi2AqKEW\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Recent\",\"col\":12}}]",
+ "creation": "2024-05-02 16:51:06.017377",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "review",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Admin Store",
+ "links": [],
+ "modified": "2024-05-09 17:29:48.502024",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Admin Store",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Asset Request",
+   "label": "Recent",
+   "quick_list_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Admin Store Executive"
+  },
+  {
+   "role": "Admin Store Manager"
+  }
+ ],
+ "sequence_id": 43.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Store Approval",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Done\",false],[\"Asset Request\",\"stage_7_emp_status\",\"=\",\"Pending\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Approval",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"stage_7_emp_status\",\"=\",\"Pending\",false],[\"Asset Request\",\"status\",\"in\",[\"Draft\",\"Pending\"],false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "OTP",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"status\",\"=\",\"Received\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Dispatched",
+   "label": "Dispatched",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"status\",\"=\",\"Dispatched\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Purchase",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"status\",\"=\",\"Pending From Purchase\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Delivered",
+   "label": "Delivered",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Admin\",false],[\"Asset Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Admin Store"
+}

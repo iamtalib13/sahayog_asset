@@ -2,6 +2,42 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Asset Request", {
+  list: function (frm) {
+    let approval_level = frm.doc.item_approval;
+    console.log("Item Approval - ", approval_level);
+
+    if (approval_level === "") {
+      // Code to execute if approval_level is an empty string
+      console.log("Approval level is empty.");
+      frm.set_value("approval_level", "");
+      frm.refresh_field("approval_level");
+    } else if (approval_level === "Reporting-Person") {
+      // Code to execute if approval_level is "Reporting-Person"
+      console.log("Approval level is Reporting-Person.");
+      frm.set_value("approval_level", 1);
+      frm.refresh_field("approval_level");
+    } else if (approval_level === "HOD/RM") {
+      // Code to execute if approval_level is "HOD/RM"
+      console.log("Approval level is HOD/RM.");
+      frm.set_value("approval_level", 2);
+      frm.refresh_field("approval_level");
+    } else if (approval_level === "GM") {
+      // Code to execute if approval_level is "GM"
+      console.log("Approval level is GM.");
+      frm.set_value("approval_level", 3);
+      frm.refresh_field("approval_level");
+    } else if (approval_level === "CFO") {
+      // Code to execute if approval_level is "CFO"
+      console.log("Approval level is CFO.");
+      frm.set_value("approval_level", 4);
+      frm.refresh_field("approval_level");
+    } else {
+      // Code to execute if approval_level doesn't match any of the above values
+      console.log("Approval level is not recognized.");
+      // Add your logic here
+    }
+  },
+
   admin_save: function (frm) {
     if (frappe.user.has_role("Administrator")) {
       frm.save();
@@ -99,6 +135,7 @@ frappe.ui.form.on("Asset Request", {
         // No match, do nothing
       }
     }
+    frm.trigger("set_Approval_levels");
 
     frm.set_value("first_intro", "Done");
   },
@@ -166,10 +203,16 @@ frappe.ui.form.on("Asset Request", {
   },
 
   refresh: function (frm) {
+    if (frm.is_new()) {
+      frm.trigger("Set_Employee_Details");
+      frm.trigger("Employee_Details");
+    } else if (!frm.is_new()) {
+      frm.trigger("Employee_Details");
+    }
     // if (frappe.user.has_role("Analytics")) {
     //   frm.set_df_property("asset", "read_only", 1);
     // }
-
+    // frm.trigger("set_Approval_levels");
     if (frappe.user.has_role("Administrator")) {
       frm.enable_save();
 
@@ -181,6 +224,7 @@ frappe.ui.form.on("Asset Request", {
 
         frm.set_value("employee_id", null);
         frm.set_value("employee_id", employee_id);
+        frm.trigger("Set_Employee_Details");
 
         frm.save();
       });
@@ -503,393 +547,6 @@ frappe.ui.form.on("Asset Request", {
     let user = frappe.session.user;
 
     if (frm.is_new()) {
-      // Get the numeric part of the user string
-      let eid = user.match(/\d+/)[0];
-
-      // Initialize the modified employee_id
-      let modifiedEmployeeId = "";
-
-      // Check if the user string contains "ABPS" or "MCPS"
-      if (user.includes("ABPS")) {
-        modifiedEmployeeId = "ABPS" + eid;
-      } else if (user.includes("MCPS")) {
-        modifiedEmployeeId = "MCPS" + eid;
-      } else {
-        // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
-        modifiedEmployeeId = eid;
-      }
-
-      // Set the "employee_id" field with the modified value
-      frm.set_value("employee_id", modifiedEmployeeId);
-      let empid = frm.doc.employee_id;
-
-      frappe.call({
-        method:
-          "sahayog_asset.sahayog_asset.doctype.asset_request.get_emp_details.get_emp_details",
-        args: {
-          emp_id: empid,
-        },
-        callback: function (r) {
-          // Check if the message array contains at least one object
-          if (r.message.length > 0) {
-            // Get the employee department field from the first object in the array
-            //var department = r.message[0].department;
-            frm.set_value("employee_department", r.message[0].department);
-            frm.set_value("division", r.message[0].division);
-            frm.set_value("region", r.message[0].region);
-            frm.set_value("employee_user", r.message[0].user_id);
-            frm.set_value("branch", r.message[0].branch);
-            frm.set_value("district", r.message[0].district);
-
-            //<Email Setup>
-
-            if (frm.doc.division === "Microfinance") {
-              if (frm.doc.region === "Region-1") {
-                frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "vijay.k@sahayogmultistate.com"
-                );
-              } else if (frm.doc.region === "Region-2") {
-                frm.set_value("stage_2_emp_id", "102@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Akash Jambhulkar");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "akash.j@sahayogmultistate.com"
-                );
-              } else if (frm.doc.region === "Region-3") {
-                if (frm.doc.district === "Chandrapur") {
-                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "vijay.k@sahayogmultistate.com"
-                  );
-                } else {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
-                  );
-                }
-              } else if (frm.doc.region === "Region-4") {
-                frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "sachin.c@sahayogmultistate.co.in"
-                );
-              }
-            } else if (
-              frm.doc.employee_department == "Information Technology"
-            ) {
-              frm.set_value("stage_2_emp_id", "1299@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Kamlesh Waghmare");
-              frm.set_value(
-                "stage_2_emp_email",
-                "kamlesh.w@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Human Resource") {
-              frm.set_value("stage_2_emp_id", "1394@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Harshvardhan Gutke");
-              frm.set_value(
-                "stage_2_emp_email",
-                "harsh.vardhan@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Operations") {
-              if (frm.doc.rp_designation == "Branch Manager") {
-                if (frm.doc.division == "Multistate") {
-                  if (frm.doc.region == "Region-1") {
-                    frm.set_value("stage_2_emp_id", "26@sahayog.com");
-                    frm.set_value("stage_2_emp_name", "Mangesh Kathane");
-                    frm.set_value(
-                      "stage_2_emp_email",
-                      "rmgondia@sahayogmultistate.com"
-                    );
-                  } else if (frm.doc.region == "Region-2") {
-                    frm.set_value("stage_2_emp_id", "145@sahayog.com");
-                    frm.set_value("stage_2_emp_name", "Nishant Shelare");
-                    frm.set_value(
-                      "stage_2_emp_email",
-                      "nishant.s@sahayogmultistate.com"
-                    );
-                  } else if (frm.doc.region == "Region-3") {
-                    frm.set_value("stage_2_emp_id", "521@sahayog.com");
-                    frm.set_value("stage_2_emp_name", "Amish Tarale");
-                    frm.set_value(
-                      "stage_2_emp_email",
-                      "amish.t@sahayogmultistate.com"
-                    );
-                  } else if (frm.doc.region == "Region-4") {
-                    frm.set_value("stage_2_emp_id", "1348@sahayog.com");
-                    frm.set_value("stage_2_emp_name", "Manish Patil");
-                    frm.set_value(
-                      "stage_2_emp_email",
-                      "manish.p@sahayogmultistate.com"
-                    );
-                  }
-                } else if (frm.doc.division == "Two Wheeler") {
-                  frm.set_value("stage_2_emp_id", "304@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sunil Rathod");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "sunil.r@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.division == "Microfinance") {
-                  frm.set_value("stage_2_emp_id", "2553@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Dillipkumar Mishra");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "dillip.m@sahayogmultistate.com"
-                  );
-                }
-              } else {
-                frm.set_value("stage_2_emp_id", "813@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Ravi Jaiswal");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "ravi.j@sahayogmultistate.com"
-                );
-              }
-            } else if (frm.doc.employee_department == "Administration") {
-              frm.set_value("stage_2_emp_id", "596@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Omair Rashid Khan");
-              frm.set_value(
-                "stage_2_emp_email",
-                "adminmanager@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Sales") {
-              if (frm.doc.division == "Multistate") {
-                if (frm.doc.region == "Region-1") {
-                  frm.set_value("stage_2_emp_id", "26@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Mangesh Kathane");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "rmgondia@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.region == "Region-2") {
-                  frm.set_value("stage_2_emp_id", "145@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Nishant Shelare");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "nishant.s@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.region == "Region-3") {
-                  frm.set_value("stage_2_emp_id", "521@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Amish Tarale");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "amish.t@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.region == "Region-4") {
-                  frm.set_value("stage_2_emp_id", "1348@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Manish Patil");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "manish.p@sahayogmultistate.com"
-                  );
-                }
-              } else if (frm.doc.division == "Two Wheeler") {
-                frm.set_value("stage_2_emp_id", "304@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Sunil Rathod");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "sunil.r@sahayogmultistate.com"
-                );
-              } else if (frm.doc.division == "Microfinance") {
-                if (frm.doc.region === "Region-1") {
-                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "vijay.k@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.region === "Region-2") {
-                  frm.set_value("stage_2_emp_id", "102@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Akash Jambhulkar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "akash.j@sahayogmultistate.com"
-                  );
-                } else if (frm.doc.region === "Region-3") {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
-                  );
-                } else if (frm.doc.region === "Region-4") {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
-                  );
-                }
-              }
-            } else if (frm.doc.employee_department == "Audit") {
-              frm.set_value("stage_2_emp_id", "914@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_2_emp_email",
-                "naresh.l@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Collection & Recovery") {
-              frm.set_value("stage_2_emp_id", "914@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_2_emp_email",
-                "naresh.l@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Credit") {
-              frm.set_value("stage_2_emp_id", "914@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_2_emp_email",
-                "naresh.l@sahayogmultistate.com"
-              );
-            } else if (
-              frm.doc.employee_department ==
-              "Operational Excellence And Service Quality"
-            ) {
-              frm.set_value("stage_2_emp_id", "914@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_2_emp_email",
-                "naresh.l@sahayogmultistate.com"
-              );
-            } else if (frm.doc.employee_department == "Finance & Accounts") {
-              if (frm.doc.stage_1_emp_id == "1389@sahayog.com") {
-                frm.set_value("stage_2_emp_id", "1389@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
-                frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
-              } else {
-                frm.set_value("stage_2_emp_id", "914@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Naresh Lulani");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "naresh.l@sahayogmultistate.com"
-                );
-              }
-            } else if (frm.doc.employee_department == "Store & Purchase") {
-              frm.set_value("stage_2_emp_id", "1389@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
-              frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
-            } else if (frm.doc.employee_department == "Legal") {
-              frm.set_value("stage_2_emp_id", "1389@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
-              frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
-            } else if (frm.doc.employee_department == "Back Office") {
-              frm.set_value("stage_2_emp_id", "1@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Vilas Wasnik");
-              frm.set_value("stage_2_emp_email", "ceo@sahayogmultistate.com");
-            } else if (
-              frm.doc.employee_department == "Teaching" ||
-              frm.doc.employee_department == "Non-Teaching" ||
-              frm.doc.employee_department == "House Keeping" ||
-              frm.doc.employee_department == "Transport"
-            ) {
-              if (frm.doc.branch == "Goregaon") {
-                frm.set_value("stage_2_emp_id", "MCPS1039@sahayog.com");
-                frm.set_value("stage_2_emp_name", "J.K.Lokhande");
-                frm.set_value("stage_2_emp_email", "director@abpschools.com");
-              } else {
-                frm.set_value("stage_2_emp_id", "ABPS1001@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Vilas Karlekar");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "coo.schools@sahayogmultistate.com"
-                );
-              }
-            }
-
-            //<set stage 3 user>
-
-            if (frm.doc.division == "School") {
-              frm.set_value("stage_3_emp_id", "MCPS1039@sahayog.com");
-              frm.set_value("stage_3_emp_name", "J.K.Lokhande");
-              frm.set_value("stage_3_emp_email", "director@abpschools.com");
-            } else if (frm.doc.division !== "School") {
-              frm.set_value("stage_3_emp_id", "914@sahayog.com");
-              frm.set_value("stage_3_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_3_emp_email",
-                "naresh.l@sahayogmultistate.com"
-              );
-            }
-            //</set stage 3 user>
-
-            //<set stage 4 user>
-            frm.set_value("stage_4_emp_id", "1389@sahayog.com");
-            frm.set_value("stage_4_emp_name", "Sandeepsingh Bhatia");
-            frm.set_value("stage_4_emp_email", "cfo@sahayogmultistate.com");
-            //</set stage 4 user>
-
-            //<set stage 5 user>
-            frm.set_value("stage_5_emp_id", "1@sahayog.com");
-            frm.set_value("stage_5_emp_name", "Vilas R Wasnik");
-            frm.set_value("stage_5_emp_email", "ceo@sahayogmultistate.com");
-            //</set stage 5 user>
-
-            //<set stage 6 user>
-            frm.set_value("stage_6_emp_id", "1299@sahayog.com");
-            frm.set_value("stage_6_emp_name", "Kamlesh Waghmare");
-            frm.set_value(
-              "stage_6_emp_email",
-              "kamlesh.w@sahayogmultistate.com"
-            );
-
-            //</set stage 6 user>
-            //</Email Setup>
-            //<set stage 7 user>
-            //set from Asset Deparment
-            //<set stage 7 user>
-
-            if (frm.doc.status == "Draft") {
-              console.log("Working refresh");
-              if (frm.doc.employee_department == "Information Technology") {
-                frm.set_value("stage_3_emp_status", "Skip");
-                frm.set_value("stage_6_emp_status", "Skip");
-              }
-
-              if (frm.doc.stage_1_emp_id == frm.doc.stage_5_emp_id) {
-                frm.set_value("stage_1_emp_status", "Skip");
-                frm.set_value("stage_2_emp_status", "Skip");
-                frm.set_value("stage_3_emp_status", "Skip");
-                frm.set_value("stage_4_emp_status", "Skip");
-                frm.set_value("stage_5_emp_status", "Pending");
-              } else if (frm.doc.stage_2_emp_id == frm.doc.stage_5_emp_id) {
-                frm.set_value("stage_2_emp_status", "Skip");
-                frm.set_value("stage_3_emp_status", "Skip");
-                frm.set_value("stage_4_emp_status", "Skip");
-              } else if (frm.doc.stage_2_emp_id == frm.doc.stage_3_emp_id) {
-                frm.set_value("stage_2_emp_status", "Skip");
-                frm.set_value("stage_3_emp_status", "Pending");
-              } else if (frm.doc.stage_3_emp_id == frm.doc.stage_5_emp_id) {
-                frm.set_value("stage_3_emp_status", "Skip");
-                frm.set_value("stage_4_emp_status", "Skip");
-              } else if (frm.doc.stage_4_emp_id == frm.doc.stage_5_emp_id) {
-                frm.set_value("stage_4_emp_status", "Skip");
-              } else if (frm.doc.stage_1_emp_id == frm.doc.stage_4_emp_id) {
-                frm.set_value("stage_1_emp_status", "Skip");
-                frm.set_value("stage_2_emp_status", "Skip");
-                frm.set_value("stage_3_emp_status", "Skip");
-              } else if (frm.doc.stage_1_emp_id == frm.doc.stage_3_emp_id) {
-                frm.set_value("stage_1_emp_status", "Skip");
-                frm.set_value("stage_2_emp_status", "Skip");
-              } else if (frm.doc.stage_1_emp_id == frm.doc.stage_2_emp_id) {
-                frm.set_value("stage_1_emp_status", "Skip");
-                // Code to handle the case where stage_1_emp_id is equal to stage_2_emp_id
-              } else {
-                // No match, do nothing
-              }
-            }
-          }
-        },
-      });
-
       var item_name = frappe.meta.get_docfield(
         "Asset List",
         "item_name",
@@ -1095,34 +752,62 @@ frappe.ui.form.on("Asset Request", {
                 "<b>Are you sure for Approval?</b>",
               () => {
                 //<check Next Not Skippable Employee>
-                let emp_stage2;
-                let emp_stage2_request;
-                let emp_stage2_status;
+                let emp_stage;
+                let emp_stage_request;
+                let emp_stage_status;
 
                 if (frm.doc.status === "Pending") {
                   if (frm.doc.stage_2_emp_status !== "Skip") {
-                    emp_stage2 = frm.doc.stage_2_emp_id;
-                    emp_stage2_request = "stage_2_request";
-                    emp_stage2_status = frm.doc.stage_2_emp_status;
+                    emp_stage = frm.doc.stage_2_emp_id;
+                    emp_stage_request = "stage_2_request";
+                    emp_stage_status = frm.doc.stage_2_emp_status;
                   } else if (frm.doc.stage_3_emp_status !== "Skip") {
-                    emp_stage2 = frm.doc.stage_3_emp_id;
-                    emp_stage2_request = "stage_3_request";
-                    emp_stage2_status = frm.doc.stage_3_emp_status;
+                    emp_stage = frm.doc.stage_3_emp_id;
+                    emp_stage_request = "stage_3_request";
+                    emp_stage_status = frm.doc.stage_3_emp_status;
                   } else if (frm.doc.stage_4_emp_status !== "Skip") {
-                    emp_stage2 = frm.doc.stage_4_emp_id;
-                    emp_stage2_request = "stage_4_request";
-                    emp_stage2_status = frm.doc.stage_4_emp_status;
+                    emp_stage = frm.doc.stage_4_emp_id;
+                    emp_stage_request = "stage_4_request";
+                    emp_stage_status = frm.doc.stage_4_emp_status;
                   } else if (frm.doc.stage_5_emp_status !== "Skip") {
-                    emp_stage2 = frm.doc.stage_5_emp_id;
-                    emp_stage2_request = "stage_5_request";
-                    emp_stage2_status = frm.doc.stage_4_emp_status;
+                    emp_stage = frm.doc.stage_5_emp_id;
+                    emp_stage_request = "stage_5_request";
+                    emp_stage_status = frm.doc.stage_4_emp_status;
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT" &&
+                    frm.doc.employee_department == "Information Technology"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT"
+                  ) {
+                    if (frm.doc.stage_6_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_6_emp_id;
+                      emp_stage_request = "stage_6_request";
+                      emp_stage_status = frm.doc.stage_6_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department !== "IT"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
                   }
                 }
                 //</check Next Not Skippable Employee>
 
                 // action to perform if Yes is selected
                 // Add your button's functionality here
-                let stage2 = emp_stage2;
+                let stage = emp_stage;
                 //<PR is Shared with RM using API Call>
                 if (frm.doc.stage_1_emp_status == "Pending") {
                   frappe.call({
@@ -1132,7 +817,7 @@ frappe.ui.form.on("Asset Request", {
                     args: {
                       doctype: frm.doctype,
                       name: frm.docname,
-                      user: stage2,
+                      user: stage,
                       read: 1,
                       write: 1,
                       submit: 0,
@@ -1150,7 +835,7 @@ frappe.ui.form.on("Asset Request", {
                       });
 
                       // Set field values
-                      frm.set_value(emp_stage2_request, "Done");
+                      frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_1_emp_status", "Approved");
                       frm.set_value("status", "Pending");
 
@@ -1259,6 +944,34 @@ frappe.ui.form.on("Asset Request", {
                     emp_stage = frm.doc.stage_5_emp_id;
                     emp_stage_request = "stage_5_request";
                     emp_stage_status = frm.doc.stage_4_emp_status;
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT" &&
+                    frm.doc.employee_department == "Information Technology"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT"
+                  ) {
+                    if (frm.doc.stage_6_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_6_emp_id;
+                      emp_stage_request = "stage_6_request";
+                      emp_stage_status = frm.doc.stage_6_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department !== "IT"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
                   }
                 }
                 //</check Next Not Skippable Employee>
@@ -1398,6 +1111,34 @@ frappe.ui.form.on("Asset Request", {
                     emp_stage = frm.doc.stage_5_emp_id;
                     emp_stage_request = "stage_5_request";
                     emp_stage_status = frm.doc.stage_4_emp_status;
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT" &&
+                    frm.doc.employee_department == "Information Technology"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department == "IT"
+                  ) {
+                    if (frm.doc.stage_6_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_6_emp_id;
+                      emp_stage_request = "stage_6_request";
+                      emp_stage_status = frm.doc.stage_6_emp_status;
+                    }
+                  } else if (
+                    frm.doc.status === "Pending" &&
+                    frm.doc.select_department !== "IT"
+                  ) {
+                    if (frm.doc.stage_7_emp_status !== "Skip") {
+                      emp_stage = frm.doc.stage_7_emp_id;
+                      emp_stage_request = "stage_7_request";
+                      emp_stage_status = frm.doc.stage_7_emp_status;
+                    }
                   }
                 }
                 //</check Next Not Skippable Employee>
@@ -1895,7 +1636,13 @@ frappe.ui.form.on("Asset Request", {
         (frm.doc.stage_6_emp_status == "Pending" &&
           frm.doc.stage_4_emp_status == "Approved") ||
         (frm.doc.stage_6_emp_status == "Pending" &&
-          frm.doc.stage_5_emp_status == "Approved")
+          frm.doc.stage_5_emp_status == "Approved") ||
+        (frm.doc.stage_6_emp_status == "Pending" &&
+          frm.doc.stage_3_emp_status == "Approved") ||
+        (frm.doc.stage_6_emp_status == "Pending" &&
+          frm.doc.stage_2_emp_status == "Approved") ||
+        (frm.doc.stage_6_emp_status == "Pending" &&
+          frm.doc.stage_1_emp_status == "Approved")
       ) {
         if (frm.doc.stage_5_emp_status === "Skip") {
           // "Stage 4" is approved and "Stage 5" is skipped
@@ -2139,108 +1886,101 @@ frappe.ui.form.on("Asset Request", {
 
     //START-------------------------------------------------------------------------------------------
     //<Stage 7>
-    else if (
-      ((user === frm.doc.stage_7_emp_id ||
-        user === "3991@sahayog.com" ||
-        user === "3511@sahayog.com") &&
-        frm.doc.stage_4_emp_status == "Approved") ||
-      ((user === frm.doc.stage_7_emp_id ||
-        user === "3991@sahayog.com" ||
-        user === "3511@sahayog.com") &&
-        frm.doc.stage_5_emp_status == "Approved") ||
-      ((user === frm.doc.stage_7_emp_id ||
-        user === "3991@sahayog.com" ||
-        user === "3511@sahayog.com") &&
-        frm.doc.stage_6_emp_status == "Approved")
-    ) {
-      var purchase_status = frappe.meta.get_docfield(
-        "Asset List",
-        "purchase",
-        cur_frm.doc.name
-      );
-      purchase_status.read_only = 1;
+    else if (frm.doc.stage_7_request == "Done") {
+      if (frappe.user.has_role("Store Manager")) {
+        console.log("Store Manager");
+        //frm.set_df_property("dispatch_check", "hidden", 0);
+        var purchase_status = frappe.meta.get_docfield(
+          "Asset List",
+          "purchase",
+          cur_frm.doc.name
+        );
+        purchase_status.read_only = 1;
 
-      console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
-      if (frm.doc.status == "Received") {
-        frm.trigger("Asset_Delivered");
-      }
-      if (
-        (frm.doc.status == "Pending" &&
-          frm.doc.stage_7_emp_status == "Pending" &&
-          frm.doc.stage_5_emp_status !== "Pending") ||
-        frm.doc.status == "Pending From Purchase" ||
-        frm.doc.status == "Pending From Store Manager"
-      ) {
-        if (
-          frm.doc.status == "Pending" ||
-          frm.doc.status == "Pending From Purchase"
-        ) {
-          frm.trigger("dispatch_button");
-        } else if (frm.doc.purchase_status == "Delivered To Store") {
-          frm.trigger("dispatch_button");
+        console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
+        if (frm.doc.status == "Received") {
+          frm.trigger("Asset_Delivered");
         }
-
         if (
-          frm.doc.status == "Pending" &&
-          frm.doc.stage_7_emp_status !== "Pending From Purchase"
+          (frm.doc.status == "Pending" &&
+            frm.doc.stage_7_emp_status == "Pending" &&
+            frm.doc.stage_5_emp_status !== "Pending") ||
+          frm.doc.status == "Pending From Purchase" ||
+          frm.doc.status == "Pending From Store Manager"
         ) {
-          // frm.add_custom_button(__("Pending From Purchase"), function () {
-          //   var d = new frappe.ui.Dialog({
-          //     title: __("Pending From Purchase Reason"),
-          //     fields: [
-          //       {
-          //         label: __(
-          //           "Please Give Reason of unavailability for this Asset Request"
-          //         ),
-          //         fieldname: "stage_7_emp_unavailable_reason",
-          //         fieldtype: "Small Text",
-          //         reqd: 1, // Set the unavailability reason field as mandatory
-          //       },
-          //     ],
-          //     primary_action_label: __("Submit"),
-          //     primary_action: function () {
-          //       // Check if the unavailability reason is provided
-          //       if (!d.fields_dict.stage_7_emp_unavailable_reason.get_value()) {
-          //         frappe.msgprint(
-          //           __("Please provide an unavailability reason.")
-          //         );
-          //         return;
-          //       }
-          //       // Generate a random 4-digit number
-          //       var randomOTP = Math.floor(1000 + Math.random() * 9000);
-          //       frm.set_value("stage_7_emp_status", "Pending From Purchase");
-          //       frm.set_value("store_otp", randomOTP); // Set the random number to store_otp
-          //       frm.set_value(
-          //         "stage_7_emp_unavailable_reason",
-          //         d.fields_dict.stage_7_emp_unavailable_reason.get_value()
-          //       );
-          //       d.hide();
-          //       frm.set_value("status", "Pending From Purchase");
-          //       console.log("Pending from Button");
-          //       frm.trigger("share_with_purchase");
-          //       cur_frm.save();
-          //     },
-          //     secondary_action_label: __("Cancel"),
-          //     secondary_action: function () {
-          //       d.hide();
-          //     },
-          //   });
-          //   d.show();
-          // });
-        }
-      }
-      // frappe.msgprint("RP Matched");
-      frm.disable_save();
-      //<Send for Approval , this button is only for PR Owner>
-      // Check if the page has already been reloaded
+          if (
+            frm.doc.status == "Pending" ||
+            frm.doc.status == "Pending From Purchase"
+          ) {
+            frm.trigger("dispatch_button");
+          } else if (frm.doc.purchase_status == "Delivered To Store") {
+            frm.trigger("dispatch_button");
+          }
 
-      // Get the dispatch_check button field element
-      var dispatchCheckButton = frm.get_field("dispatch_check").$wrapper;
+          if (
+            frm.doc.status == "Pending" &&
+            frm.doc.stage_7_emp_status !== "Pending From Purchase"
+          ) {
+            // frm.add_custom_button(__("Pending From Purchase"), function () {
+            //   var d = new frappe.ui.Dialog({
+            //     title: __("Pending From Purchase Reason"),
+            //     fields: [
+            //       {
+            //         label: __(
+            //           "Please Give Reason of unavailability for this Asset Request"
+            //         ),
+            //         fieldname: "stage_7_emp_unavailable_reason",
+            //         fieldtype: "Small Text",
+            //         reqd: 1, // Set the unavailability reason field as mandatory
+            //       },
+            //     ],
+            //     primary_action_label: __("Submit"),
+            //     primary_action: function () {
+            //       // Check if the unavailability reason is provided
+            //       if (!d.fields_dict.stage_7_emp_unavailable_reason.get_value()) {
+            //         frappe.msgprint(
+            //           __("Please provide an unavailability reason.")
+            //         );
+            //         return;
+            //       }
+            //       // Generate a random 4-digit number
+            //       var randomOTP = Math.floor(1000 + Math.random() * 9000);
+            //       frm.set_value("stage_7_emp_status", "Pending From Purchase");
+            //       frm.set_value("store_otp", randomOTP); // Set the random number to store_otp
+            //       frm.set_value(
+            //         "stage_7_emp_unavailable_reason",
+            //         d.fields_dict.stage_7_emp_unavailable_reason.get_value()
+            //       );
+            //       d.hide();
+            //       frm.set_value("status", "Pending From Purchase");
+            //       console.log("Pending from Button");
+            //       frm.trigger("share_with_purchase");
+            //       cur_frm.save();
+            //     },
+            //     secondary_action_label: __("Cancel"),
+            //     secondary_action: function () {
+            //       d.hide();
+            //     },
+            //   });
+            //   d.show();
+            // });
+          }
+        }
+        // frappe.msgprint("RP Matched");
+        frm.disable_save();
+        //<Send for Approval , this button is only for PR Owner>
+        // Check if the page has already been reloaded
+
+        // Get the dispatch_check button field element
+        var dispatchCheckButton = frm.get_field("dispatch_check").$wrapper;
+      } else {
+      }
     } //</Stage 7>
 
     //END-------------------------------------------------------------------------------------------
     else {
       console.log("You Already Approved");
+      frm.set_df_property("asset", "read_only", 1);
     }
 
     //START-------------------------------------------------------------------------------------------
@@ -2313,9 +2053,493 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
+  Employee_Details: function (frm) {
+    console.table([
+      {
+        "Employee ID": frm.doc.employee_id,
+        Name: frm.doc.emp_name,
+        Designation: frm.doc.designation,
+        Department: frm.doc.employee_department,
+        Region: frm.doc.region,
+        Division: frm.doc.division,
+        Branch: frm.doc.branch,
+        district: frm.doc.district,
+        Phone: frm.doc.phone,
+      },
+    ]);
+  },
+  Set_Employee_Details: function (frm) {
+    let user;
+    if (frm.is_new()) {
+      user = frappe.session.user;
+    } else if (!frm.is_new()) {
+      console.log("Eid-", frm.doc.employee_id);
+      user = frm.doc.employee_id;
+    }
 
-  hide_childtable_Edit_Setting: function (frm) {},
+    // Get the numeric part of the user string
+    let eid = user.match(/\d+/)[0];
 
+    // Initialize the modified employee_id
+    let modifiedEmployeeId = "";
+
+    // Check if the user string contains "ABPS" or "MCPS"
+    if (user.includes("ABPS")) {
+      modifiedEmployeeId = "ABPS" + eid;
+    } else if (user.includes("MCPS")) {
+      modifiedEmployeeId = "MCPS" + eid;
+    } else {
+      // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
+      modifiedEmployeeId = eid;
+    }
+
+    // Set the "employee_id" field with the modified value
+    frm.set_value("employee_id", modifiedEmployeeId);
+    let empid = frm.doc.employee_id;
+
+    frappe.call({
+      method:
+        "sahayog_asset.sahayog_asset.doctype.asset_request.get_emp_details.get_emp_details",
+      args: {
+        emp_id: empid,
+      },
+      callback: function (r) {
+        // Check if the message array contains at least one object
+        if (r.message.length > 0) {
+          // Get the employee department field from the first object in the array
+          //var department = r.message[0].department;
+
+          frm.set_value("employee_department", r.message[0].department);
+          frm.set_value("division", r.message[0].division);
+          frm.set_value("region", r.message[0].region);
+          frm.set_value("employee_user", r.message[0].user_id);
+          frm.set_value("branch", r.message[0].branch);
+          frm.set_value("district", r.message[0].district);
+          frm.set_value("emp_name", r.message[0].employee_name);
+          frm.set_value("phone", r.message[0].cell_number);
+          frm.set_value("stage_1_emp_name", r.message[0].reporting_employee);
+          frm.set_value(
+            "stage_1_emp_id",
+            r.message[0].reporting_employee_user_id
+          );
+          frm.set_value(
+            "stage_1_emp_email",
+            r.message[0].reporting_employee_email
+          );
+          frm.set_value(
+            "rp_designation",
+            r.message[0].reporting_person_designation
+          );
+          frm.set_value("designation", r.message[0].designation);
+
+          //<Email Setup>
+          if (frm.is_new()) {
+            if (frm.doc.division === "Microfinance") {
+              if (frm.doc.region === "Region-1") {
+                frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "vijay.k@sahayogmultistate.com"
+                );
+              } else if (frm.doc.region === "Region-2") {
+                frm.set_value("stage_2_emp_id", "102@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Akash Jambhulkar");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "akash.j@sahayogmultistate.com"
+                );
+              } else if (frm.doc.region === "Region-3") {
+                if (frm.doc.district === "Chandrapur") {
+                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "vijay.k@sahayogmultistate.com"
+                  );
+                } else {
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "sachin.c@sahayogmultistate.co.in"
+                  );
+                }
+              } else if (frm.doc.region === "Region-4") {
+                frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "sachin.c@sahayogmultistate.co.in"
+                );
+              }
+            } else if (
+              frm.doc.employee_department == "Information Technology"
+            ) {
+              frm.set_value("stage_2_emp_id", "1299@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Kamlesh Waghmare");
+              frm.set_value(
+                "stage_2_emp_email",
+                "kamlesh.w@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Human Resource") {
+              frm.set_value("stage_2_emp_id", "1394@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Harshvardhan Gutke");
+              frm.set_value(
+                "stage_2_emp_email",
+                "harsh.vardhan@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Operations") {
+              if (frm.doc.rp_designation == "Branch Manager") {
+                if (frm.doc.division == "Multistate") {
+                  if (frm.doc.region == "Region-1") {
+                    frm.set_value("stage_2_emp_id", "26@sahayog.com");
+                    frm.set_value("stage_2_emp_name", "Mangesh Kathane");
+                    frm.set_value(
+                      "stage_2_emp_email",
+                      "rmgondia@sahayogmultistate.com"
+                    );
+                  } else if (frm.doc.region == "Region-2") {
+                    frm.set_value("stage_2_emp_id", "145@sahayog.com");
+                    frm.set_value("stage_2_emp_name", "Nishant Shelare");
+                    frm.set_value(
+                      "stage_2_emp_email",
+                      "nishant.s@sahayogmultistate.com"
+                    );
+                  } else if (frm.doc.region == "Region-3") {
+                    frm.set_value("stage_2_emp_id", "521@sahayog.com");
+                    frm.set_value("stage_2_emp_name", "Amish Tarale");
+                    frm.set_value(
+                      "stage_2_emp_email",
+                      "amish.t@sahayogmultistate.com"
+                    );
+                  } else if (frm.doc.region == "Region-4") {
+                    frm.set_value("stage_2_emp_id", "1348@sahayog.com");
+                    frm.set_value("stage_2_emp_name", "Manish Patil");
+                    frm.set_value(
+                      "stage_2_emp_email",
+                      "manish.p@sahayogmultistate.com"
+                    );
+                  }
+                } else if (frm.doc.division == "Two Wheeler") {
+                  frm.set_value("stage_2_emp_id", "304@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sunil Rathod");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "sunil.r@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.division == "Microfinance") {
+                  frm.set_value("stage_2_emp_id", "2553@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Dillipkumar Mishra");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "dillip.m@sahayogmultistate.com"
+                  );
+                }
+              } else {
+                frm.set_value("stage_2_emp_id", "813@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Ravi Jaiswal");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "ravi.j@sahayogmultistate.com"
+                );
+              }
+            } else if (frm.doc.employee_department == "Administration") {
+              frm.set_value("stage_2_emp_id", "596@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Omair Rashid Khan");
+              frm.set_value(
+                "stage_2_emp_email",
+                "adminmanager@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Sales") {
+              if (frm.doc.division == "Multistate") {
+                if (frm.doc.region == "Region-1") {
+                  frm.set_value("stage_2_emp_id", "26@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Mangesh Kathane");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "rmgondia@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.region == "Region-2") {
+                  frm.set_value("stage_2_emp_id", "145@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Nishant Shelare");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "nishant.s@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.region == "Region-3") {
+                  frm.set_value("stage_2_emp_id", "521@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Amish Tarale");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "amish.t@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.region == "Region-4") {
+                  frm.set_value("stage_2_emp_id", "1348@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Manish Patil");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "manish.p@sahayogmultistate.com"
+                  );
+                }
+              } else if (frm.doc.division == "Two Wheeler") {
+                frm.set_value("stage_2_emp_id", "304@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Sunil Rathod");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "sunil.r@sahayogmultistate.com"
+                );
+              } else if (frm.doc.division == "Microfinance") {
+                if (frm.doc.region === "Region-1") {
+                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "vijay.k@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.region === "Region-2") {
+                  frm.set_value("stage_2_emp_id", "102@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Akash Jambhulkar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "akash.j@sahayogmultistate.com"
+                  );
+                } else if (frm.doc.region === "Region-3") {
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "sachin.c@sahayogmultistate.co.in"
+                  );
+                } else if (frm.doc.region === "Region-4") {
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "sachin.c@sahayogmultistate.co.in"
+                  );
+                }
+              }
+            } else if (frm.doc.employee_department == "Audit") {
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_2_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Collection & Recovery") {
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_2_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Credit") {
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_2_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            } else if (
+              frm.doc.employee_department ==
+              "Operational Excellence And Service Quality"
+            ) {
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_2_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            } else if (frm.doc.employee_department == "Finance & Accounts") {
+              if (frm.doc.stage_1_emp_id == "1389@sahayog.com") {
+                frm.set_value("stage_2_emp_id", "1389@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
+                frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
+              } else {
+                frm.set_value("stage_2_emp_id", "914@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Naresh Lulani");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "naresh.l@sahayogmultistate.com"
+                );
+              }
+            } else if (frm.doc.employee_department == "Store & Purchase") {
+              frm.set_value("stage_2_emp_id", "1389@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
+              frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
+            } else if (frm.doc.employee_department == "Legal") {
+              frm.set_value("stage_2_emp_id", "1389@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Sandeepsingh Bhatia");
+              frm.set_value("stage_2_emp_email", "cfo@sahayogmultistate.com");
+            } else if (frm.doc.employee_department == "Back Office") {
+              frm.set_value("stage_2_emp_id", "1@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Vilas Wasnik");
+              frm.set_value("stage_2_emp_email", "ceo@sahayogmultistate.com");
+            } else if (
+              frm.doc.employee_department == "Teaching" ||
+              frm.doc.employee_department == "Non-Teaching" ||
+              frm.doc.employee_department == "House Keeping" ||
+              frm.doc.employee_department == "Transport"
+            ) {
+              if (frm.doc.branch == "Goregaon") {
+                frm.set_value("stage_2_emp_id", "MCPS1039@sahayog.com");
+                frm.set_value("stage_2_emp_name", "J.K.Lokhande");
+                frm.set_value("stage_2_emp_email", "director@abpschools.com");
+              } else {
+                frm.set_value("stage_2_emp_id", "ABPS1001@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Vilas Karlekar");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "coo.schools@sahayogmultistate.com"
+                );
+              }
+            }
+
+            //<set stage 3 user>
+
+            if (frm.doc.division == "School") {
+              frm.set_value("stage_3_emp_id", "MCPS1039@sahayog.com");
+              frm.set_value("stage_3_emp_name", "J.K.Lokhande");
+              frm.set_value("stage_3_emp_email", "director@abpschools.com");
+            } else if (frm.doc.division !== "School") {
+              frm.set_value("stage_3_emp_id", "914@sahayog.com");
+              frm.set_value("stage_3_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_3_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            }
+            //</set stage 3 user>
+
+            //<set stage 4 user>
+            frm.set_value("stage_4_emp_id", "1389@sahayog.com");
+            frm.set_value("stage_4_emp_name", "Sandeepsingh Bhatia");
+            frm.set_value("stage_4_emp_email", "cfo@sahayogmultistate.com");
+            //</set stage 4 user>
+
+            //<set stage 5 user>
+            frm.set_value("stage_5_emp_id", "1@sahayog.com");
+            frm.set_value("stage_5_emp_name", "Vilas R Wasnik");
+            frm.set_value("stage_5_emp_email", "ceo@sahayogmultistate.com");
+            //</set stage 5 user>
+
+            //<set stage 6 user>
+            frm.set_value("stage_6_emp_id", "1299@sahayog.com");
+            frm.set_value("stage_6_emp_name", "Kamlesh Waghmare");
+            frm.set_value(
+              "stage_6_emp_email",
+              "kamlesh.w@sahayogmultistate.com"
+            );
+
+            //</set stage 6 user>
+            //</Email Setup>
+            //<set stage 7 user>
+            //set from Asset Deparment
+            //<set stage 7 user>
+          }
+
+          if (frm.doc.status == "Draft") {
+            console.log("Working refresh");
+            if (frm.doc.employee_department == "Information Technology") {
+              frm.set_value("stage_3_emp_status", "Skip");
+              frm.set_value("stage_6_emp_status", "Skip");
+            }
+
+            if (frm.doc.stage_1_emp_id == frm.doc.stage_5_emp_id) {
+              frm.set_value("stage_1_emp_status", "Skip");
+              frm.set_value("stage_2_emp_status", "Skip");
+              frm.set_value("stage_3_emp_status", "Skip");
+              frm.set_value("stage_4_emp_status", "Skip");
+              frm.set_value("stage_5_emp_status", "Pending");
+            } else if (frm.doc.stage_2_emp_id == frm.doc.stage_5_emp_id) {
+              frm.set_value("stage_2_emp_status", "Skip");
+              frm.set_value("stage_3_emp_status", "Skip");
+              frm.set_value("stage_4_emp_status", "Skip");
+            } else if (frm.doc.stage_2_emp_id == frm.doc.stage_3_emp_id) {
+              frm.set_value("stage_2_emp_status", "Skip");
+              frm.set_value("stage_3_emp_status", "Pending");
+            } else if (frm.doc.stage_3_emp_id == frm.doc.stage_5_emp_id) {
+              frm.set_value("stage_3_emp_status", "Skip");
+              frm.set_value("stage_4_emp_status", "Skip");
+            } else if (frm.doc.stage_4_emp_id == frm.doc.stage_5_emp_id) {
+              frm.set_value("stage_4_emp_status", "Skip");
+            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_4_emp_id) {
+              frm.set_value("stage_1_emp_status", "Skip");
+              frm.set_value("stage_2_emp_status", "Skip");
+              frm.set_value("stage_3_emp_status", "Skip");
+            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_3_emp_id) {
+              frm.set_value("stage_1_emp_status", "Skip");
+              frm.set_value("stage_2_emp_status", "Skip");
+            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_2_emp_id) {
+              frm.set_value("stage_1_emp_status", "Skip");
+              // Code to handle the case where stage_1_emp_id is equal to stage_2_emp_id
+            } else {
+              // No match, do nothing
+            }
+            frm.trigger("set_Approval_levels");
+          }
+        }
+      },
+    });
+  },
+
+  set_Approval_levels: function (frm) {
+    const highest_approval_level = frm.doc.highest_approval_level;
+    const pendingStatus = "Pending";
+    let higherLevel;
+
+    console.log("Highest Level want - ", highest_approval_level);
+
+    let pendingLevels = [];
+
+    for (let i = 1; i <= 5; i++) {
+      const status = frm.doc[`stage_${i}_emp_status`];
+      if (status === pendingStatus) {
+        pendingLevels.push(i);
+      }
+    }
+
+    if (pendingLevels.length > 0) {
+      console.log("Pending Levels: ", pendingLevels.join(", "));
+    } else {
+      console.log("No pending levels found.");
+    }
+
+    if (pendingLevels.includes(parseInt(highest_approval_level))) {
+      higherLevel = highest_approval_level;
+      console.log(`Highest Level ${highest_approval_level} is present.`);
+    } else {
+      // Find the immediate higher pending level
+      higherLevel = pendingLevels.find(
+        (level) => level > highest_approval_level
+      );
+      if (higherLevel !== undefined) {
+        console.log(`Immediate higher pending level found: ${higherLevel}`);
+      } else {
+        console.log(
+          `Highest Level ${highest_approval_level} is not present in any of the pending levels.`
+        );
+      }
+    }
+
+    console.log("Higher Level is - ", higherLevel);
+
+    if (higherLevel == 1) {
+      console.log("2/3/4 are skip");
+      frm.set_value("stage_2_emp_status", "Skip");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (higherLevel == 2) {
+      console.log("3/4 are skip");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (higherLevel == 3) {
+      frm.set_value("stage_4_emp_status", "Skip");
+      console.log("4 are skip");
+    }
+    //frm.save();
+  },
   select_department: function (frm) {
     if (!frappe.user.has_role("Administrator")) {
       // Your code here
@@ -2413,8 +2637,7 @@ frappe.ui.form.on("Asset Request", {
     // Create the dispatch intro message
     let dispatchMessage = `
   Dispatched By: <span style="font-weight: bold;">${dispatchedBy}</span><br>
-  Mode of Transport: <span style="font-weight: bold;">${modeOfTransport}</span><br>
-  Dispatched Remark: <span style="font-weight: bold;">${dispatchedRemark}</span><br>
+  
 `;
 
     // Add a separator line without any gap space
@@ -2482,6 +2705,7 @@ frappe.ui.form.on("Asset Request", {
         let description = frm.doc.item_description;
         let item_purpose = frm.doc.item_purpose;
         let uom = frm.doc.uom;
+        let item_approval = frm.doc.approval_level;
 
         let assetTable = frm.doc.asset || [];
 
@@ -2510,6 +2734,7 @@ frappe.ui.form.on("Asset Request", {
           uom: uom,
           item_description: description,
           item_purpose: item_purpose,
+          approval_level: item_approval,
         });
         frm.set_value("list", null);
         frm.set_value("quantity", null);
@@ -2518,6 +2743,25 @@ frappe.ui.form.on("Asset Request", {
         frm.set_value("uom", "NOS");
 
         frm.refresh_field("asset");
+        //<Taking Highest Apporoval Level by checking in Child table>
+        let highestLevel;
+        if (assetTable.length == 0) {
+          highestLevel = item_approval;
+        } else {
+          highestLevel = assetTable[0].approval_level; // Initialize with first row's approval_level
+        }
+
+        console.log("highest Level - ", highestLevel);
+        assetTable.forEach(function (row) {
+          if (row.approval_level > highestLevel) {
+            highestLevel = row.approval_level;
+          }
+        });
+
+        frm.doc.highest_approval_level = highestLevel;
+        frm.refresh_field("highest_approval_level");
+        //</Taking Highest Apporoval Level by checking in Child table>
+
         if (!frappe.user.has_role("Administrator")) {
           // Your code here
           frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
@@ -2529,6 +2773,30 @@ frappe.ui.form.on("Asset Request", {
         }
       });
     }
+  },
+  validate: function (frm) {
+    frm.trigger("set_highest_approval_level");
+  },
+  set_highest_approval_level: function (frm) {
+    //<Taking Highest Apporoval Level by checking in Child table>
+    let assetTable = frm.doc.asset || [];
+    let highestLevel;
+    if (assetTable.length == 0) {
+      highestLevel = item_approval;
+    } else {
+      highestLevel = assetTable[0].approval_level; // Initialize with first row's approval_level
+    }
+
+    console.log("highest Level - ", highestLevel);
+    assetTable.forEach(function (row) {
+      if (row.approval_level > highestLevel) {
+        highestLevel = row.approval_level;
+      }
+    });
+
+    frm.doc.highest_approval_level = highestLevel;
+    frm.refresh_field("highest_approval_level");
+    //</Taking Highest Apporoval Level by checking in Child table>
   },
 
   onload_post_render: function (frm) {
@@ -2568,31 +2836,6 @@ frappe.ui.form.on("Asset Request", {
       }
     }
   },
-  // activate_add_item: function (frm) {
-  //   let d = new frappe.ui.Dialog({
-  //     title: "Add Your Item",
-  //     fields: [
-  //       {
-  //         label: "Item",
-  //         fieldname: "list",
-  //         reqd: 1,
-  //         fieldtype: "Link",
-  //         options: "Sahayog Item",
-  //       },
-  //     ],
-  //     primary_action_label: "Add Item",
-  //     primary_action: function (values) {
-  //       let item_docname = d.get_value("list");
-  //       if (item_docname) {
-  //         // TODO: Add code to perform the desired action after adding the item
-  //         d.hide();
-  //       } else {
-  //         frappe.msgprint("Please select an item");
-  //       }
-  //     },
-  //   });
-  //   d.show();
-  // },
 
   share_with_hod: function (frm) {
     let hod = frm.doc.hod;

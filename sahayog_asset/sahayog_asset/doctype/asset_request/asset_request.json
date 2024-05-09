@@ -12,8 +12,8 @@
   "emp_name",
   "designation",
   "column_break_jzngo",
-  "phone",
   "employee_department",
+  "phone",
   "column_break_r9uiq",
   "region",
   "district",
@@ -33,6 +33,9 @@
   "column_break_fmazx",
   "item_purpose",
   "column_break_hlfgf",
+  "item_approval",
+  "approval_level",
+  "highest_approval_level",
   "add_item",
   "section_break_crbxo",
   "asset",
@@ -142,9 +145,8 @@
   },
   {
    "fieldname": "employee_id",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Employee Id",
-   "options": "Employee",
    "read_only": 1,
    "set_only_once": 1
   },
@@ -160,8 +162,7 @@
    "fetch_from": "employee_id.designation",
    "fieldname": "designation",
    "fieldtype": "Data",
-   "label": "Designation ",
-   "read_only": 1
+   "label": "Designation "
   },
   {
    "fieldname": "section_break_xiifo",
@@ -298,7 +299,6 @@
   {
    "fieldname": "employee_details_tab",
    "fieldtype": "Tab Break",
-   "hidden": 1,
    "label": "Employee Details"
   },
   {
@@ -339,7 +339,7 @@
   {
    "fieldname": "stage_3_emp_status",
    "fieldtype": "Select",
-   "label": "Approval status",
+   "label": "GM Approval status",
    "options": "Pending\nReject\nApproved\nSkip"
   },
   {
@@ -394,7 +394,7 @@
    "default": "Skip",
    "fieldname": "stage_5_emp_status",
    "fieldtype": "Select",
-   "label": "Approval Status",
+   "label": "CEO Approval Status",
    "options": "Pending\nReject\nApproved\nSkip"
   },
   {
@@ -647,7 +647,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.status !== \"Draft\"",
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
    "label": "Employee Details"
@@ -817,9 +816,10 @@
    "label": "Validation Check"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('Store Manager')",
+   "depends_on": "//eval:frappe.user.has_role('Store Manager')",
    "fieldname": "dispatch_check",
    "fieldtype": "Button",
+   "hidden": 1,
    "label": "Dispatch/Pending"
   },
   {
@@ -832,6 +832,7 @@
    "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "admin_save",
    "fieldtype": "Button",
+   "hidden": 1,
    "label": "Admin Save"
   },
   {
@@ -839,11 +840,29 @@
    "fieldname": "district",
    "fieldtype": "Data",
    "label": "District"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fetch_from": "list.approval_level",
+   "fieldname": "item_approval",
+   "fieldtype": "Data",
+   "label": "Item Approval"
+  },
+  {
+   "depends_on": "eval:doc.select_department",
+   "fieldname": "approval_level",
+   "fieldtype": "Data",
+   "label": "Approval Level"
+  },
+  {
+   "fieldname": "highest_approval_level",
+   "fieldtype": "Data",
+   "label": "Highest Approval Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-05 17:23:41.748419",
+ "modified": "2024-05-08 11:21:53.636350",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
