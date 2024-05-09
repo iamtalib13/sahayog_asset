@@ -33,10 +33,11 @@
   "column_break_fmazx",
   "item_purpose",
   "column_break_hlfgf",
+  "add_item",
+  "asset_item_approval_level_section",
   "item_approval",
   "approval_level",
   "highest_approval_level",
-  "add_item",
   "section_break_crbxo",
   "asset",
   "asset_lock",
@@ -297,6 +298,7 @@
    "options": "false\ntrue"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "employee_details_tab",
    "fieldtype": "Tab Break",
    "label": "Employee Details"
@@ -858,11 +860,17 @@
    "fieldname": "highest_approval_level",
    "fieldtype": "Data",
    "label": "Highest Approval Level"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
+   "fieldname": "asset_item_approval_level_section",
+   "fieldtype": "Section Break",
+   "label": "Asset Item Approval Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-08 11:21:53.636350",
+ "modified": "2024-05-09 17:46:21.677206",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
