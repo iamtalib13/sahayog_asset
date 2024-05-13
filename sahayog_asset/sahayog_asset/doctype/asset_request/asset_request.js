@@ -243,6 +243,8 @@ frappe.ui.form.on("Asset Request", {
     if (frm.doc.status === "Draft") {
       if (!frm.is_new() && frm.doc.first_intro == "Done") {
         frm.set_intro("Please Verify and Send for Approval", "blue");
+        frm.set_df_property("asset", "read_only", 0);
+
       }
     } else if (
       frm.doc.status === "Pending" ||
@@ -593,6 +595,17 @@ frappe.ui.form.on("Asset Request", {
               let rm_stage_request;
               let rm_stage_status;
 
+              if(frm.doc.status === "Draft")
+                {
+                  $.each(frm.doc["asset"] || [], function(i, d) {
+                    if (!d.quantity || d.quantity == 0) {
+                        frappe.throw("Quantity cannot be blank or zero in the Asset List.");
+                        return  // Stop further execution
+                    }
+                });
+                  
+
+                }
               if (frm.doc.status === "Draft") {
                 if (frm.doc.stage_1_emp_status !== "Skip") {
                   rm_stage = frm.doc.stage_1_emp_id;
@@ -836,9 +849,16 @@ frappe.ui.form.on("Asset Request", {
 
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_1_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
 
+                      frm.set_value("stage_1_emp_status", "Approved");
+                      if(frm.doc.stage_7_request=="Done")
+                        {
+                          frm.set_value("status", "Pending From Store Manager");
+                        }else{
+                          frm.set_value("status", "Pending");
+
+                        }
+                    
                       // Save the form
                       frm.save();
                     },
@@ -1008,7 +1028,13 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_2_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
+                       if(frm.doc.stage_7_request=="Done")
+                        {
+                          frm.set_value("status", "Pending From Store Manager");
+                        }else{
+                          frm.set_value("status", "Pending");
+
+                        }
 
                       // Save the form
                       frm.save();
@@ -1175,7 +1201,13 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_3_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
+                      if(frm.doc.stage_7_request=="Done")
+                        {
+                          frm.set_value("status", "Pending From Store Manager");
+                        }else{
+                          frm.set_value("status", "Pending");
+
+                        }
 
                       // Save the form
                       frm.save();
@@ -1563,7 +1595,13 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_5_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
+                      if(frm.doc.stage_7_request=="Done")
+                        {
+                          frm.set_value("status", "Pending From Store Manager");
+                        }else{
+                          frm.set_value("status", "Pending");
+
+                        }
 
                       // Save the form
                       frm.save();
@@ -1855,7 +1893,13 @@ frappe.ui.form.on("Asset Request", {
                         // Set field values
                         frm.set_value(emp_stage_request, "Done");
                         frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending");
+                        if(frm.doc.stage_7_request=="Done")
+                          {
+                            frm.set_value("status", "Pending From Store Manager");
+                          }else{
+                            frm.set_value("status", "Pending");
+  
+                          }
 
                         // Save the form
                         frm.save();
@@ -1910,7 +1954,8 @@ frappe.ui.form.on("Asset Request", {
         ) {
           if (
             frm.doc.status == "Pending" ||
-            frm.doc.status == "Pending From Purchase"
+            frm.doc.status == "Pending From Purchase" ||
+            frm.doc.status == "Pending From Store Manager"
           ) {
             frm.trigger("dispatch_button");
           } else if (frm.doc.purchase_status == "Delivered To Store") {
@@ -1980,7 +2025,11 @@ frappe.ui.form.on("Asset Request", {
     //END-------------------------------------------------------------------------------------------
     else {
       console.log("You Already Approved");
-      frm.set_df_property("asset", "read_only", 1);
+      if(frm.doc.status !=="Draft")
+        {
+          frm.set_df_property("asset", "read_only", 1) ;
+        }
+     
     }
 
     //START-------------------------------------------------------------------------------------------
@@ -2814,27 +2863,29 @@ frappe.ui.form.on("Asset Request", {
       }
     );
 
-    function validateNumericInput(evt) {
-      // Get the pressed key code
-      var keyCode = evt.which || evt.keyCode;
-
-      // Allow numeric keys (0-9) from main keyboard and number pad,
-      // backspace, left arrow, and right arrow
+    function validateNumericInput(event) {
+      // Get the pressed key code or key name
+      var key = event.key || String.fromCharCode(event.keyCode || event.which);
+    
+      // Validate that only numbers, right arrow, left arrow, delete, and backspace are allowed
+      var regex = /^[0-9]+$/;
+    
+      // Allow only numeric keys (0-9), Right Arrow, Left Arrow, Delete, and Backspace
       if (
         !(
-          (
-            (keyCode >= 48 && keyCode <= 57) || // main keyboard numbers
-            (keyCode >= 96 && keyCode <= 105) || // number pad numbers
-            keyCode === 8 || // backspace
-            keyCode === 37 || // left arrow
-            keyCode === 39
-          ) // right arrow
+          (key >= "0" && key <= "9") ||
+          key === "ArrowRight" ||
+          key === "ArrowLeft" ||
+          key === "Delete" ||
+          key === "Backspace"
         )
       ) {
-        // Prevent the default action for non-allowed keys
-        evt.preventDefault();
+        event.preventDefault();
+        return;
       }
     }
+    
+    
   },
 
   share_with_hod: function (frm) {
@@ -3702,4 +3753,13 @@ frappe.ui.form.on("Asset Request", {
     // Continue with other operations if no condition was met
     // ...
   },
+});
+
+frappe.ui.form.on("Asset Request", "validate", function(frm) { 
+  $.each(frm.doc["asset"] || [], function(i, d) {
+      if (!d.quantity || d.quantity == 0) {
+          frappe.throw("Quantity cannot be blank or zero in the Asset List.");
+          return  // Stop further execution
+      }
+  });
 });
