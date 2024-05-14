@@ -33,10 +33,11 @@
   "column_break_fmazx",
   "item_purpose",
   "column_break_hlfgf",
+  "add_item",
+  "asset_item_approval_level_section",
   "item_approval",
   "approval_level",
   "highest_approval_level",
-  "add_item",
   "section_break_crbxo",
   "asset",
   "asset_lock",
@@ -297,6 +298,7 @@
    "options": "false\ntrue"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "employee_details_tab",
    "fieldtype": "Tab Break",
    "label": "Employee Details"
@@ -329,7 +331,7 @@
   {
    "fieldname": "stage_3_emp_id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "GM ID"
   },
   {
    "fieldname": "stage_3_emp_name",
@@ -356,7 +358,7 @@
   {
    "fieldname": "stage_4_emp_id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "CFO ID"
   },
   {
    "fieldname": "stage_4_emp_name",
@@ -383,7 +385,7 @@
   {
    "fieldname": "stage_5_emp_id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "CEO ID"
   },
   {
    "fieldname": "stage_5_emp_name",
@@ -411,7 +413,7 @@
   {
    "fieldname": "stage_6_emp_id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "CTO ID"
   },
   {
    "fieldname": "stage_6_emp_name",
@@ -440,7 +442,7 @@
    "fetch_from": "select_department.store_emp_id",
    "fieldname": "stage_7_emp_id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "Store ID"
   },
   {
    "fetch_from": "select_department.store_emp_name",
@@ -832,7 +834,6 @@
    "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "admin_save",
    "fieldtype": "Button",
-   "hidden": 1,
    "label": "Admin Save"
   },
   {
@@ -858,11 +859,17 @@
    "fieldname": "highest_approval_level",
    "fieldtype": "Data",
    "label": "Highest Approval Level"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
+   "fieldname": "asset_item_approval_level_section",
+   "fieldtype": "Section Break",
+   "label": "Asset Item Approval Level"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-08 11:21:53.636350",
+ "modified": "2024-05-13 15:47:57.199263",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

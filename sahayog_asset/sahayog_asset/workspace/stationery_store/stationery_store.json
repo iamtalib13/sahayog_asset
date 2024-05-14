@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "Stationery Store",
  "links": [],
- "modified": "2024-05-09 17:29:35.135193",
+ "modified": "2024-05-14 10:26:26.545182",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Stationery Store",
@@ -35,17 +35,8 @@
    "role": "Stationery Store Manager"
   }
  ],
- "sequence_id": 42.0,
+ "sequence_id": 5.0,
  "shortcuts": [
-  {
-   "color": "Red",
-   "doc_view": "List",
-   "format": "{} Pending",
-   "label": "Store Approval",
-   "link_to": "Asset Request",
-   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Pending\",false],[\"Asset Request\",\"status\",\"in\",[\"Pending From Store Manager\",null],false]]",
-   "type": "DocType"
-  },
   {
    "color": "Red",
    "doc_view": "List",
@@ -62,6 +53,15 @@
    "label": "Purchase",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"status\",\"=\",\"Pending From Purchase\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Store Approval",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Done\",false],[\"Asset Request\",\"status\",\"in\",[\"Pending From Store Manager\",null],false]]",
    "type": "DocType"
   },
   {

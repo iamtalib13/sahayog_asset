@@ -16,6 +16,12 @@ def validate(self):
             if not asset.quantity:
                 frappe.throw("Quantity cannot be blank for all assets.")  # Show message if quantity is blank
 
+@frappe.whitelist()
+def store_pending(doc):
+    if doc.stage_7_request == "Done":
+       doc.status = "Pending From Store Manager"
+       doc.save
+
     
     
 # @frappe.whitelist()

@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "IT Store",
  "links": [],
- "modified": "2024-05-09 17:29:23.221396",
+ "modified": "2024-05-14 10:26:26.505168",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "IT Store",
@@ -35,7 +35,7 @@
    "role": "IT Store Manager"
   }
  ],
- "sequence_id": 41.0,
+ "sequence_id": 4.0,
  "shortcuts": [
   {
    "color": "Orange",
@@ -47,21 +47,21 @@
    "type": "DocType"
   },
   {
-   "color": "Red",
-   "doc_view": "List",
-   "format": "{} Pending",
-   "label": "Store Approval",
-   "link_to": "Asset Request",
-   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Done\",false],[\"Asset Request\",\"stage_7_emp_status\",\"=\",\"Pending\",false]]",
-   "type": "DocType"
-  },
-  {
    "color": "Green",
    "doc_view": "List",
    "format": "{}",
    "label": "Delivered",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false],[\"Asset Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Store Approval",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false],[\"Asset Request\",\"status\",\"=\",\"Pending From Store Manager\",false]]",
    "type": "DocType"
   },
   {

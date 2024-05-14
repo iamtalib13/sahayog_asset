@@ -244,7 +244,6 @@ frappe.ui.form.on("Asset Request", {
       if (!frm.is_new() && frm.doc.first_intro == "Done") {
         frm.set_intro("Please Verify and Send for Approval", "blue");
         frm.set_df_property("asset", "read_only", 0);
-
       }
     } else if (
       frm.doc.status === "Pending" ||
@@ -285,11 +284,13 @@ frappe.ui.form.on("Asset Request", {
           stage: "Stage 6",
           emp: frm.doc.stage_6_emp_name,
           status: frm.doc.stage_6_emp_status,
+          request: frm.doc.stage_6_request,
         },
         {
           stage: "Stage 7",
           emp: frm.doc.stage_7_emp_name,
           status: frm.doc.stage_7_emp_status,
+          request: frm.doc.stage_7_request,
         },
       ];
       let rightArrowSymbol = "&rarr;";
@@ -347,7 +348,21 @@ frappe.ui.form.on("Asset Request", {
       let store_status;
       let store_status_color;
 
-      if (frm.doc.stage_7_request == "Pending") {
+      if (frm.doc.select_department == "IT") {
+        if (frm.doc.stage_6_request == "Pending") {
+          store_status = "Waiting for Approval";
+          store_status_color = "gray";
+        } else if (frm.doc.stage_7_emp_status == "Pending") {
+          store_status = "Approval Received";
+          store_status_color = "green";
+        } else if (frm.doc.stage_7_emp_status == "Dispatched") {
+          store_status = "Dispatched";
+          store_status_color = "green";
+        } else if (frm.doc.stage_7_emp_status == "Pending From Purchase") {
+          store_status = "Pending From Purchase";
+          store_status_color = "gray";
+        }
+      } else if (frm.doc.stage_7_request == "Pending") {
         store_status = "Waiting for Approval";
         store_status_color = "gray";
       } else if (frm.doc.stage_7_emp_status == "Pending") {
@@ -376,7 +391,7 @@ frappe.ui.form.on("Asset Request", {
       } else {
         introHeading2 += store_status;
       }
-
+      let fontColor;
       let pendingdetect = false;
       for (let i = 5; i < stages.length; i++) {
         let emp = stages[i].emp;
@@ -384,12 +399,11 @@ frappe.ui.form.on("Asset Request", {
 
         // Determine the color based on the value of the status
 
-        let fontColor =
+        fontColor =
           status === "Approved"
             ? "green"
-            : status === "Pending" && !pendingdetect
-            ? ((pendingdetect = true),
-              frm.doc.stage_4_emp_status === "Approved" ? "red" : "gray")
+            : status === "Pending" && !pendingFound
+            ? ((pendingFound = true), "red")
             : "gray";
 
         // Check if the status is "Skip"; if yes, skip adding details for this stage
@@ -543,6 +557,7 @@ frappe.ui.form.on("Asset Request", {
           .find(".grid-remove-all-rows")
           .hide();
         frm.fields_dict["asset"].grid.wrapper.find(".grid-remove-rows").hide();
+        console.log("hiding child controls");
       }
     }
 
@@ -595,17 +610,16 @@ frappe.ui.form.on("Asset Request", {
               let rm_stage_request;
               let rm_stage_status;
 
-              if(frm.doc.status === "Draft")
-                {
-                  $.each(frm.doc["asset"] || [], function(i, d) {
-                    if (!d.quantity || d.quantity == 0) {
-                        frappe.throw("Quantity cannot be blank or zero in the Asset List.");
-                        return  // Stop further execution
-                    }
+              if (frm.doc.status === "Draft") {
+                $.each(frm.doc["asset"] || [], function (i, d) {
+                  if (!d.quantity || d.quantity == 0) {
+                    frappe.throw(
+                      "Quantity cannot be blank or zero in the Asset List."
+                    );
+                    return; // Stop further execution
+                  }
                 });
-                  
-
-                }
+              }
               if (frm.doc.status === "Draft") {
                 if (frm.doc.stage_1_emp_status !== "Skip") {
                   rm_stage = frm.doc.stage_1_emp_id;
@@ -851,14 +865,12 @@ frappe.ui.form.on("Asset Request", {
                       frm.set_value(emp_stage_request, "Done");
 
                       frm.set_value("stage_1_emp_status", "Approved");
-                      if(frm.doc.stage_7_request=="Done")
-                        {
-                          frm.set_value("status", "Pending From Store Manager");
-                        }else{
-                          frm.set_value("status", "Pending");
+                      if (frm.doc.stage_7_request == "Done") {
+                        frm.set_value("status", "Pending From Store Manager");
+                      } else {
+                        frm.set_value("status", "Pending");
+                      }
 
-                        }
-                    
                       // Save the form
                       frm.save();
                     },
@@ -1028,13 +1040,11 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_2_emp_status", "Approved");
-                       if(frm.doc.stage_7_request=="Done")
-                        {
-                          frm.set_value("status", "Pending From Store Manager");
-                        }else{
-                          frm.set_value("status", "Pending");
-
-                        }
+                      if (frm.doc.stage_7_request == "Done") {
+                        frm.set_value("status", "Pending From Store Manager");
+                      } else {
+                        frm.set_value("status", "Pending");
+                      }
 
                       // Save the form
                       frm.save();
@@ -1109,6 +1119,13 @@ frappe.ui.form.on("Asset Request", {
     ) {
       frm.set_df_property("asset", "read_only", 1);
       console.log("Employee Matched at Stage 3 :" + frm.doc.stage_3_emp_id);
+      if (frappe.user.has_role("Asset List Customizer")) {
+        frm.set_df_property("asset", "read_only", 0);
+        frm.add_custom_button(__("Save List"), function () {
+          frm.save();
+        });
+      }
+      frm.change_custom_button_type("Save List", null, "primary");
 
       if (
         frm.doc.status == "Pending" &&
@@ -1201,13 +1218,11 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_3_emp_status", "Approved");
-                      if(frm.doc.stage_7_request=="Done")
-                        {
-                          frm.set_value("status", "Pending From Store Manager");
-                        }else{
-                          frm.set_value("status", "Pending");
-
-                        }
+                      if (frm.doc.stage_7_request == "Done") {
+                        frm.set_value("status", "Pending From Store Manager");
+                      } else {
+                        frm.set_value("status", "Pending");
+                      }
 
                       // Save the form
                       frm.save();
@@ -1365,7 +1380,11 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_4_emp_status", "Approved");
-                      frm.set_value("status", "Pending");
+                      if (frm.doc.stage_7_request == "Done") {
+                        frm.set_value("status", "Pending From Store Manager");
+                      } else {
+                        frm.set_value("status", "Pending");
+                      }
 
                       // Save the form
                       frm.save();
@@ -1595,13 +1614,11 @@ frappe.ui.form.on("Asset Request", {
                       // Set field values
                       frm.set_value(emp_stage_request, "Done");
                       frm.set_value("stage_5_emp_status", "Approved");
-                      if(frm.doc.stage_7_request=="Done")
-                        {
-                          frm.set_value("status", "Pending From Store Manager");
-                        }else{
-                          frm.set_value("status", "Pending");
-
-                        }
+                      if (frm.doc.stage_7_request == "Done") {
+                        frm.set_value("status", "Pending From Store Manager");
+                      } else {
+                        frm.set_value("status", "Pending");
+                      }
 
                       // Save the form
                       frm.save();
@@ -1745,73 +1762,7 @@ frappe.ui.form.on("Asset Request", {
                         // Set field values
                         frm.set_value(emp_stage_request, "Done");
                         frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending");
-
-                        // Save the form
-                        frm.save();
-                      },
-                    });
-                    frappe.call({
-                      method: "frappe.share.add",
-                      freeze: true, // Set to true to freeze the UI
-                      freeze_message: "Internet Not Stable, Please Wait...",
-                      args: {
-                        doctype: frm.doctype,
-                        name: frm.docname,
-                        user: "3991@sahayog.com",
-                        read: 1,
-                        write: 1,
-                        submit: 0,
-                        share: 1,
-                        notify: 1,
-                        send_email: 0, // Set this to 0 to prevent sending email notifications
-                      },
-                      callback: function (response) {
-                        // Check if the document has been modified
-
-                        // Document share was successful
-                        frappe.show_alert({
-                          message: "Your Asset Request Sent Successfully",
-                          indicator: "green",
-                        });
-
-                        // Set field values
-                        frm.set_value(emp_stage_request, "Done");
-                        frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending");
-
-                        // Save the form
-                        frm.save();
-                      },
-                    });
-                    frappe.call({
-                      method: "frappe.share.add",
-                      freeze: true, // Set to true to freeze the UI
-                      freeze_message: "Internet Not Stable, Please Wait...",
-                      args: {
-                        doctype: frm.doctype,
-                        name: frm.docname,
-                        user: "3511@sahayog.com",
-                        read: 1,
-                        write: 1,
-                        submit: 0,
-                        share: 1,
-                        notify: 1,
-                        send_email: 0, // Set this to 0 to prevent sending email notifications
-                      },
-                      callback: function (response) {
-                        // Check if the document has been modified
-
-                        // Document share was successful
-                        frappe.show_alert({
-                          message: "Your Asset Request Sent Successfully",
-                          indicator: "green",
-                        });
-
-                        // Set field values
-                        frm.set_value(emp_stage_request, "Done");
-                        frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending");
+                        frm.set_value("status", "Pending From Store Manager");
 
                         // Save the form
                         frm.save();
@@ -1893,13 +1844,11 @@ frappe.ui.form.on("Asset Request", {
                         // Set field values
                         frm.set_value(emp_stage_request, "Done");
                         frm.set_value("stage_6_emp_status", "Approved");
-                        if(frm.doc.stage_7_request=="Done")
-                          {
-                            frm.set_value("status", "Pending From Store Manager");
-                          }else{
-                            frm.set_value("status", "Pending");
-  
-                          }
+                        if (frm.doc.stage_7_request == "Done") {
+                          frm.set_value("status", "Pending From Store Manager");
+                        } else {
+                          frm.set_value("status", "Pending");
+                        }
 
                         // Save the form
                         frm.save();
@@ -2025,11 +1974,13 @@ frappe.ui.form.on("Asset Request", {
     //END-------------------------------------------------------------------------------------------
     else {
       console.log("You Already Approved");
-      if(frm.doc.status !=="Draft")
-        {
-          frm.set_df_property("asset", "read_only", 1) ;
-        }
-     
+
+      if (
+        !frappe.user.has_role("Administrator") &&
+        frm.doc.status !== "Draft"
+      ) {
+        frm.set_df_property("asset", "read_only", 1);
+      }
     }
 
     //START-------------------------------------------------------------------------------------------
@@ -2866,10 +2817,10 @@ frappe.ui.form.on("Asset Request", {
     function validateNumericInput(event) {
       // Get the pressed key code or key name
       var key = event.key || String.fromCharCode(event.keyCode || event.which);
-    
+
       // Validate that only numbers, right arrow, left arrow, delete, and backspace are allowed
       var regex = /^[0-9]+$/;
-    
+
       // Allow only numeric keys (0-9), Right Arrow, Left Arrow, Delete, and Backspace
       if (
         !(
@@ -2884,8 +2835,6 @@ frappe.ui.form.on("Asset Request", {
         return;
       }
     }
-    
-    
   },
 
   share_with_hod: function (frm) {
@@ -3755,11 +3704,13 @@ frappe.ui.form.on("Asset Request", {
   },
 });
 
-frappe.ui.form.on("Asset Request", "validate", function(frm) { 
-  $.each(frm.doc["asset"] || [], function(i, d) {
+frappe.ui.form.on("Asset Request", "validate", function (frm) {
+  if (!frappe.user.has_role("Asset List Customizer")) {
+    $.each(frm.doc["asset"] || [], function (i, d) {
       if (!d.quantity || d.quantity == 0) {
-          frappe.throw("Quantity cannot be blank or zero in the Asset List.");
-          return  // Stop further execution
+        frappe.throw("Quantity cannot be blank or zero in the Asset List.");
+        return; // Stop further execution
       }
-  });
+    });
+  }
 });

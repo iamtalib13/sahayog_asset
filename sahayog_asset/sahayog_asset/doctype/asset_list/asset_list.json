@@ -17,8 +17,10 @@
   "section_break_rwgpr",
   "dispatched_status",
   "mode_of_transport",
+  "item_status",
   "column_break_hf2no",
   "transport_remark",
+  "replaced_remark",
   "purchase_manager",
   "purchase",
   "approval_level_details_section",
@@ -141,12 +143,27 @@
    "fieldname": "approval_level_details_section",
    "fieldtype": "Section Break",
    "label": "Approval Level Details"
+  },
+  {
+   "depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
+   "fieldname": "item_status",
+   "fieldtype": "Select",
+   "label": "Item Status",
+   "mandatory_depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
+   "options": "\nNew\nReplaced"
+  },
+  {
+   "depends_on": "eval:doc.item_status==\"Replaced\"",
+   "fieldname": "replaced_remark",
+   "fieldtype": "Small Text",
+   "label": "Replaced Remark",
+   "mandatory_depends_on": "eval:doc.item_status==\"Replaced\""
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-05-11 15:25:21.186962",
+ "modified": "2024-05-13 17:30:01.026227",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset List",
