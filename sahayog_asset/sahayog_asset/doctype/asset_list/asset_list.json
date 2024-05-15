@@ -150,20 +150,22 @@
    "fieldtype": "Select",
    "label": "Item Status",
    "mandatory_depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
-   "options": "\nNew\nReplaced"
+   "options": "\nNew\nReplaced",
+   "read_only_depends_on": " frappe.user.has_role('Purchase Department')"
   },
   {
    "depends_on": "eval:doc.item_status==\"Replaced\"",
    "fieldname": "replaced_remark",
    "fieldtype": "Small Text",
    "label": "Replaced Remark",
-   "mandatory_depends_on": "eval:doc.item_status==\"Replaced\""
+   "mandatory_depends_on": "eval:doc.item_status==\"Replaced\"",
+   "read_only_depends_on": " frappe.user.has_role('Purchase Department')"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-05-13 17:30:01.026227",
+ "modified": "2024-05-14 13:20:48.782420",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset List",

@@ -1,17 +1,20 @@
 {
  "actions": [],
- "allow_rename": 1,
+ "allow_events_in_timeline": 1,
+ "autoname": "format:EMAIL-{employee_name}-{employee_id}",
  "creation": "2024-05-14 10:17:01.622886",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "status",
+  "delivered_date",
+  "return_remark",
   "email_details_section",
   "email",
-  "otp",
   "column_break_yz3vi",
-  "status",
+  "otp",
   "employee_details_section",
   "employee_id",
   "employee_name",
@@ -37,24 +40,29 @@
   {
    "fieldname": "otp",
    "fieldtype": "Data",
-   "label": "OTP"
+   "label": "Email OTP",
+   "mandatory_depends_on": "eval:frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\"",
+   "read_only_depends_on": "eval:frappe.user.has_role('HR Manager')"
   },
   {
    "fieldname": "email",
    "fieldtype": "Data",
-   "label": "Email"
+   "label": "Email ID",
+   "mandatory_depends_on": "eval:frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\"",
+   "read_only_depends_on": "eval:frappe.user.has_role('HR Manager')"
   },
   {
-   "depends_on": "eval:doc.status==\"Delivered\"",
    "fieldname": "email_details_section",
    "fieldtype": "Section Break",
-   "label": "Email Details"
+   "label": "Email Account Details",
+   "read_only_depends_on": "eval:frappe.user.has_role('HR Manager')"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nPending\nDelivered"
+   "options": "Draft\nPending\nDelivered\nCorrection-Required"
   },
   {
    "fieldname": "employee_details_section",
@@ -132,21 +140,34 @@
   },
   {
    "fieldname": "department",
-   "fieldtype": "Data",
+   "fieldtype": "Select",
    "label": "Department",
+   "options": "\nAdministration\nAudit\nBack Office\nCollection & Recovery\nCredit\nFinance & Accounts\nHouse Keeping\nHuman Resource\nInformation Technology\nJanhit\nLegal\nLoan & Recovery\nManagement\nNon-Teaching\nOperations\nOperational Excellence And Service Quality\nSales\nStore & Purchase\nTeaching\nTraining & Development\nTransport",
    "reqd": 1
   },
   {
    "fieldname": "column_break_yz3vi",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "return_remark",
+   "fieldtype": "Small Text",
+   "label": "Return Remark"
+  },
+  {
+   "fieldname": "delivered_date",
+   "fieldtype": "Date",
+   "label": "Delivered Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-14 10:51:58.161100",
+ "modified": "2024-05-14 16:31:11.890045",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
@@ -164,7 +185,24 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Blue",
+   "title": "Draft"
+  },
+  {
+   "color": "Cyan",
+   "title": "Pending"
+  },
+  {
+   "color": "Green",
+   "title": "Delivered"
+  },
+  {
+   "color": "Red",
+   "title": "Correction-Required"
+  }
+ ],
  "track_changes": 1,
  "track_seen": 1,
  "track_views": 1

@@ -9,3 +9,9 @@ class EmailRequest(Document):
 
 def before_insert(self):
 	self.status = "Draft"
+
+
+
+@frappe.whitelist(allow_guest=True)
+def get_server_datetime():
+    return frappe.utils.now_datetime()
