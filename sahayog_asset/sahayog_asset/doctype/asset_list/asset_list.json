@@ -16,10 +16,12 @@
   "item_purpose",
   "section_break_rwgpr",
   "dispatched_status",
-  "mode_of_transport",
-  "item_status",
+  "dispatched_location",
   "column_break_hf2no",
+  "mode_of_transport",
   "transport_remark",
+  "column_break_p4afy",
+  "item_status",
   "replaced_remark",
   "purchase_manager",
   "purchase",
@@ -41,7 +43,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Qty",
-   "read_only_depends_on": "eval:frappe.user.has_role('Purchase Department') "
+   "read_only_depends_on": "eval: frappe.user.has_role('Purchase Department')  || doc.dispatched_status === \"Self-Purchase\" || doc.dispatched_status === \"Skip\" || doc.dispatched_status === \"Dispatch\"\n"
   },
   {
    "columns": 1,
@@ -70,24 +72,25 @@
   {
    "columns": 1,
    "default": "Pending",
-   "description": "Store Manager ?",
    "fieldname": "dispatched_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Dispatched",
-   "options": "Pending\nDispatch",
+   "label": "Store",
+   "options": "Pending\nDispatch\nSelf-Purchase",
    "permlevel": 1,
-   "read_only_depends_on": "eval:doc.purchase == \"Pending\""
+   "read_only_depends_on": "eval:doc.purchase == \"Pending\" || doc.dispatched_locked==\"True\""
   },
   {
    "columns": 1,
+   "depends_on": "eval:doc.dispatched_status==\"Pending\"",
    "fieldname": "purchase",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Purchase",
+   "mandatory_depends_on": "eval:frappe.user.has_role('Purchase Department') && doc.dispatched_status==\"Pending\" && !frappe.user.has_role('System Manager')",
    "options": "\nPending\nDispatch",
    "permlevel": 2,
-   "read_only_depends_on": "eval:frappe.user.has_role('Store Manager')"
+   "read_only_depends_on": "eval:frappe.user.has_role('Store Manager') || doc.dispatched_status==\"Dispatch\""
   },
   {
    "fieldname": "column_break_tebhh",
@@ -151,7 +154,7 @@
    "label": "Item Status",
    "mandatory_depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
    "options": "\nNew\nReplaced",
-   "read_only_depends_on": " frappe.user.has_role('Purchase Department')"
+   "read_only_depends_on": "eval:frappe.user.has_role('Purchase Department')"
   },
   {
    "depends_on": "eval:doc.item_status==\"Replaced\"",
@@ -159,13 +162,25 @@
    "fieldtype": "Small Text",
    "label": "Replaced Remark",
    "mandatory_depends_on": "eval:doc.item_status==\"Replaced\"",
-   "read_only_depends_on": " frappe.user.has_role('Purchase Department')"
+   "read_only_depends_on": "eval:frappe.user.has_role('Purchase Department')"
+  },
+  {
+   "depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
+   "fieldname": "dispatched_location",
+   "fieldtype": "Small Text",
+   "label": "Dispatched Location",
+   "mandatory_depends_on": "eval:doc.dispatched_status == \"Dispatch\" && !frappe.user.has_role('Purchase Department')",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "column_break_p4afy",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-05-14 13:20:48.782420",
+ "modified": "2024-07-06 10:59:11.906635",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset List",

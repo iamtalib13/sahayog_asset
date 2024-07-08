@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "Stationery Store",
  "links": [],
- "modified": "2024-05-14 12:39:42.048101",
+ "modified": "2024-07-04 17:41:32.781353",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Stationery Store",
@@ -35,7 +35,7 @@
    "role": "Stationery Store Manager"
   }
  ],
- "sequence_id": 6.0,
+ "sequence_id": 26.0,
  "shortcuts": [
   {
    "color": "Red",

@@ -170,9 +170,10 @@
    "options": "\nReporting-Person\nHOD/RM\nGM\nCFO"
   }
  ],
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-25 15:38:23.231130",
+ "modified": "2024-07-05 16:09:10.422762",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",

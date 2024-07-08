@@ -1,7 +1,87 @@
 // Copyright (c) 2023, Sid and contributors
 // For license information, please see license.txt
 
+// frappe.ui.form.on("Asset List", "form_render", function (frm, cdt, cdn) {
+//   let child_doc = locals[cdt][cdn];
+//   let status = child_doc.dispatched_status;
+//   console.log("dispatched status on refresh - ", status);
+//   // if (status !== "Pending") {
+//   //   frm.fields_dict[child_doc.doctype].grid.get_field(
+//   //     "dispatched_status"
+//   //   ).df.read_only = 1;
+//   // }
+//   // frm.refresh_field(child_doc.doctype);
+//   console.log("child refresh");
+//   var df = frappe.meta.get_docfield(
+//     "Asset List",
+//     "dispatched_status",
+//     cur_frm.doc.name
+//   );
+//   df.read_only = 1;
+// });
+
+frappe.ui.form.on("Asset List", {
+  form_render(frm, cdt, cdn) {
+    let child_doc = locals[cdt][cdn];
+    let dispatchedStatus = child_doc.dispatched_status; // Assuming 'dispatched_status' is the field you want to check
+    let fieldname = "dispatched_status"; // Replace with your actual field name
+
+    if (dispatchedStatus !== "Pending") {
+      console.log("Not pending");
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "dispatched_status",
+        false
+      );
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "mode_of_transport",
+        false
+      );
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "item_status",
+        false
+      );
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "transport_remark",
+        false
+      );
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "replaced_remark",
+        false
+      );
+    } else {
+      console.log("pending");
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "dispatched_status",
+        true
+      );
+    }
+  },
+});
+
+frappe.ui.form.on("Asset List", {
+  onload: (frm, cdt, cdn) => {},
+
+  dispatched_status: (frm, cdt, cdn) => {
+    let child_doc = locals[cdt][cdn];
+    let status = child_doc.dispatched_status;
+    console.log("dispatched status - ", status);
+
+    // if (status === "Dispatch" || status === "Self-Purchase") {
+    //   frappe.model.set_value(cdt, cdn, "dispatched_locked", "True");
+    //   frm.refresh_field("dispatched_locked");
+    // } else if (status === "Pending") {
+    //   frappe.model.set_value(cdt, cdn, "dispatched_locked", "False");
+    //   frm.refresh_field("dispatched_locked");
+    // }
+  },
+});
+
 frappe.ui.form.on("Asset Request", {
+  onload: function (frm) {
+    $("span.sidebar-toggle-btn").hide();
+    $(".col-lg-2.layout-side-section").hide();
+    frm.trigger("disbale_add_new");
+  },
   list: function (frm) {
     let approval_level = frm.doc.item_approval;
     console.log("Item Approval - ", approval_level);
@@ -135,6 +215,7 @@ frappe.ui.form.on("Asset Request", {
         // No match, do nothing
       }
     }
+    frm.trigger("zero_trim_child_table");
     frm.trigger("set_Approval_levels");
 
     frm.set_value("first_intro", "Done");
@@ -203,17 +284,34 @@ frappe.ui.form.on("Asset Request", {
   },
 
   refresh: function (frm) {
+    frm.trigger("hide_timeline");
+    frm.trigger("disbale_add_new");
+
     if (frm.is_new()) {
       frm.trigger("Set_Employee_Details");
       frm.trigger("Employee_Details");
     } else if (!frm.is_new()) {
       frm.trigger("Employee_Details");
+      if (
+        frappe.user.has_role("Administrator") ||
+        frappe.user.has_role("IT Support Executive") ||
+        frappe.user.has_role("Admin Support Executive") ||
+        frappe.user.has_role("Stationery Store & Support Manager")
+      ) {
+        if (!frm.doc.stage_1_emp_id) {
+          frm.trigger("Set_Employee_Details");
+          frm.save();
+        }
+      }
     }
     // if (frappe.user.has_role("Analytics")) {
     //   frm.set_df_property("asset", "read_only", 1);
     // }
     // frm.trigger("set_Approval_levels");
-    if (frappe.user.has_role("Administrator")) {
+    if (
+      frappe.user.has_role("Administrator") ||
+      frappe.user.has_role("IT Support Executive")
+    ) {
       frm.enable_save();
 
       frm.add_custom_button(__("Employee Correct"), function () {
@@ -225,7 +323,6 @@ frappe.ui.form.on("Asset Request", {
         frm.set_value("employee_id", null);
         frm.set_value("employee_id", employee_id);
         frm.trigger("Set_Employee_Details");
-
         frm.save();
       });
     }
@@ -590,7 +687,13 @@ frappe.ui.form.on("Asset Request", {
 
     //START-------------------------------------------------------------------------------------------
     //<Stage 0: Employe Who Request Asset>
-    if (user === frm.doc.employee_user) {
+    if (
+      user === frm.doc.employee_user ||
+      frappe.user.has_role("Administrator") ||
+      frappe.user.has_role("IT Support Executive") ||
+      frappe.user.has_role("Admin Support Executive") ||
+      frappe.user.has_role("Stationery Store & Support Manager")
+    ) {
       let empid = frm.doc.employee_id;
 
       if (!frm.is_new()) {
@@ -604,6 +707,8 @@ frappe.ui.form.on("Asset Request", {
               message: __("Please Add At Least One Asset Item"),
             });
           } else {
+            console.log("ready to send");
+
             frm.add_custom_button(__("Send for Approval"), function () {
               // Add your button's functionality here
               let rm_stage;
@@ -1687,6 +1792,11 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 6>
     else if (user === frm.doc.stage_6_emp_id) {
+      if (frm.doc.stage_6_emp_status == "Approved") {
+        console.log("already approved");
+        frm.set_df_property("asset", "read_only", 1);
+      }
+
       if (
         (frm.doc.stage_6_emp_status == "Pending" &&
           frm.doc.stage_4_emp_status == "Approved") ||
@@ -1891,7 +2001,13 @@ frappe.ui.form.on("Asset Request", {
         purchase_status.read_only = 1;
 
         console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
-        if (frm.doc.status == "Received") {
+        if (
+          frm.doc.status == "Dispatched" ||
+          frm.doc.status == "Recieved" ||
+          frm.doc.status == "Delivered"
+        ) {
+          frm.set_df_property("asset", "read_only", 1);
+        } else if (frm.doc.status == "Received") {
           frm.trigger("Asset_Delivered");
         }
         if (
@@ -1901,14 +2017,14 @@ frappe.ui.form.on("Asset Request", {
           frm.doc.status == "Pending From Purchase" ||
           frm.doc.status == "Pending From Store Manager"
         ) {
-          if (
-            frm.doc.status == "Pending" ||
-            frm.doc.status == "Pending From Purchase" ||
-            frm.doc.status == "Pending From Store Manager"
-          ) {
+          if (frm.doc.status == "Pending From Store Manager") {
             frm.trigger("dispatch_button");
           } else if (frm.doc.purchase_status == "Delivered To Store") {
             frm.trigger("dispatch_button");
+          } else if (frm.doc.status == "Dispatched") {
+            frm.set_df_property("asset", "read_only", 1);
+          } else {
+            frm.set_df_property("asset", "read_only", 1);
           }
 
           if (
@@ -1989,11 +2105,20 @@ frappe.ui.form.on("Asset Request", {
     let p2 = "40@sahayog.com";
     let p3 = "2481@sahayog.com";
     let p4 = "2946@sahayog.com";
-    if (user === p1 || user === p2 || user === p3 || user === p4) {
-      if (frm.doc.status == "Pending From Purchase")
+    if (frappe.user.has_role("Purchase Department")) {
+      console.log("Purchase department logged in");
+      if (frm.doc.status == "Pending From Purchase") {
+        console.log("Pending from purchase");
+        frm.set_df_property("asset", "read_only", 0);
         frm.trigger("purchase_remark");
 
-      frm.trigger("popup_for_purchase");
+        frm.trigger("popup_for_purchase");
+      } else {
+        frm.set_df_property("asset", "read_only", 1);
+      }
+    }
+
+    if (frappe.user.has_role("Purchase Department")) {
     }
 
     //END-------------------------------------------------------------------------------------------
@@ -2053,6 +2178,46 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
+
+  disbale_add_new: function (frm) {
+    frm.get_field("asset").grid.cannot_add_rows = true;
+  },
+
+  hide_timeline: function (frm) {
+    // Check if the user has the "System Manager" role
+    const hasSystemManagerRole = frappe.user_roles.includes("System Manager");
+
+    // Get all timeline items
+    let timeline_items = frm.timeline.wrapper.find(".timeline-item");
+
+    // Iterate through timeline items and hide entries based on specific criteria
+    timeline_items.each(function () {
+      let item = $(this);
+      let itemText = item.text();
+
+      // Hide entries containing 'OTP', 'New Email', or 'Notification sent to' if the user is not a System Manager
+      if (
+        !hasSystemManagerRole &&
+        (itemText.includes("OTP") ||
+          itemText.includes("New Email") ||
+          itemText.includes("Notification sent to"))
+      ) {
+        item.hide();
+      }
+    });
+  },
+
+  zero_trim_child_table: function (frm) {
+    // Iterate through each row of the "asset" child table
+    frm.doc.asset.forEach(function (row, index) {
+      // Trim leading zeros from the quantity field
+      var trimmedQuantity = row.quantity.replace(/^0+/, "");
+      // Update the quantity field in the "asset" child table with trimmed value
+      frm.doc.asset[index].quantity = trimmedQuantity;
+    });
+    // Refresh the "asset" child table field to reflect the changes
+    frm.refresh_field("asset");
+  },
   Employee_Details: function (frm) {
     console.table([
       {
@@ -2110,6 +2275,7 @@ frappe.ui.form.on("Asset Request", {
           //var department = r.message[0].department;
 
           frm.set_value("employee_department", r.message[0].department);
+          console.log("Department : ", r.message[0].department);
           frm.set_value("division", r.message[0].division);
           frm.set_value("region", r.message[0].region);
           frm.set_value("employee_user", r.message[0].user_id);
@@ -2122,6 +2288,7 @@ frappe.ui.form.on("Asset Request", {
             "stage_1_emp_id",
             r.message[0].reporting_employee_user_id
           );
+
           frm.set_value(
             "stage_1_emp_email",
             r.message[0].reporting_employee_email
@@ -2131,9 +2298,10 @@ frappe.ui.form.on("Asset Request", {
             r.message[0].reporting_person_designation
           );
           frm.set_value("designation", r.message[0].designation);
+          console.log("setting reporting");
 
           //<Email Setup>
-          if (frm.is_new()) {
+          if (frm.is_new() || frm.doc.status == "Draft") {
             if (frm.doc.division === "Microfinance") {
               if (frm.doc.region === "Region-1") {
                 frm.set_value("stage_2_emp_id", "49@sahayog.com");
@@ -2174,8 +2342,9 @@ frappe.ui.form.on("Asset Request", {
                 );
               }
             } else if (
-              frm.doc.employee_department == "Information Technology"
+              frm.doc.employee_department === "Information Technology"
             ) {
+              console.log("checking IT");
               frm.set_value("stage_2_emp_id", "1299@sahayog.com");
               frm.set_value("stage_2_emp_name", "Kamlesh Waghmare");
               frm.set_value(
@@ -3116,6 +3285,9 @@ frappe.ui.form.on("Asset Request", {
 
   purchase_remark: function (frm) {
     frm.add_custom_button(__("Set Estimate"), function () {
+      var tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
       var d = new frappe.ui.Dialog({
         title: __("Set Estimate Date"),
         fields: [
@@ -3124,7 +3296,9 @@ frappe.ui.form.on("Asset Request", {
             fieldname: "estimated_date",
             fieldtype: "Date",
             reqd: 1, // Make the field mandatory
-            default: frm.doc.estimated_date, // Pre-fill with existing value
+            default: frappe.datetime.str_to_user(
+              tomorrow.toISOString().substring(0, 10)
+            ), // Set default date to current date + 1
           },
           {
             label: __("Purchase Remark"),
@@ -3143,6 +3317,17 @@ frappe.ui.form.on("Asset Request", {
 
           if (!d.fields_dict.purchase_remark.get_value()) {
             frappe.msgprint(__("Please provide a Purchase Remark."));
+            return;
+          }
+
+          var selectedDate = new Date(d.fields_dict.estimated_date.get_value());
+          var currentDate = new Date();
+
+          // Check if selected date is in the past
+          if (selectedDate < currentDate) {
+            frappe.msgprint(
+              __("Please select a future date for the Estimate Date.")
+            );
             return;
           }
 
@@ -3173,17 +3358,31 @@ frappe.ui.form.on("Asset Request", {
 
     frm.add_custom_button(__("Dispatch To Store"), function () {
       var store_manager = frm.doc.stage_7_emp_name;
-
-      frappe.confirm(
-        "Are you sure you want to Dipatch Asset Item?",
-        () => {
-          // action to perform if Yes is selected
-          frm.trigger("purchase_dispatch");
-        },
-        () => {
-          // action to perform if No is selected
+      // Iterate over each row in the "asset" child table
+      var has_pending_and_null_purchase;
+      frm.doc.asset.forEach(function (row) {
+        if (row.dispatched_status === "Pending" && !row.purchase) {
+          has_pending_and_null_purchase = true;
+          return false; // Exit loop early
         }
-      );
+      });
+
+      if (has_pending_and_null_purchase) {
+        // Throw error if any row has the specified condition
+        frappe.throw("purchase cannot be blank");
+        return;
+      } else {
+        frappe.confirm(
+          "Are you sure you want to Dipatch Asset Item?",
+          () => {
+            // action to perform if Yes is selected
+            frm.trigger("purchase_dispatch");
+          },
+          () => {
+            // action to perform if No is selected
+          }
+        );
+      }
     });
 
     // Rest of your code for the "Dispatch To Store" button
@@ -3374,6 +3573,9 @@ frappe.ui.form.on("Asset Request", {
         return row.purchase == "Dispatch";
       });
 
+      const all_self_purchase = assetTable.every(function (row) {
+        return row.dispatched_status == "Self-Purchase";
+      });
       if (Intitial_Check) {
         frappe.warn(
           "All Pending From Purchase Department ?",
@@ -3702,6 +3904,23 @@ frappe.ui.form.on("Asset Request", {
     // Continue with other operations if no condition was met
     // ...
   },
+
+  hide_otp_from_timeline: function (frm) {
+    console.log("hiding otp");
+    // Check if the user has the "System Manager" role
+    const hasSystemManagerRole = frappe.user_roles.includes("System Manager");
+
+    // Get all timeline items
+    let timeline_items = frm.timeline.wrapper.find(".timeline-item");
+
+    // Iterate through timeline items and hide entries containing 'OTP' if the user is not a System Manager
+    timeline_items.each(function () {
+      let item = $(this);
+      if (item.text().includes("OTP") && !hasSystemManagerRole) {
+        item.hide();
+      }
+    });
+  },
 });
 
 frappe.ui.form.on("Asset Request", "validate", function (frm) {
@@ -3713,4 +3932,63 @@ frappe.ui.form.on("Asset Request", "validate", function (frm) {
       }
     });
   }
+});
+
+frappe.ui.form.on("Asset Request", "refresh", function (frm) {
+  frm.trigger("hide_otp_from_timeline");
+  //for Dispatched Status
+  $(document).ready(function () {
+    $('div[data-fieldname="dispatched_status"] .static-area').each(function () {
+      var text = $(this).text().trim();
+      var $parent = $(this).parent();
+
+      if (text === "Pending") {
+        $parent.css({
+          color: "#E50914",
+          "font-weight": "bold",
+          "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+        });
+      } else if (text === "Dispatch") {
+        $parent.css({
+          color: "#1DB954",
+          "font-weight": "bold",
+          "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+        });
+
+        // Disable the select element
+        $parent
+          .find('select[data-fieldname="dispatched_status"]')
+          .attr("disabled", true);
+      } else if (text === "Self-Purchase") {
+        $parent.css({
+          color: "#1877F2",
+          "font-weight": "bold",
+          "background-color": "rgba(24, 119, 242, 0.1)", // light blue background
+        });
+
+        // Disable the select element
+        $parent
+          .find('select[data-fieldname="dispatched_status"]')
+          .attr("disabled", true);
+      }
+    });
+  });
+
+  //for Purchase Status
+  $('div[data-fieldname="purchase"] .static-area').each(function () {
+    var text = $(this).text().trim();
+    if (text === "Pending") {
+      $(this).parent().css({
+        color: "#E50914",
+        "font-weight": "bold",
+        "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+      });
+    } else if (text === "Dispatch") {
+      $(this).parent().css({
+        color: "#1DB954",
+        "font-weight": "bold",
+        "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+      });
+    }
+  });
 });

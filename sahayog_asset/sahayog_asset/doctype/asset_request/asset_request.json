@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_events_in_timeline": 1,
  "autoname": "format:SAR-{DD}{MM}{YYYY}-{###}",
  "creation": "2023-05-31 10:22:21.975347",
  "default_view": "List",
@@ -8,6 +9,8 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_7",
+  "ticket_details_section",
+  "ticket_id",
   "employee_details_section",
   "emp_name",
   "designation",
@@ -163,7 +166,8 @@
    "fetch_from": "employee_id.designation",
    "fieldname": "designation",
    "fieldtype": "Data",
-   "label": "Designation "
+   "label": "Designation ",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_xiifo",
@@ -176,14 +180,16 @@
    "in_standard_filter": 1,
    "label": "Division",
    "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fetch_from": "employee_id.branch",
    "fieldname": "branch",
    "fieldtype": "Data",
    "in_standard_filter": 1,
-   "label": "Branch"
+   "label": "Branch",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_5",
@@ -199,7 +205,8 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4",
+   "reqd": 1
   },
   {
    "default": "Today",
@@ -274,7 +281,6 @@
    "options": "Asset List"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "approval_details_tab",
    "fieldtype": "Tab Break",
    "label": "Approval Details"
@@ -307,7 +313,8 @@
    "fieldname": "emp_name",
    "fieldtype": "Data",
    "label": "Employee Name",
-   "read_only": 1
+   "read_only": 1,
+   "reqd": 1
   },
   {
    "fieldname": "employee_hod",
@@ -320,7 +327,8 @@
    "fieldname": "employee_department",
    "fieldtype": "Link",
    "label": "Employee Department",
-   "options": "Department"
+   "options": "Department",
+   "reqd": 1
   },
   {
    "collapsible": 1,
@@ -475,6 +483,7 @@
    "label": "Reporting Person Name"
   },
   {
+   "default": "Pending",
    "fieldname": "stage_1_emp_status",
    "fieldtype": "Select",
    "label": "RP Approval Status",
@@ -507,7 +516,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Pending",
    "fieldname": "stage_1_request",
    "fieldtype": "Select",
    "label": "Stage 1 Request",
@@ -840,7 +848,8 @@
    "fetch_from": "employee_id.district",
    "fieldname": "district",
    "fieldtype": "Data",
-   "label": "District"
+   "label": "District",
+   "reqd": 1
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -861,15 +870,26 @@
    "label": "Highest Approval Level"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "asset_item_approval_level_section",
    "fieldtype": "Section Break",
    "label": "Asset Item Approval Level"
+  },
+  {
+   "fieldname": "ticket_details_section",
+   "fieldtype": "Section Break",
+   "label": "Ticket Details"
+  },
+  {
+   "fieldname": "ticket_id",
+   "fieldtype": "Link",
+   "label": "Ticket ID",
+   "options": "Sahayog Ticket",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-13 15:47:57.199263",
+ "modified": "2024-07-06 12:24:37.282091",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
