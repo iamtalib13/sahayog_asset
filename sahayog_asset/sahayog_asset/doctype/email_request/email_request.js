@@ -12,7 +12,7 @@ frappe.ui.form.on("Email Request", {
     if (frm.is_new()) {
     } else if (!frm.is_new()) {
       if (status == "Correction-Required") {
-        if (frappe.user.has_role("HR Manager")) {
+        if (frappe.user.has_role("HR Support Manager")) {
           frm.trigger("submit_button");
           frm.trigger("correction_intro_messages");
         }
@@ -23,7 +23,7 @@ frappe.ui.form.on("Email Request", {
       } else if (status == "Draft" || status == "Correction-Required") {
         frm.trigger("draft_intro_messages");
 
-        if (frappe.user.has_role("HR Manager")) {
+        if (frappe.user.has_role("HR Support Manager")) {
           frm.trigger("submit_button");
         }
         if (frappe.user.has_role("IT Store Manager")) {
@@ -142,7 +142,7 @@ frappe.ui.form.on("Email Request", {
   },
 
   draft_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Manager")) {
+    if (frappe.user.has_role("HR Support Manager")) {
       frm.set_intro(
         "Please submit the Email Request to the IT Department",
         "red"
@@ -150,7 +150,7 @@ frappe.ui.form.on("Email Request", {
     }
   },
   pending_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Manager")) {
+    if (frappe.user.has_role("HR Support Manager")) {
       frm.set_intro(
         "<div style='display:flex; align-items:center;'><div style='width: 30px; height: 30px; background-color: green; border-radius: 50%; margin-right: 10px; display: flex; justify-content: center; align-items: center;'><span style='color: white; font-size: 20px;'>&#x2713;</span></div><div style='font-size: 15px;'>Your email creation request has been sent to the IT department</div></div>",
         "green"
@@ -166,7 +166,7 @@ frappe.ui.form.on("Email Request", {
     }
   },
   delivered_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Manager")) {
+    if (frappe.user.has_role("HR Support Manager")) {
       frm.set_intro(
         "<b><font color='black'>Email Account</font></b> - " +
           frm.doc.email +
@@ -190,7 +190,7 @@ frappe.ui.form.on("Email Request", {
   },
 
   correction_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Manager")) {
+    if (frappe.user.has_role("HR Support Manager")) {
       frm.set_intro(
         "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
           "<div class='card' style='padding: 10px; background-color: #f8f9fa;'>" +
@@ -201,7 +201,7 @@ frappe.ui.form.on("Email Request", {
     }
 
     if (frappe.user.has_role("IT Store Manager")) {
-      if (frappe.user.has_role("HR Manager")) {
+      if (frappe.user.has_role("HR Support Manager")) {
         frm.set_intro(
           "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
             "<div class='card' style='padding: 10px; background-color: #f8f9fa;'>" +
@@ -214,7 +214,7 @@ frappe.ui.form.on("Email Request", {
   },
 
   submit_button: function (frm) {
-    if (frappe.user.has_role("HR Manager")) {
+    if (frappe.user.has_role("HR Support Manager")) {
       frm
         .add_custom_button(__("Submit Email Request"), function () {
           frappe.confirm(
