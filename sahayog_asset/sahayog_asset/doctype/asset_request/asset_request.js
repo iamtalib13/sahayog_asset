@@ -2018,6 +2018,8 @@ frappe.ui.form.on("Asset Request", {
           frm.doc.status == "Pending From Store Manager"
         ) {
           if (frm.doc.status == "Pending From Store Manager") {
+            console.log("pending from store Manager");
+            frm.set_df_property("asset", "read_only", 0);
             frm.trigger("dispatch_button");
           } else if (frm.doc.purchase_status == "Delivered To Store") {
             frm.trigger("dispatch_button");
