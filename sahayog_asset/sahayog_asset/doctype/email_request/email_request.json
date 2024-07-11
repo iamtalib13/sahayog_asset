@@ -11,6 +11,7 @@
   "status",
   "delivered_date",
   "return_remark",
+  "request_type",
   "email_details_section",
   "email",
   "column_break_yz3vi",
@@ -35,21 +36,22 @@
    "fieldname": "employee_id",
    "fieldtype": "Data",
    "label": "Employee ID",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "otp",
    "fieldtype": "Data",
    "label": "Email OTP",
    "mandatory_depends_on": "eval:frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\"",
-   "read_only_depends_on": "eval:frappe.user.has_role('HR Manager')"
+   "read_only_depends_on": "eval:!frappe.user.has_role('IT Store Manager')"
   },
   {
+   "depends_on": "eval:doc.request_type",
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email ID",
-   "mandatory_depends_on": "eval:frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\"",
-   "read_only_depends_on": "eval:frappe.user.has_role('HR Manager')"
+   "mandatory_depends_on": "eval:(frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\") && doc.request_type==\"New\"",
+   "read_only_depends_on": "eval:!frappe.user.has_role('IT Store Manager') && doc.request_type==\"New\""
   },
   {
    "fieldname": "email_details_section",
@@ -65,6 +67,7 @@
    "options": "Draft\nPending\nDelivered\nCorrection-Required"
   },
   {
+   "depends_on": "eval:doc.request_type==\"New\"",
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
    "label": "Employee Details"
@@ -73,13 +76,13 @@
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "label": "Employee Name",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "designation",
    "fieldtype": "Data",
    "label": "Designation",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "column_break_gwykf",
@@ -90,30 +93,30 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Zone",
-   "options": "\nZone-1\nZone-2\nZone-3\nZone-4",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "options": "\nZone-1\nZone-2\nZone-3\nZone-4"
   },
   {
    "fieldname": "region",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Region",
-   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
   },
   {
    "fieldname": "district",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "District",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "branch",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Branch",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "column_break_6k7pj",
@@ -122,28 +125,28 @@
   {
    "fieldname": "phone",
    "fieldtype": "Data",
-   "label": "Phone"
+   "label": "Phone",
+   "mandatory_depends_on": "eval:doc.request_type==\"New\""
   },
   {
    "fieldname": "gender",
    "fieldtype": "Select",
    "label": "Gender",
-   "options": "\nMale\nFemale",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "options": "\nMale\nFemale"
   },
   {
    "fieldname": "division",
    "fieldtype": "Select",
    "label": "Division",
-   "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool"
   },
   {
    "fieldname": "department",
    "fieldtype": "Select",
    "label": "Department",
-   "options": "\nAdministration\nAudit\nBack Office\nCollection & Recovery\nCredit\nFinance & Accounts\nHouse Keeping\nHuman Resource\nInformation Technology\nJanhit\nLegal\nLoan & Recovery\nManagement\nNon-Teaching\nOperations\nOperational Excellence And Service Quality\nSales\nStore & Purchase\nTeaching\nTraining & Development\nTransport",
-   "reqd": 1
+   "options": "\nAdministration\nAudit\nBack Office\nCollection & Recovery\nCredit\nFinance & Accounts\nHouse Keeping\nHuman Resource\nInformation Technology\nJanhit\nLegal\nLoan & Recovery\nManagement\nNon-Teaching\nOperations\nOperational Excellence And Service Quality\nSales\nStore & Purchase\nTeaching\nTraining & Development\nTransport"
   },
   {
    "fieldname": "column_break_yz3vi",
@@ -156,14 +159,22 @@
    "label": "Return Remark"
   },
   {
+   "depends_on": "eval:doc.status==\"Delivered\"",
    "fieldname": "delivered_date",
    "fieldtype": "Date",
    "label": "Delivered Date"
+  },
+  {
+   "fieldname": "request_type",
+   "fieldtype": "Select",
+   "label": "Request Type",
+   "options": "\nNew\nDelete",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-14 16:31:11.890045",
+ "modified": "2024-07-11 17:29:03.556436",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

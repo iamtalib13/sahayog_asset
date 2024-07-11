@@ -32,8 +32,8 @@ frappe.ui.form.on("Email Request", {
         }
       } else if (status == "Pending") {
         frm.trigger("pending_intro_messages");
-
-        frm.disable_save();
+     
+        
         if (frappe.user.has_role("IT Store Manager")) {
           frm
             .add_custom_button(__("Deliver To HR"), function () {
@@ -132,6 +132,10 @@ frappe.ui.form.on("Email Request", {
               "background-color": "#fd0e35", // Set soft red color
               color: "#ffffff", // Set font color to white
             });
+        }else if(frappe.user.has_role("HR Support Executive"))
+        {
+          frm.disable_save();
+          frm.disable_form();
         }
       } else if (status == "Delivered") {
         frm.trigger("delivered_intro_messages");

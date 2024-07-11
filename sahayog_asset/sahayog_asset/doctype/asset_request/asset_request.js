@@ -293,7 +293,7 @@ frappe.ui.form.on("Asset Request", {
     } else if (!frm.is_new()) {
       frm.trigger("Employee_Details");
       if (
-        frappe.user.has_role("Administrator") ||
+        frappe.user.has_role("System Manager") ||
         frappe.user.has_role("IT Support Executive") ||
         frappe.user.has_role("Admin Support Executive") ||
         frappe.user.has_role("Stationery Store & Support Manager")
@@ -309,8 +309,7 @@ frappe.ui.form.on("Asset Request", {
     // }
     // frm.trigger("set_Approval_levels");
     if (
-      frappe.user.has_role("Administrator") ||
-      frappe.user.has_role("IT Support Executive")
+      frappe.user.has_role("System Manager")
     ) {
       frm.enable_save();
 
