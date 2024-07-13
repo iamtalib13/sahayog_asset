@@ -1813,170 +1813,177 @@ frappe.ui.form.on("Asset Request", {
           frm.set_df_property("asset", "read_only", 1);
           console.log("Employee Matched at Stage 6 :" + frm.doc.stage_6_emp_id);
           console.log("CEO Not Required");
-          frm.add_custom_button(__("Verify"), function () {
-            if (
-              frm.doc.status == "Pending" &&
-              frm.doc.stage_6_emp_status == "Pending"
-            ) {
-              frappe.confirm(
-                "We are assuming that you verified this Asset Request <br> " +
-                  "<b>Are you sure for Proceed?</b>",
-                () => {
-                  //<check Next Not Skippable Employee>
-                  let emp_stage;
-                  let emp_stage_request;
-                  let emp_stage_status;
-
-                  if (
-                    frm.doc.status === "Pending" &&
-                    frm.doc.select_department == "IT"
-                  ) {
-                    if (frm.doc.stage_7_emp_status !== "Skip") {
-                      emp_stage = frm.doc.stage_7_emp_id;
-                      emp_stage_request = "stage_7_request";
-                      emp_stage_status = frm.doc.stage_7_emp_status;
+          if(frm.doc.stage_6_request=="Done")
+          {
+            frm.add_custom_button(__("Verify"), function () {
+              if (
+                frm.doc.status == "Pending" &&
+                frm.doc.stage_6_emp_status == "Pending"
+              ) {
+                frappe.confirm(
+                  "We are assuming that you verified this Asset Request <br> " +
+                    "<b>Are you sure for Proceed?</b>",
+                  () => {
+                    //<check Next Not Skippable Employee>
+                    let emp_stage;
+                    let emp_stage_request;
+                    let emp_stage_status;
+  
+                    if (
+                      frm.doc.status === "Pending" &&
+                      frm.doc.select_department == "IT"
+                    ) {
+                      if (frm.doc.stage_7_emp_status !== "Skip") {
+                        emp_stage = frm.doc.stage_7_emp_id;
+                        emp_stage_request = "stage_7_request";
+                        emp_stage_status = frm.doc.stage_7_emp_status;
+                      }
                     }
+                    //</check Next Not Skippable Employee>
+  
+                    // action to perform if Yes is selected
+                    // Add your button's functionality here
+                    let stage = emp_stage;
+                    //<PR is Shared with RM using API Call>
+                    if (emp_stage_status == "Pending") {
+                      frappe.call({
+                        method: "frappe.share.add",
+                        freeze: true, // Set to true to freeze the UI
+                        freeze_message: "Internet Not Stable, Please Wait...",
+                        args: {
+                          doctype: frm.doctype,
+                          name: frm.docname,
+                          user: stage,
+                          read: 1,
+                          write: 1,
+                          submit: 0,
+                          share: 1,
+                          notify: 1,
+                          send_email: 0, // Set this to 0 to prevent sending email notifications
+                        },
+                        callback: function (response) {
+                          // Check if the document has been modified
+  
+                          // Document share was successful
+                          frappe.show_alert({
+                            message: "Your Asset Request Sent Successfully",
+                            indicator: "green",
+                          });
+  
+                          // Set field values
+                          frm.set_value(emp_stage_request, "Done");
+                          frm.set_value("stage_6_emp_status", "Approved");
+                          frm.set_value("status", "Pending From Store Manager");
+  
+                          // Save the form
+                          frm.save();
+                        },
+                      });
+  
+                      //</PR is Shared with RM using API Call>
+                    } else {
+                      frappe.msgprint("Approval Already Sent");
+                    }
+                  },
+                  () => {
+                    // action to perform if No is selected
                   }
-                  //</check Next Not Skippable Employee>
-
-                  // action to perform if Yes is selected
-                  // Add your button's functionality here
-                  let stage = emp_stage;
-                  //<PR is Shared with RM using API Call>
-                  if (emp_stage_status == "Pending") {
-                    frappe.call({
-                      method: "frappe.share.add",
-                      freeze: true, // Set to true to freeze the UI
-                      freeze_message: "Internet Not Stable, Please Wait...",
-                      args: {
-                        doctype: frm.doctype,
-                        name: frm.docname,
-                        user: stage,
-                        read: 1,
-                        write: 1,
-                        submit: 0,
-                        share: 1,
-                        notify: 1,
-                        send_email: 0, // Set this to 0 to prevent sending email notifications
-                      },
-                      callback: function (response) {
-                        // Check if the document has been modified
-
-                        // Document share was successful
-                        frappe.show_alert({
-                          message: "Your Asset Request Sent Successfully",
-                          indicator: "green",
-                        });
-
-                        // Set field values
-                        frm.set_value(emp_stage_request, "Done");
-                        frm.set_value("stage_6_emp_status", "Approved");
-                        frm.set_value("status", "Pending From Store Manager");
-
-                        // Save the form
-                        frm.save();
-                      },
-                    });
-
-                    //</PR is Shared with RM using API Call>
-                  } else {
-                    frappe.msgprint("Approval Already Sent");
-                  }
-                },
-                () => {
-                  // action to perform if No is selected
-                }
-              );
-            } else {
-              frappe.msgprint("Already Approved", "Message", "red");
-            }
-          });
+                );
+              } else {
+                frappe.msgprint("Already Approved", "Message", "red");
+              }
+            });
+          }
+         
         } else if (frm.doc.stage_5_emp_status === "Approved") {
           // "Stage 4" is approved, but "Stage 5" approval is pending
           console.log("Employee Matched at Stage 6 :" + frm.doc.stage_6_emp_id);
           console.log("pending from Stage 5");
-          frm.add_custom_button(__("Verify"), function () {
-            if (
-              frm.doc.status == "Pending" &&
-              frm.doc.stage_6_emp_status == "Pending"
-            ) {
-              frappe.confirm(
-                "We are assuming that you verified this Asset Request <br> " +
-                  "<b>Are you sure for Proceed?</b>",
-                () => {
-                  //<check Next Not Skippable Employee>
-                  let emp_stage;
-                  let emp_stage_request;
-                  let emp_stage_status;
-
-                  if (
-                    frm.doc.status === "Pending" &&
-                    frm.doc.select_department == "IT"
-                  ) {
-                    if (frm.doc.stage_7_emp_status !== "Skip") {
-                      emp_stage = frm.doc.stage_7_emp_id;
-                      emp_stage_request = "stage_7_request";
-                      emp_stage_status = frm.doc.stage_7_emp_status;
+          if(frm.doc.stage_6_request=="Done"){
+            frm.add_custom_button(__("Verify"), function () {
+              if (
+                frm.doc.status == "Pending" &&
+                frm.doc.stage_6_emp_status == "Pending"
+              ) {
+                frappe.confirm(
+                  "We are assuming that you verified this Asset Request <br> " +
+                    "<b>Are you sure for Proceed?</b>",
+                  () => {
+                    //<check Next Not Skippable Employee>
+                    let emp_stage;
+                    let emp_stage_request;
+                    let emp_stage_status;
+  
+                    if (
+                      frm.doc.status === "Pending" &&
+                      frm.doc.select_department == "IT"
+                    ) {
+                      if (frm.doc.stage_7_emp_status !== "Skip") {
+                        emp_stage = frm.doc.stage_7_emp_id;
+                        emp_stage_request = "stage_7_request";
+                        emp_stage_status = frm.doc.stage_7_emp_status;
+                      }
                     }
+                    //</check Next Not Skippable Employee>
+  
+                    // action to perform if Yes is selected
+                    // Add your button's functionality here
+                    let stage = emp_stage;
+                    //<PR is Shared with RM using API Call>
+                    if (emp_stage_status == "Pending") {
+                      frappe.call({
+                        method: "frappe.share.add",
+                        freeze: true, // Set to true to freeze the UI
+                        freeze_message: "Internet Not Stable, Please Wait...",
+                        args: {
+                          doctype: frm.doctype,
+                          name: frm.docname,
+                          user: stage,
+                          read: 1,
+                          write: 1,
+                          submit: 0,
+                          share: 1,
+                          notify: 1,
+                          send_email: 0, // Set this to 0 to prevent sending email notifications
+                        },
+                        callback: function (response) {
+                          // Check if the document has been modified
+  
+                          // Document share was successful
+                          frappe.show_alert({
+                            message: "Your Asset Request Sent Successfully",
+                            indicator: "green",
+                          });
+  
+                          // Set field values
+                          frm.set_value(emp_stage_request, "Done");
+                          frm.set_value("stage_6_emp_status", "Approved");
+                          if (frm.doc.stage_7_request == "Done") {
+                            frm.set_value("status", "Pending From Store Manager");
+                          } else {
+                            frm.set_value("status", "Pending");
+                          }
+  
+                          // Save the form
+                          frm.save();
+                        },
+                      });
+  
+                      //</PR is Shared with RM using API Call>
+                    } else {
+                      frappe.msgprint("Approval Already Sent");
+                    }
+                  },
+                  () => {
+                    // action to perform if No is selected
                   }
-                  //</check Next Not Skippable Employee>
-
-                  // action to perform if Yes is selected
-                  // Add your button's functionality here
-                  let stage = emp_stage;
-                  //<PR is Shared with RM using API Call>
-                  if (emp_stage_status == "Pending") {
-                    frappe.call({
-                      method: "frappe.share.add",
-                      freeze: true, // Set to true to freeze the UI
-                      freeze_message: "Internet Not Stable, Please Wait...",
-                      args: {
-                        doctype: frm.doctype,
-                        name: frm.docname,
-                        user: stage,
-                        read: 1,
-                        write: 1,
-                        submit: 0,
-                        share: 1,
-                        notify: 1,
-                        send_email: 0, // Set this to 0 to prevent sending email notifications
-                      },
-                      callback: function (response) {
-                        // Check if the document has been modified
-
-                        // Document share was successful
-                        frappe.show_alert({
-                          message: "Your Asset Request Sent Successfully",
-                          indicator: "green",
-                        });
-
-                        // Set field values
-                        frm.set_value(emp_stage_request, "Done");
-                        frm.set_value("stage_6_emp_status", "Approved");
-                        if (frm.doc.stage_7_request == "Done") {
-                          frm.set_value("status", "Pending From Store Manager");
-                        } else {
-                          frm.set_value("status", "Pending");
-                        }
-
-                        // Save the form
-                        frm.save();
-                      },
-                    });
-
-                    //</PR is Shared with RM using API Call>
-                  } else {
-                    frappe.msgprint("Approval Already Sent");
-                  }
-                },
-                () => {
-                  // action to perform if No is selected
-                }
-              );
-            } else {
-              frappe.msgprint("Already Approved", "Message", "red");
-            }
-          });
+                );
+              } else {
+                frappe.msgprint("Already Approved", "Message", "red");
+              }
+            });
+          }
+     
         }
       }
 
@@ -3907,20 +3914,43 @@ frappe.ui.form.on("Asset Request", {
   },
 
   hide_otp_from_timeline: function (frm) {
-    console.log("hiding otp");
     // Check if the user has the "System Manager" role
-    const hasSystemManagerRole = frappe.user_roles.includes("System Manager");
+const hasSystemManagerRole = frappe.user_roles.includes('System Manager');
 
-    // Get all timeline items
-    let timeline_items = frm.timeline.wrapper.find(".timeline-item");
+// Get all timeline items
+let timeline_items = frm.timeline.wrapper.find('.timeline-item');
 
-    // Iterate through timeline items and hide entries containing 'OTP' if the user is not a System Manager
-    timeline_items.each(function () {
-      let item = $(this);
-      if (item.text().includes("OTP") && !hasSystemManagerRole) {
+// Iterate through timeline items and hide entries based on conditions
+timeline_items.each(function() {
+    let item = $(this);
+    let text = item.text();
+
+    // Hide entries containing 'OTP' if the user is not a System Manager
+    if (text.includes('OTP') && !hasSystemManagerRole) {
         item.hide();
-      }
-    });
+    }
+
+    // Hide entries containing 'Notification sent to'
+    if (text.includes('Notification sent to')) {
+        item.hide();
+    }
+
+    // Hide entries containing 'New Email'
+    if (text.includes('New Email')) {
+        item.hide();
+    }
+
+    // Hide entries containing 'viewed this'
+    if (text.includes('viewed this')) {
+        item.hide();
+    }
+
+    // Hide entries containing 'viewed this'
+    if (text.includes('added rows')) {
+      item.hide();
+  }
+});
+
   },
 });
 
