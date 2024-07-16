@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_events_in_timeline": 1,
- "autoname": "format:EMAIL-{employee_name}-{employee_id}",
+ "autoname": "format:email-{employee_name}-{employee_id}",
  "creation": "2024-05-14 10:17:01.622886",
  "default_view": "List",
  "doctype": "DocType",
@@ -12,6 +12,7 @@
   "delivered_date",
   "return_remark",
   "request_type",
+  "delete_reason",
   "email_details_section",
   "email",
   "column_break_yz3vi",
@@ -50,7 +51,7 @@
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email ID",
-   "mandatory_depends_on": "eval:(frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\") && doc.request_type==\"New\"",
+   "mandatory_depends_on": "eval:(frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\") && doc.request_type==\"New\" || (frappe.user.has_role('HR Support Manager') && doc.request_type==\"Delete\")",
    "read_only_depends_on": "eval:!frappe.user.has_role('IT Store Manager') && doc.request_type==\"New\""
   },
   {
@@ -67,7 +68,7 @@
    "options": "Draft\nPending\nDelivered\nCorrection-Required"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\"",
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
    "label": "Employee Details"
@@ -170,11 +171,19 @@
    "label": "Request Type",
    "options": "\nNew\nDelete",
    "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.request_type == \"Delete\"",
+   "fieldname": "delete_reason",
+   "fieldtype": "Small Text",
+   "label": "Delete Reason",
+   "mandatory_depends_on": "eval:doc.request_type == \"Delete\""
   }
  ],
+ "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-11 17:29:03.556436",
+ "modified": "2024-07-16 11:29:48.709132",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

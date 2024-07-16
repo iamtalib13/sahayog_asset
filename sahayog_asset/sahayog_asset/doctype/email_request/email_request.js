@@ -132,7 +132,7 @@ frappe.ui.form.on("Email Request", {
               "background-color": "#fd0e35", // Set soft red color
               color: "#ffffff", // Set font color to white
             });
-        }else if(frappe.user.has_role("HR Support Executive"))
+        }else if(frappe.user.has_role("HR Support Manager"))
         {
           frm.disable_save();
           frm.disable_form();

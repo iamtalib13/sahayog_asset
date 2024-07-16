@@ -1,4 +1,9 @@
 frappe.listview_settings["Asset Request"] = {
+  hide_name_column: true,
+  refresh: function(listview) {
+          $(".layout-side-section").hide(); 
+      
+  } ,
   // Columns to fetch but not display
   //query_fields: ["select_department"],
   // Additional filters (array or object) for fetch query

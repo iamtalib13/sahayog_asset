@@ -3914,6 +3914,16 @@ frappe.ui.form.on("Asset Request", {
   },
 
   hide_otp_from_timeline: function (frm) {
+    const printButton = document.querySelector('button[data-original-title="Print"]');
+if (printButton) {
+    printButton.style.display = 'none';
+}
+
+// Hide the menu button
+const menuButton = document.querySelector('button[data-original-title="Menu"]');
+if (menuButton) {
+    menuButton.style.display = 'none';
+}
     // Check if the user has the "System Manager" role
 const hasSystemManagerRole = frappe.user_roles.includes('System Manager');
 
@@ -4023,3 +4033,5 @@ frappe.ui.form.on("Asset Request", "refresh", function (frm) {
     }
   });
 });
+
+
