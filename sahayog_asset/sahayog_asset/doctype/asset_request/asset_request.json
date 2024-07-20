@@ -205,7 +205,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4",
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4\nHead Office",
    "reqd": 1
   },
   {
@@ -234,7 +234,8 @@
   },
   {
    "fieldname": "section_break_hitna",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Add Item Form"
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -281,6 +282,7 @@
    "options": "Asset List"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "approval_details_tab",
    "fieldtype": "Tab Break",
    "label": "Approval Details"
@@ -622,7 +624,7 @@
   {
    "depends_on": "eval:doc.select_department",
    "fieldname": "item_purpose",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Item Purpose"
   },
   {
@@ -870,6 +872,7 @@
    "label": "Highest Approval Level"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "asset_item_approval_level_section",
    "fieldtype": "Section Break",
    "label": "Asset Item Approval Level"
@@ -889,7 +892,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-06 12:24:37.282091",
+ "modified": "2024-07-20 15:58:45.529358",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

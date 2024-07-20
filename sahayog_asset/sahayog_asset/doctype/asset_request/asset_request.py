@@ -10,11 +10,7 @@ class AssetRequest(Document):
 
 def validate(self):
     if self.status == "Pending":
-        # Iterate through each row in the "asset" child table
-        for asset in self.get("asset"):
-            # Check if the "quantity" field is blank
-            if not asset.quantity:
-                frappe.throw("Quantity cannot be blank for all assets.")  # Show message if quantity is blank
+        frappe.throw("Empty")
 
 @frappe.whitelist()
 def store_pending(doc):

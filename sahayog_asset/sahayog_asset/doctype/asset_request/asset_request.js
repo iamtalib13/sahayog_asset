@@ -167,11 +167,11 @@ frappe.ui.form.on("Asset Request", {
   },
   validate: function (frm) {
     if (!frm.doc.asset) {
-      frappe.throw({
-        title: __("Please Add Asset Item"),
-        indicator: "red",
-        message: __("Please Add At Least One Asset Item"),
-      });
+      // frappe.throw({
+      //   title: __("Please Add Asset Item"),
+      //   indicator: "red",
+      //   message: __("Please Add At Least One Asset Item"),
+      // });
     }
   },
 
@@ -286,7 +286,7 @@ frappe.ui.form.on("Asset Request", {
   refresh: function (frm) {
     frm.trigger("hide_timeline");
     frm.trigger("disbale_add_new");
-
+    frm.trigger("add_form_color");
     if (frm.is_new()) {
       frm.trigger("Set_Employee_Details");
       frm.trigger("Employee_Details");
@@ -700,11 +700,11 @@ frappe.ui.form.on("Asset Request", {
           console.log("Employee Matched at Stage 0 :" + frm.doc.employee_user);
           //<Send for Approval , this button is only for Asset Requester Owner>
           if (!frm.doc.asset || frm.doc.asset.length === 0) {
-            frappe.throw({
-              title: __("Please Add Asset Item"),
-              indicator: "red",
-              message: __("Please Add At Least One Asset Item"),
-            });
+            // frappe.throw({
+            //   title: __("Please Add Asset Item"),
+            //   indicator: "red",
+            //   message: __("Please Add At Least One Asset Item"),
+            // });
           } else {
             console.log("ready to send");
 
@@ -750,11 +750,11 @@ frappe.ui.form.on("Asset Request", {
 
                 if (rm_stage_status == "Pending") {
                   if (!frm.doc.asset || frm.doc.asset.length === 0) {
-                    frappe.throw({
-                      title: __("Please Add Asset Item"),
-                      indicator: "red",
-                      message: __("Please Add At Least One Asset Item"),
-                    });
+                    // frappe.throw({
+                    //   title: __("Please Add Asset Item"),
+                    //   indicator: "red",
+                    //   message: __("Please Add At Least One Asset Item"),
+                    // });
                   } else {
                     frappe.confirm(
                       "<i>Do you want to send for Approval?</i>",
@@ -2186,6 +2186,17 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
+  add_form_color:function(frm){
+    frm.fields_dict["section_break_hitna"].wrapper.css(
+      "background-color",
+      "antiquewhite"
+    );
+    frm.fields_dict["column_break_xogan"].wrapper.css(
+      "background-color",
+      "antiquewhite"
+    );
+    
+  },
 
   disbale_add_new: function (frm) {
     frm.get_field("asset").grid.cannot_add_rows = true;
@@ -3477,11 +3488,11 @@ frappe.ui.form.on("Asset Request", {
 
   validation_check: function (frm) {
     if (!frm.doc.asset || frm.doc.asset.length === 0) {
-      frappe.throw({
-        title: __("Please Add Asset Item"),
-        indicator: "red",
-        message: __("Please Add At Least One Asset Item"),
-      });
+      // frappe.throw({
+      //   title: __("Please Add Asset Item"),
+      //   indicator: "red",
+      //   message: __("Please Add At Least One Asset Item"),
+      // });
     } else {
       let isAssetTableEmpty = true;
       for (let row of frm.doc.asset) {

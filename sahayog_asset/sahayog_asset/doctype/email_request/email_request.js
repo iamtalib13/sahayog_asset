@@ -10,9 +10,15 @@ frappe.ui.form.on("Email Request", {
   refresh: function (frm) {
     let status = frm.doc.status;
     if (frm.is_new()) {
+      
+        frm.trigger("read_only_from_hr");
+      
+    
     } else if (!frm.is_new()) {
+      frm.trigger("read_only_from_hr");
+      
       if (status == "Correction-Required") {
-        if (frappe.user.has_role("HR Support Manager")) {
+        if (frappe.user.has_role("HR Support Executive")) {
           frm.trigger("submit_button");
           frm.trigger("correction_intro_messages");
         }
@@ -23,7 +29,7 @@ frappe.ui.form.on("Email Request", {
       } else if (status == "Draft" || status == "Correction-Required") {
         frm.trigger("draft_intro_messages");
 
-        if (frappe.user.has_role("HR Support Manager")) {
+        if (frappe.user.has_role("HR Support Executive")) {
           frm.trigger("submit_button");
         }
         if (frappe.user.has_role("IT Store Manager")) {
@@ -35,6 +41,11 @@ frappe.ui.form.on("Email Request", {
      
         
         if (frappe.user.has_role("IT Store Manager")) {
+
+         frm.trigger("read_only_from_it_store_manager");
+         
+         if( frm.doc.request_type=="New")
+         {
           frm
             .add_custom_button(__("Deliver To HR"), function () {
               if (!frm.doc.email && !frm.doc.otp) {
@@ -71,13 +82,12 @@ frappe.ui.form.on("Email Request", {
                       freeze_message: "Internet Not Stable, Please Wait...",
                       callback: function (r) {
                         frm.set_value("delivered_date", r.message);
+                        frm.set_value("status", "Delivered");
                         frm.save();
-                        d.hide();
+                        
                       },
                     });
 
-                    frm.set_value("status", "Delivered");
-                    frm.save();
                   },
                   () => {
                     // Action to perform if "No" is selected
@@ -132,7 +142,41 @@ frappe.ui.form.on("Email Request", {
               "background-color": "#fd0e35", // Set soft red color
               color: "#ffffff", // Set font color to white
             });
-        }else if(frappe.user.has_role("HR Support Manager"))
+
+          }else if( frm.doc.request_type=="Delete")
+          {
+            frm
+            .add_custom_button(__("Delete"), function () {
+             
+                frappe.confirm(
+                  "Are you sure you want to delete?",
+                  () => {
+                    // Action to perform if "Yes" is selected
+                    frm.call({
+                      method: "get_server_datetime",
+                      freeze: true, // Set to true to freeze the UI
+                      freeze_message: "Internet Not Stable, Please Wait...",
+                      callback: function (r) {
+                        frm.set_value("delivered_date", r.message);
+                        frm.set_value("status", "Deleted");
+                        frm.save();
+                      },
+                    });
+
+             
+                  },
+                  () => {
+                    // Action to perform if "No" is selected
+                  }
+                );
+              
+            })
+            .css({
+              "background-color": "#ff6347", // Set green color
+              color: "#ffffff", // Set font color to white
+            });
+          }
+        }else if(frappe.user.has_role("HR Support Executive"))
         {
           frm.disable_save();
           frm.disable_form();
@@ -142,11 +186,18 @@ frappe.ui.form.on("Email Request", {
         frm.disable_save();
         frm.disable_form();
       }
+
+      else if (status == "Deleted") {
+        frm.trigger("delivered_intro_messages");
+        frm.disable_save();
+        frm.disable_form();
+      }
+      
     }
   },
 
   draft_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Manager")) {
+    if (frappe.user.has_role("HR Support Executive")) {
       frm.set_intro(
         "Please submit the Email Request to the IT Department",
         "red"
@@ -154,23 +205,43 @@ frappe.ui.form.on("Email Request", {
     }
   },
   pending_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Manager")) {
+    if (frappe.user.has_role("HR Support Executive")) {
+      let request_type = frm.doc.request_type;
+      let message = '';
+      
+      if (request_type == "New") {
+          message = "Your email creation request has been sent to IT Department.";
+      } else if (request_type == "Delete") {
+          message = "Your email deletion request has been sent to IT Department.";
+      }
+      
       frm.set_intro(
-        "<div style='display:flex; align-items:center;'><div style='width: 30px; height: 30px; background-color: green; border-radius: 50%; margin-right: 10px; display: flex; justify-content: center; align-items: center;'><span style='color: white; font-size: 20px;'>&#x2713;</span></div><div style='font-size: 15px;'>Your email creation request has been sent to the IT department</div></div>",
-        "green"
+          `<div style='display:flex; align-items:center;'><div style='width: 30px; height: 30px; background-color: green; border-radius: 50%; margin-right: 10px; display: flex; justify-content: center; align-items: center;'><span style='color: white; font-size: 20px;'>&#x2713;</span></div><div style='font-size: 15px;'>${message}</div></div>`,
+          "green"
       );
+      
     }
     if (frappe.user.has_role("IT Store Manager")) {
-      frm.set_intro(
-        "Please create an Email Account for - <b><font color='black'>" +
-          frm.doc.employee_name +
-          "</font></b>",
-        "red"
-      );
+
+    let request_type = frm.doc.request_type;
+let action = '';
+
+if (request_type == "New") {
+    action = "create";
+} else if (request_type == "Delete") {
+    action = "delete";
+}
+
+frm.set_intro(
+    `Please ${action} an Email Account for - <b><font color='black'>${frm.doc.employee_name}</font></b>`,
+    "red"
+);
+
     }
   },
   delivered_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Manager")) {
+    if (frappe.user.has_role("HR Support Executive")) {
+
       frm.set_intro(
         "<b><font color='black'>Email Account</font></b> - " +
           frm.doc.email +
@@ -182,19 +253,28 @@ frappe.ui.form.on("Email Request", {
     }
 
     if (frappe.user.has_role("IT Store Manager")) {
-      frm.set_intro(
-        "<b><font color='black'>Email Account</font></b> - " +
-          frm.doc.email +
-          " <b><font color='black'> for </font></b> " +
-          frm.doc.employee_name +
-          " <b><font color='black'>Delivered Successfully to the HR Department</font></b>",
-        "green"
-      );
+      let request_type = frm.doc.request_type;
+let action = '';
+let color = '';
+
+if (request_type == "New") {
+    action = "created";
+    color = "green";
+} else if (request_type == "Delete") {
+    action = "deleted";
+    color = "red";
+}
+
+frm.set_intro(
+    `Email Account - <b>${frm.doc.email}</b> for <b>${frm.doc.employee_name}</b> ${action} successfully.`,
+    color
+);
+
     }
   },
 
   correction_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Manager")) {
+    if (frappe.user.has_role("HR Support Executive")) {
       frm.set_intro(
         "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
           "<div class='card' style='padding: 10px; background-color: #f8f9fa;'>" +
@@ -205,7 +285,7 @@ frappe.ui.form.on("Email Request", {
     }
 
     if (frappe.user.has_role("IT Store Manager")) {
-      if (frappe.user.has_role("HR Support Manager")) {
+      if (frappe.user.has_role("HR Support Executive")) {
         frm.set_intro(
           "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
             "<div class='card' style='padding: 10px; background-color: #f8f9fa;'>" +
@@ -218,7 +298,7 @@ frappe.ui.form.on("Email Request", {
   },
 
   submit_button: function (frm) {
-    if (frappe.user.has_role("HR Support Manager")) {
+    if (frappe.user.has_role("HR Support Executive")) {
       frm
         .add_custom_button(__("Submit Email Request"), function () {
           frappe.confirm(
@@ -391,5 +471,67 @@ frappe.ui.form.on("Email Request", {
         `<b style='color:red;'>Please Enter 10 Digit Phone No. (Length: ${length})</b>`
       );
     }
+  },
+  read_only_from_it_store_manager:function(frm){
+
+    if(frm.doc.request_type=="New")
+    {
+      frm.set_df_property('delete_reason', 'read_only', 1)
+      frm.set_df_property('email', 'read_only', 0)
+      frm.set_df_property('employee_id', 'read_only', 1)
+      frm.set_df_property('employee_name', 'read_only', 1)
+      frm.set_df_property('gender', 'read_only', 1)
+      frm.set_df_property('phone', 'read_only', 1)
+      frm.set_df_property('zone', 'read_only', 1)
+      frm.set_df_property('region', 'read_only', 1)
+      frm.set_df_property('district', 'read_only', 1)
+      frm.set_df_property('branch', 'read_only', 1)
+      frm.set_df_property('designation', 'read_only', 1)
+      frm.set_df_property('division', 'read_only', 1)
+      frm.set_df_property('department', 'read_only', 1)
+
+    }else if(frm.doc.request_type=="Delete")
+    {
+      frm.set_df_property('delete_reason', 'read_only', 1)
+      frm.set_df_property('email', 'read_only', 1)
+      frm.set_df_property('employee_id', 'read_only', 1)
+      frm.set_df_property('employee_name', 'read_only', 1)
+    }
+
+    
+  },
+  read_only_from_hr:function(frm){
+
+    if (frappe.user.has_role("HR Support Executive")) {
+      if(frm.doc.request_type=="New")
+      {
+        frm.set_df_property('email', 'read_only', 1);
+
+console.log("hr read"); 
+      }else   if(frm.doc.request_type=="Delete")
+      {
+        frm.set_df_property('email', 'read_only', 0);
+
+      }
+      frm.set_df_property('email', 'read_only', 1);
+
+}
+    
+  },
+
+  request_type:function(frm){
+    if (frappe.user.has_role("HR Support Executive")) {
+              if(frm.doc.request_type=="New")
+              {
+                frm.set_df_property('email', 'read_only', 1);
+      console.log("hr read"); 
+              }else   if(frm.doc.request_type=="Delete")
+              {
+                frm.set_df_property('email', 'read_only', 0);
+
+              }
+
+    }
+
   },
 });
