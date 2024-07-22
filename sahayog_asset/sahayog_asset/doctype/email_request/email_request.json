@@ -8,12 +8,15 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "status",
+  "approval_html_section",
   "approval_html",
-  "delivered_date",
+  "section_break_mm0dh",
+  "status",
   "return_remark",
   "request_type",
   "delete_reason",
+  "column_break_arvor",
+  "delivered_date",
   "email_details_section",
   "email",
   "column_break_yz3vi",
@@ -241,12 +244,25 @@
    "fieldname": "level_1_remark",
    "fieldtype": "Small Text",
    "label": "Level 1 Remark"
+  },
+  {
+   "fieldname": "column_break_arvor",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_mm0dh",
+   "fieldtype": "Section Break",
+   "label": "Request Details"
+  },
+  {
+   "fieldname": "approval_html_section",
+   "fieldtype": "Section Break"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-22 14:15:51.281420",
+ "modified": "2024-07-22 16:32:06.593551",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

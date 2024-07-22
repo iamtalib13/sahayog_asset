@@ -8,6 +8,8 @@ frappe.ui.form.on("Email Request", {
     }
   },
   refresh: function (frm) {
+    frm.trigger("section_colors");
+    
     let status = frm.doc.status;
     if (frm.is_new()) {
       
@@ -209,6 +211,8 @@ frappe.ui.form.on("Email Request", {
         frm.disable_form();
       }
       
+    }else{
+      
     }
   },
 
@@ -313,8 +317,45 @@ frm.add_custom_button(__("Reject"), function () {
 }
   },
 
-    async approval_pending_intro_messages(frm) {
-      // Get Approval Tracker details from the form
+
+
+  section_colors:function(frm){
+
+    // Extremely light blue gradient for approval_html_section
+frm.fields_dict["approval_html_section"].wrapper.css(
+  "background", 
+  "linear-gradient(to right, #f9fcff, #f2faff)" // Extremely light blue gradient
+);
+
+    // Slightly darker blue gradient for the third section
+frm.fields_dict["section_break_mm0dh"].wrapper.css(
+  "background", 
+ "linear-gradient(to right, #f0faff, #e6f7ff)" // Most lightest blue gradient
+);
+
+
+// Very light blue gradient for email details section
+frm.fields_dict["email_details_section"].wrapper.css(
+  "background", 
+  "linear-gradient(to right, #e0f7fa, #b2ebf2)" // Very light blue gradient
+);
+
+// Slightly lighter blue gradient for employee details section
+frm.fields_dict["employee_details_section"].wrapper.css(
+  "background", 
+  "linear-gradient(to right, #cce7ff, #a3d9ff)" // Slightly lighter blue gradient
+);
+
+
+
+
+  
+  
+    
+  },
+
+  async approval_pending_intro_messages(frm) {
+    // Get Approval Tracker details from the form
     const full_name = frm.doc.level_1_name || "Not specified";
     const status = frm.doc.level_1_status || "Not specified";
 
@@ -335,24 +376,33 @@ frm.add_custom_button(__("Reject"), function () {
     // Generate HTML for card view
     let html = `
         <div style="
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-            padding: 16px; 
-            background-color: #f9f9f9; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: transparent; 
             width: 100%; /* Full width */
             text-align: left;
             box-sizing: border-box; /* Ensure padding and border are included in width */
         ">
-            <h4 style="margin-top: 0;">Approval Tracker</h4>
-            <p><strong>Employee Name:</strong> ${first_last_name}</p>
-            <p><strong>Status:</strong> <span style="color: ${status_color};">${status}</span></p>
+            <h4 style="margin: 0 0 8px 0; font-size: var(--text-base);font-weight:Bold  ">Approval Tracker</h4>
+            <div style="
+                border: 1px solid #ddd; 
+                border-radius: 4px; 
+                padding: 8px; 
+                display: flex; 
+                align-items: center;
+            ">
+                <img src='/files/user.png' style="width: 50px; height: 50px; border-radius: 50%; margin-right: 16px;"></img>
+                <div>
+                    <p style="margin: 0; font-weight: bold;">${first_last_name}</p>
+                    <p style="margin: 0; color: ${status_color};">${status}</p>
+                </div>
+            </div>
+            <hr>
         </div>
     `;
 
     // Set the HTML as Summary HTML
     frm.set_df_property("approval_html", "options", html);
-      },
+}
+,
   
 
   get_approval_details: async function(frm) {
