@@ -312,6 +312,13 @@ frm.add_custom_button(__("Reject"), function () {
     d.show();
 });
 
+
+// Lighter green for the Approve button
+frm.custom_buttons["Approve"].css("background-color", "#a5d6a7"); // Lighter green
+
+// Lighter red for the Reject button
+frm.custom_buttons["Reject"].css("background-color", "#ef9a9a"); // Lighter red
+
 }else {
   console.log("approval not matched");
 }
