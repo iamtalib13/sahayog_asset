@@ -808,6 +808,11 @@ frappe.ui.form.on("Asset Request", {
           frm.change_custom_button_type("Send for Approval", null, "primary");
           //</Send for Approval , this button is only for Asset Requester Owner>
         } else if (frm.doc.status == "Dispatched") {
+
+          if(user === frm.doc.employee_user)
+          {
+
+          
           frm.add_custom_button(__("Receive"), function () {
             var d = new frappe.ui.Dialog({
               title: __("Received Remark"),
@@ -849,6 +854,7 @@ frappe.ui.form.on("Asset Request", {
 
             d.show();
           });
+        }
         } else if (frm.doc.status == "Received") {
           frm.disable_save();
         }
@@ -2317,6 +2323,7 @@ frappe.ui.form.on("Asset Request", {
             r.message[0].reporting_person_designation
           );
           frm.set_value("designation", r.message[0].designation);
+          frm.set_value("zone", r.message[0].zone);
           console.log("setting reporting");
 
           //<Email Setup>

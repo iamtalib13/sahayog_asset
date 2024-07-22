@@ -19,6 +19,7 @@
   "phone",
   "column_break_r9uiq",
   "region",
+  "zone",
   "district",
   "column_sbreak_aed1x",
   "division",
@@ -888,11 +889,16 @@
    "label": "Ticket ID",
    "options": "Sahayog Ticket",
    "read_only": 1
+  },
+  {
+   "fieldname": "zone",
+   "fieldtype": "Data",
+   "label": "Zone"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-20 15:58:45.529358",
+ "modified": "2024-07-22 13:18:13.063494",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

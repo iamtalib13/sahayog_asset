@@ -9,6 +9,7 @@
  "engine": "InnoDB",
  "field_order": [
   "status",
+  "approval_html",
   "delivered_date",
   "return_remark",
   "request_type",
@@ -30,7 +31,14 @@
   "column_break_6k7pj",
   "designation",
   "division",
-  "department"
+  "department",
+  "approval_details_tab",
+  "level_1_section",
+  "level_1_user_id",
+  "level_1_name",
+  "level_1_email",
+  "level_1_status",
+  "level_1_remark"
  ],
  "fields": [
   {
@@ -65,7 +73,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nPending\nDelivered\nDeleted\nCorrection-Required"
+   "options": "Draft\nApproval Pending\nPending From IT\nDelivered\nDeleted\nCorrection-Required\nRejected"
   },
   {
    "depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\"",
@@ -188,12 +196,57 @@
    "fieldtype": "Small Text",
    "label": "Delete Reason",
    "mandatory_depends_on": "eval:doc.request_type == \"Delete\""
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
+   "fieldname": "approval_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Approval Details"
+  },
+  {
+   "default": "Not-Set",
+   "fieldname": "level_1_status",
+   "fieldtype": "Select",
+   "label": "Level 1 Status",
+   "options": "Not-Set\nPending\nApproved\nRejected"
+  },
+  {
+   "fieldname": "level_1_user_id",
+   "fieldtype": "Data",
+   "label": "User ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "level_1_email",
+   "fieldtype": "Data",
+   "label": "Level 1 Email",
+   "reqd": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "level_1_section",
+   "fieldtype": "Section Break",
+   "label": "Level 1"
+  },
+  {
+   "fieldname": "level_1_name",
+   "fieldtype": "Data",
+   "label": "Level 1 Name"
+  },
+  {
+   "fieldname": "approval_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "level_1_remark",
+   "fieldtype": "Small Text",
+   "label": "Level 1 Remark"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-18 13:41:19.373416",
+ "modified": "2024-07-22 14:15:51.281420",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

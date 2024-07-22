@@ -12,9 +12,16 @@ frappe.ui.form.on("Email Request", {
     if (frm.is_new()) {
       
         frm.trigger("read_only_from_hr");
-      
+        frm.trigger("get_approval_details");
     
     } else if (!frm.is_new()) {
+     
+      if(status !=="Draft")
+      {
+        frm.trigger("approval_pending_intro_messages");
+      }else {
+
+      }
       frm.trigger("read_only_from_hr");
       
       if (status == "Correction-Required") {
@@ -36,7 +43,7 @@ frappe.ui.form.on("Email Request", {
           frm.disable_save();
           frm.disable_form();
         }
-      } else if (status == "Pending") {
+      } else if (status == "Pending From IT") {
         frm.trigger("pending_intro_messages");
      
         
@@ -188,7 +195,16 @@ frappe.ui.form.on("Email Request", {
       }
 
       else if (status == "Deleted") {
+        
         frm.trigger("delivered_intro_messages");
+        frm.disable_save();
+        frm.disable_form();
+      }
+      else if (status == "Approval Pending") {
+        frm.trigger("correction_intro_messages");
+        frm.trigger("approval_pending_intro_messages");
+        frm.trigger("approval_controls")
+        
         frm.disable_save();
         frm.disable_form();
       }
@@ -196,12 +212,170 @@ frappe.ui.form.on("Email Request", {
     }
   },
 
+
+  approval_controls:function(frm){
+let user= frappe.session.user;
+let approval_user=frm.doc.level_1_user_id;
+    console.log(user);
+    console.log(approval_user);
+if(user == approval_user)
+{
+  console.log("apprroval matched");
+  frm.add_custom_button(__("Approve"), function () {
+   
+
+    // Create a dialog to collect approval remark
+    var d = new frappe.ui.Dialog({
+        title: __("Approval Remark"),
+        fields: [
+            {
+                label: __("Remark"),
+                fieldname: "approval_remark",
+                fieldtype: "Small Text",
+                reqd: 1, // Set the remark field as mandatory
+            }
+        ],
+        primary_action_label: __("Approve"),
+        primary_action: async function () {
+            // Get the remark from the dialog
+            let remark = d.fields_dict.approval_remark.get_value();
+            if (!remark) {
+                frappe.msgprint(__("Please provide a remark before approving."));
+                return;
+            }
+
+            // Confirm the approval action
+            frappe.confirm(
+                "We are assuming that you verified this Email Request <br> " +
+                "<b>Are you sure for Approval?</b>",
+                async () => {
+                    frm.set_value("status", "Pending From IT");
+                    frm.set_value("level_1_status", "Approved");
+                    frm.set_value("level_1_remark", remark);
+                    d.hide();
+                    await frm.save();
+                    frappe.show_alert({
+                        message: "Email Request has been approved and sent to IT.",
+                        indicator: "green",
+                    });
+                },
+                () => {
+                    // action to perform if No is selected
+                }
+            );
+        },
+        secondary_action_label: __("Cancel"),
+        secondary_action: function () {
+            d.hide();
+        },
+    });
+
+    d.show();
+});
+
+frm.add_custom_button(__("Reject"), function () {
+    var d = new frappe.ui.Dialog({
+        title: __("Rejection Reason"),
+        fields: [
+            {
+                label: __("Remark"),
+                fieldname: "level_1_remark",
+                fieldtype: "Small Text",
+                reqd: 1, // Set the remark field as mandatory
+            },
+        ],
+        primary_action_label: __("Reject"),
+        primary_action: function () {
+            // Check if the rejection reason and remark are provided
+            let remark = d.fields_dict.level_1_remark.get_value();
+            if (!remark) {
+                frappe.msgprint(__("Please provide a remark before rejecting."));
+                return;
+            }
+
+            frm.set_value("status", "Rejected");
+            frm.set_value("level_1_status", "Rejected");
+            frm.set_value("level_1_remark", remark);
+            d.hide();
+            frm.save();
+        },
+        secondary_action_label: __("Cancel"),
+        secondary_action: function () {
+            d.hide();
+        },
+    });
+
+    d.show();
+});
+
+}else {
+  console.log("approval not matched");
+}
+  },
+
+    async approval_pending_intro_messages(frm) {
+      // Get Approval Tracker details from the form
+    const full_name = frm.doc.level_1_name || "Not specified";
+    const status = frm.doc.level_1_status || "Not specified";
+
+    // Extract the first and last name
+    const name_parts = full_name.split(' ');
+    const first_last_name = name_parts.length > 1 ? `${name_parts[0]} ${name_parts[name_parts.length - 1]}` : full_name;
+
+    // Determine the status color
+    let status_color;
+    if (status === "Pending") {
+        status_color = "red";
+    } else if (status === "Approved") {
+        status_color = "green";
+    } else {
+        status_color = "gray"; // Default color for unspecified statuses
+    }
+
+    // Generate HTML for card view
+    let html = `
+        <div style="
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            padding: 16px; 
+            background-color: #f9f9f9; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Full width */
+            text-align: left;
+            box-sizing: border-box; /* Ensure padding and border are included in width */
+        ">
+            <h4 style="margin-top: 0;">Approval Tracker</h4>
+            <p><strong>Employee Name:</strong> ${first_last_name}</p>
+            <p><strong>Status:</strong> <span style="color: ${status_color};">${status}</span></p>
+        </div>
+    `;
+
+    // Set the HTML as Summary HTML
+    frm.set_df_property("approval_html", "options", html);
+      },
+  
+
+  get_approval_details: async function(frm) {
+    try {
+        let level_1_user = await frappe.db.get_single_value('Email Approval', 'employee_id');
+        let level_1_email = await frappe.db.get_single_value('Email Approval', 'email_id');
+        let level_1_name = await frappe.db.get_single_value('Email Approval', 'employee_name');
+        
+        frm.set_value("level_1_user_id", level_1_user);
+        frm.set_value("level_1_email", level_1_email);
+        frm.set_value("level_1_name", level_1_name);
+    } catch (error) {
+        console.error("Error fetching values:", error);
+    }
+},
+
   draft_intro_messages: function (frm) {
     if (frappe.user.has_role("HR Support Executive")) {
       frm.set_intro(
-        "Please submit the Email Request to the IT Department",
+        "Please submit the Email Request for approval to <b>Harshavardhan Ghutke Sir</b>",
         "red"
-      );
+    );
+    
     }
   },
   pending_intro_messages: function (frm) {
@@ -242,14 +416,28 @@ frm.set_intro(
   delivered_intro_messages: function (frm) {
     if (frappe.user.has_role("HR Support Executive")) {
 
-      frm.set_intro(
-        "<b><font color='black'>Email Account</font></b> - " +
-          frm.doc.email +
-          " <b><font color='black'> for </font></b> " +
-          frm.doc.employee_name +
-          " <b><font color='black'>Delivered Successfully to the HR Department</font></b>",
-        "green"
-      );
+      let request_type = frm.doc.request_type;
+let action = '';
+let color = '';
+
+if (request_type == "New") {
+    action = "Delivered";
+    color = "green";
+} else if (request_type == "Delete") {
+    action = "Deleted";
+    color = "red";
+}
+
+// Use the 'action' variable in frm.set_intro
+frm.set_intro(
+  "<b>Email Account</b> - " +
+  frm.doc.email +
+  " <b>for</b> " +
+  frm.doc.employee_name +
+  " <b>" + action + " Successfully</b>",color
+);
+
+      
     }
 
     if (frappe.user.has_role("IT Store Manager")) {
@@ -274,7 +462,8 @@ frm.set_intro(
   },
 
   correction_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Executive")) {
+    if (frappe.user.has_role("HR Support Executive") && frm.doc.return_remark) {
+
       frm.set_intro(
         "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
           "<div class='card' style='padding: 10px; background-color: #f8f9fa;'>" +
@@ -300,26 +489,37 @@ frm.set_intro(
   submit_button: function (frm) {
     if (frappe.user.has_role("HR Support Executive")) {
       frm
-        .add_custom_button(__("Submit Email Request"), function () {
-          frappe.confirm(
-            "Are you sure you want to submit to the IT Department ?",
+    .add_custom_button(__("Submit Email Request"), function () {
+        frappe.confirm(
+            "Are you sure you want to submit?",
             () => {
-              // action to perform if Yes is selected
-              //perform desired action such as routing to new form or fetching etc.
+                // action to perform if Yes is selected
+                // perform desired action such as routing to new form or fetching etc.
 
-              frm.set_value("status", "Pending");
-              frm.refresh_field("status");
-              frm.save();
+                frm.set_value("status", "Approval Pending");
+                frm.set_value("level_1_status", "Pending");
+                frm.refresh_field("status");
+                frm.refresh_field("level_1_status");
+
+                frm.save().then(() => {
+                    // Handle successful save
+                    frappe.msgprint(__("Email Request has been submitted successfully."));
+                }).catch((error) => {
+                    // Handle save failure
+                    frappe.throw(__("Failed to submit Email Request. Please try again."));
+                   
+                });
             },
             () => {
-              // action to perform if No is selected
+                // action to perform if No is selected
             }
-          );
-        })
-        .css({
-          "background-color": "#28a745", // Set green color
-          color: "#ffffff", // Set font color to white
-        });
+        );
+    })
+    .css({
+        "background-color": "#28a745", // Set green color
+        color: "#ffffff", // Set font color to white
+    });
+
     }
   },
 
