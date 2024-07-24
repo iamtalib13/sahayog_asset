@@ -308,9 +308,7 @@ frappe.ui.form.on("Asset Request", {
     //   frm.set_df_property("asset", "read_only", 1);
     // }
     // frm.trigger("set_Approval_levels");
-    if (
-      frappe.user.has_role("System Manager")
-    ) {
+    if (frappe.user.has_role("System Manager")) {
       frm.enable_save();
 
       frm.add_custom_button(__("Employee Correct"), function () {
@@ -808,53 +806,49 @@ frappe.ui.form.on("Asset Request", {
           frm.change_custom_button_type("Send for Approval", null, "primary");
           //</Send for Approval , this button is only for Asset Requester Owner>
         } else if (frm.doc.status == "Dispatched") {
+          if (user === frm.doc.employee_user) {
+            frm.add_custom_button(__("Receive"), function () {
+              var d = new frappe.ui.Dialog({
+                title: __("Received Remark"),
+                fields: [
+                  {
+                    label: __("Please Give Received Remark for this Asset"),
+                    fieldname: "emp_received_remark",
+                    fieldtype: "Small Text",
+                    reqd: 1, // Set the rejection reason field as mandatory
+                    description: __(
+                      "Wrtie Courier Name & Builty No / Vehicle No. / Mode of Transport"
+                    ), // Description for the field
+                  },
+                ],
+                primary_action_label: __("Receive"),
+                primary_action: function () {
+                  // Check if the rejection reason is provided
+                  if (!d.fields_dict.emp_received_remark.get_value()) {
+                    frappe.msgprint(__("Please provide a Received Remark."));
+                    return;
+                  }
+                  // Generate a random 4-digit number
+                  var randomOTP = Math.floor(1000 + Math.random() * 9000);
 
-          if(user === frm.doc.employee_user)
-          {
-
-          
-          frm.add_custom_button(__("Receive"), function () {
-            var d = new frappe.ui.Dialog({
-              title: __("Received Remark"),
-              fields: [
-                {
-                  label: __("Please Give Received Remark for this Asset"),
-                  fieldname: "emp_received_remark",
-                  fieldtype: "Small Text",
-                  reqd: 1, // Set the rejection reason field as mandatory
-                  description: __(
-                    "Wrtie Courier Name & Builty No / Vehicle No. / Mode of Transport"
-                  ), // Description for the field
+                  frm.set_value(
+                    "emp_received_remark",
+                    d.fields_dict.emp_received_remark.get_value()
+                  );
+                  d.hide();
+                  frm.set_value("status", "Received");
+                  frm.set_value("received_otp", randomOTP); // Set the random number to store_otp
+                  cur_frm.save();
                 },
-              ],
-              primary_action_label: __("Receive"),
-              primary_action: function () {
-                // Check if the rejection reason is provided
-                if (!d.fields_dict.emp_received_remark.get_value()) {
-                  frappe.msgprint(__("Please provide a Received Remark."));
-                  return;
-                }
-                // Generate a random 4-digit number
-                var randomOTP = Math.floor(1000 + Math.random() * 9000);
+                secondary_action_label: __("Cancel"),
+                secondary_action: function () {
+                  d.hide();
+                },
+              });
 
-                frm.set_value(
-                  "emp_received_remark",
-                  d.fields_dict.emp_received_remark.get_value()
-                );
-                d.hide();
-                frm.set_value("status", "Received");
-                frm.set_value("received_otp", randomOTP); // Set the random number to store_otp
-                cur_frm.save();
-              },
-              secondary_action_label: __("Cancel"),
-              secondary_action: function () {
-                d.hide();
-              },
+              d.show();
             });
-
-            d.show();
-          });
-        }
+          }
         } else if (frm.doc.status == "Received") {
           frm.disable_save();
         }
@@ -1819,8 +1813,7 @@ frappe.ui.form.on("Asset Request", {
           frm.set_df_property("asset", "read_only", 1);
           console.log("Employee Matched at Stage 6 :" + frm.doc.stage_6_emp_id);
           console.log("CEO Not Required");
-          if(frm.doc.stage_6_request=="Done")
-          {
+          if (frm.doc.stage_6_request == "Done") {
             frm.add_custom_button(__("Verify"), function () {
               if (
                 frm.doc.status == "Pending" &&
@@ -1834,7 +1827,7 @@ frappe.ui.form.on("Asset Request", {
                     let emp_stage;
                     let emp_stage_request;
                     let emp_stage_status;
-  
+
                     if (
                       frm.doc.status === "Pending" &&
                       frm.doc.select_department == "IT"
@@ -1846,7 +1839,7 @@ frappe.ui.form.on("Asset Request", {
                       }
                     }
                     //</check Next Not Skippable Employee>
-  
+
                     // action to perform if Yes is selected
                     // Add your button's functionality here
                     let stage = emp_stage;
@@ -1869,23 +1862,23 @@ frappe.ui.form.on("Asset Request", {
                         },
                         callback: function (response) {
                           // Check if the document has been modified
-  
+
                           // Document share was successful
                           frappe.show_alert({
                             message: "Your Asset Request Sent Successfully",
                             indicator: "green",
                           });
-  
+
                           // Set field values
                           frm.set_value(emp_stage_request, "Done");
                           frm.set_value("stage_6_emp_status", "Approved");
                           frm.set_value("status", "Pending From Store Manager");
-  
+
                           // Save the form
                           frm.save();
                         },
                       });
-  
+
                       //</PR is Shared with RM using API Call>
                     } else {
                       frappe.msgprint("Approval Already Sent");
@@ -1900,12 +1893,11 @@ frappe.ui.form.on("Asset Request", {
               }
             });
           }
-         
         } else if (frm.doc.stage_5_emp_status === "Approved") {
           // "Stage 4" is approved, but "Stage 5" approval is pending
           console.log("Employee Matched at Stage 6 :" + frm.doc.stage_6_emp_id);
           console.log("pending from Stage 5");
-          if(frm.doc.stage_6_request=="Done"){
+          if (frm.doc.stage_6_request == "Done") {
             frm.add_custom_button(__("Verify"), function () {
               if (
                 frm.doc.status == "Pending" &&
@@ -1919,7 +1911,7 @@ frappe.ui.form.on("Asset Request", {
                     let emp_stage;
                     let emp_stage_request;
                     let emp_stage_status;
-  
+
                     if (
                       frm.doc.status === "Pending" &&
                       frm.doc.select_department == "IT"
@@ -1931,7 +1923,7 @@ frappe.ui.form.on("Asset Request", {
                       }
                     }
                     //</check Next Not Skippable Employee>
-  
+
                     // action to perform if Yes is selected
                     // Add your button's functionality here
                     let stage = emp_stage;
@@ -1954,27 +1946,30 @@ frappe.ui.form.on("Asset Request", {
                         },
                         callback: function (response) {
                           // Check if the document has been modified
-  
+
                           // Document share was successful
                           frappe.show_alert({
                             message: "Your Asset Request Sent Successfully",
                             indicator: "green",
                           });
-  
+
                           // Set field values
                           frm.set_value(emp_stage_request, "Done");
                           frm.set_value("stage_6_emp_status", "Approved");
                           if (frm.doc.stage_7_request == "Done") {
-                            frm.set_value("status", "Pending From Store Manager");
+                            frm.set_value(
+                              "status",
+                              "Pending From Store Manager"
+                            );
                           } else {
                             frm.set_value("status", "Pending");
                           }
-  
+
                           // Save the form
                           frm.save();
                         },
                       });
-  
+
                       //</PR is Shared with RM using API Call>
                     } else {
                       frappe.msgprint("Approval Already Sent");
@@ -1989,7 +1984,6 @@ frappe.ui.form.on("Asset Request", {
               }
             });
           }
-     
         }
       }
 
@@ -2192,7 +2186,7 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
-  add_form_color:function(frm){
+  add_form_color: function (frm) {
     frm.fields_dict["section_break_hitna"].wrapper.css(
       "background-color",
       "antiquewhite"
@@ -2201,7 +2195,6 @@ frappe.ui.form.on("Asset Request", {
       "background-color",
       "antiquewhite"
     );
-    
   },
 
   disbale_add_new: function (frm) {
@@ -3932,65 +3925,68 @@ frappe.ui.form.on("Asset Request", {
   },
 
   hide_otp_from_timeline: function (frm) {
-    const printButton = document.querySelector('button[data-original-title="Print"]');
-if (printButton) {
-    printButton.style.display = 'none';
-}
+    const printButton = document.querySelector(
+      'button[data-original-title="Print"]'
+    );
+    if (printButton) {
+      printButton.style.display = "none";
+    }
 
-// Hide the menu button
-const menuButton = document.querySelector('button[data-original-title="Menu"]');
-if (menuButton) {
-    menuButton.style.display = 'none';
-}
+    // Hide the menu button
+    const menuButton = document.querySelector(
+      'button[data-original-title="Menu"]'
+    );
+    if (menuButton) {
+      menuButton.style.display = "none";
+    }
     // Check if the user has the "System Manager" role
-const hasSystemManagerRole = frappe.user_roles.includes('System Manager');
+    const hasSystemManagerRole = frappe.user_roles.includes("System Manager");
 
-// Get all timeline items
-let timeline_items = frm.timeline.wrapper.find('.timeline-item');
+    // Get all timeline items
+    let timeline_items = frm.timeline.wrapper.find(".timeline-item");
 
-// Iterate through timeline items and hide entries based on conditions
-timeline_items.each(function() {
-    let item = $(this);
-    let text = item.text();
+    // Iterate through timeline items and hide entries based on conditions
+    timeline_items.each(function () {
+      let item = $(this);
+      let text = item.text();
 
-    // Hide entries containing 'OTP' if the user is not a System Manager
-    if (text.includes('OTP') && !hasSystemManagerRole) {
+      // Hide entries containing 'OTP' if the user is not a System Manager
+      if (text.includes("OTP") && !hasSystemManagerRole) {
         item.hide();
-    }
+      }
 
-    // Hide entries containing 'Notification sent to'
-    if (text.includes('Notification sent to')) {
+      // Hide entries containing 'Notification sent to'
+      if (text.includes("Notification sent to")) {
         item.hide();
-    }
+      }
 
-    // Hide entries containing 'New Email'
-    if (text.includes('New Email')) {
+      // Hide entries containing 'New Email'
+      if (text.includes("New Email")) {
         item.hide();
-    }
+      }
 
-    // Hide entries containing 'viewed this'
-    if (text.includes('viewed this')) {
+      // Hide entries containing 'viewed this'
+      if (text.includes("viewed this")) {
         item.hide();
-    }
+      }
 
-    // Hide entries containing 'viewed this'
-    if (text.includes('added rows')) {
-      item.hide();
-  }
-});
-
+      // Hide entries containing 'viewed this'
+      if (text.includes("added rows")) {
+        item.hide();
+      }
+    });
   },
 });
 
 frappe.ui.form.on("Asset Request", "validate", function (frm) {
-  if (!frappe.user.has_role("Asset List Customizer")) {
-    $.each(frm.doc["asset"] || [], function (i, d) {
-      if (!d.quantity || d.quantity == 0) {
-        frappe.throw("Quantity cannot be blank or zero in the Asset List.");
-        return; // Stop further execution
-      }
-    });
-  }
+  // if (!frappe.user.has_role("Asset List Customizer")) {
+  //   $.each(frm.doc["asset"] || [], function (i, d) {
+  //     if (!d.quantity || d.quantity == 0) {
+  //       frappe.throw("Quantity cannot be blank or zero in the Asset List.");
+  //       return; // Stop further execution
+  //     }
+  //   });
+  // }
 });
 
 frappe.ui.form.on("Asset Request", "refresh", function (frm) {
@@ -4051,5 +4047,3 @@ frappe.ui.form.on("Asset Request", "refresh", function (frm) {
     }
   });
 });
-
-

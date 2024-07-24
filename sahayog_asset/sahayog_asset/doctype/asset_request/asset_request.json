@@ -893,12 +893,13 @@
   {
    "fieldname": "zone",
    "fieldtype": "Data",
-   "label": "Zone"
+   "label": "Zone",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-22 13:18:13.063494",
+ "modified": "2024-07-23 10:33:34.741679",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

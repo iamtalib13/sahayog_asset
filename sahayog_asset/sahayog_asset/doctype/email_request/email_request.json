@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_events_in_timeline": 1,
- "autoname": "format:email-{employee_name}-{employee_id}",
+ "autoname": "format:Email-{DD}{MM}{YY}-{###}",
  "creation": "2024-05-14 10:17:01.622886",
  "default_view": "List",
  "doctype": "DocType",
@@ -11,6 +11,7 @@
   "approval_html_section",
   "approval_html",
   "section_break_mm0dh",
+  "email_category",
   "status",
   "return_remark",
   "request_type",
@@ -23,32 +24,37 @@
   "otp",
   "employee_details_section",
   "employee_id",
-  "employee_name",
-  "gender",
-  "phone",
-  "column_break_gwykf",
-  "zone",
-  "region",
-  "district",
   "branch",
+  "department",
+  "column_break_gwykf",
+  "employee_name",
+  "region",
+  "division",
   "column_break_6k7pj",
   "designation",
-  "division",
-  "department",
+  "zone",
+  "column_break_kyfu9",
+  "gender",
+  "district",
+  "column_break_h47cn",
+  "phone",
   "approval_details_tab",
   "level_1_section",
   "level_1_user_id",
   "level_1_name",
   "level_1_email",
   "level_1_status",
-  "level_1_remark"
+  "level_1_remark",
+  "creator_details_section",
+  "creator_name"
  ],
  "fields": [
   {
+   "depends_on": "eval:doc.email_category==\"Employee\"",
    "fieldname": "employee_id",
    "fieldtype": "Data",
    "label": "Employee ID",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\""
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
   },
   {
    "depends_on": "eval:doc.request_type==\"New\"",
@@ -85,89 +91,90 @@
    "label": "Employee Details"
   },
   {
+   "depends_on": "eval:doc.email_category==\"Employee\"",
    "fieldname": "employee_name",
    "fieldtype": "Data",
    "label": "Employee Name",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\""
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" ",
    "fieldname": "designation",
    "fieldtype": "Data",
    "label": "Designation",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\""
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\""
   },
   {
    "fieldname": "column_break_gwykf",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:(doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Employee\")",
    "fieldname": "zone",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Zone",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")\n",
    "options": "\nZone-1\nZone-2\nZone-3\nZone-4"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:(doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Employee\")",
    "fieldname": "region",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Region",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")\n",
    "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:(doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")",
    "fieldname": "district",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "District",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\""
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")\n"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:(doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Employee\")",
    "fieldname": "branch",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Branch",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\""
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\")\n"
   },
   {
    "fieldname": "column_break_6k7pj",
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
    "fieldname": "phone",
    "fieldtype": "Data",
    "label": "Phone",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\""
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\""
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
    "fieldname": "gender",
    "fieldtype": "Select",
    "label": "Gender",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
    "options": "\nMale\nFemale"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" || doc.email_category==\"Department\"",
    "fieldname": "division",
    "fieldtype": "Select",
    "label": "Division",
-   "mandatory_depends_on": "eval:doc.request_type==\"New\"",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Department\") || (doc.request_type==\"Delete\" && doc.email_category==\"Department\")\n",
    "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" || doc.email_category==\"Department\"",
    "fieldname": "department",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "label": "Department",
-   "options": "\nAdministration\nAudit\nBack Office\nCollection & Recovery\nCredit\nFinance & Accounts\nHouse Keeping\nHuman Resource\nInformation Technology\nJanhit\nLegal\nLoan & Recovery\nManagement\nNon-Teaching\nOperations\nOperational Excellence And Service Quality\nSales\nStore & Purchase\nTeaching\nTraining & Development\nTransport"
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Department\") || (doc.request_type==\"Delete\" && doc.email_category==\"Department\")\n\n"
   },
   {
    "fieldname": "column_break_yz3vi",
@@ -186,6 +193,7 @@
    "label": "Delivered Date"
   },
   {
+   "depends_on": "eval:doc.email_category",
    "fieldname": "request_type",
    "fieldtype": "Select",
    "label": "Request Type",
@@ -257,12 +265,37 @@
   {
    "fieldname": "approval_html_section",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "email_category",
+   "fieldtype": "Select",
+   "label": "Email Category",
+   "options": "\nBranch\nDepartment\nEmployee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_kyfu9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_h47cn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "creator_details_section",
+   "fieldtype": "Section Break",
+   "label": "Creator Details"
+  },
+  {
+   "fieldname": "creator_name",
+   "fieldtype": "Data",
+   "label": "Creator Name"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-22 16:32:06.593551",
+ "modified": "2024-07-24 14:11:18.124140",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",
