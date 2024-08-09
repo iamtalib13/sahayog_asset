@@ -74,25 +74,30 @@ frappe.ui.form.on("Sahayog Item", {
   },
 
   refresh: function (frm) {
-    if (frappe.user.has_role("Stationery Asset Admin")) {
-      if (frm.is_new()) {
-        console.log("Stationery Asset");
-        frm.set_value("category", "Stationery");
-        frm.set_df_property("category", "read_only", 1);
-        frm.set_df_property("other", "hidden", 1);
-        frm.set_value("enable", 1);
-      } else {
-        frm.set_df_property("category", "read_only", 1);
-      }
-    } else if (frappe.user.has_role("IT Asset Admin")) {
-      if (frm.is_new()) {
-        console.log("IT Asset");
-        frm.set_value("category", "IT");
-        frm.set_df_property("category", "read_only", 1);
-        // frm.set_df_property("category", "hidden", 1);
-        frm.set_value("enable", 1);
-      } else {
-        frm.set_df_property("category", "read_only", 1);
+    if (!frappe.user.has_role("System Manager")) {
+      if (frappe.user.has_role("Stationery Asset Admin")) {
+        if (frm.is_new()) {
+          console.log("Stationery Asset");
+          frm.set_value("category", "Stationery");
+          frm.set_df_property("category", "read_only", 1);
+          frm.set_df_property("other", "hidden", 1);
+          frm.set_value("enable", 1);
+        } else {
+          frm.set_df_property("category", "read_only", 1);
+        }
+      } else if (
+        frappe.user.has_role("IT Store Manager") ||
+        frappe.user.has_role("IT Support Manager")
+      ) {
+        if (frm.is_new()) {
+          console.log("IT Asset");
+          frm.set_value("category", "IT");
+          frm.set_df_property("category", "read_only", 1);
+          // frm.set_df_property("category", "hidden", 1);
+          frm.set_value("enable", 1);
+        } else {
+          frm.set_df_property("category", "read_only", 1);
+        }
       }
     }
   },

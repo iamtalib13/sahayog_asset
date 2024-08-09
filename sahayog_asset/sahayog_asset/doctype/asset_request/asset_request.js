@@ -300,7 +300,7 @@ frappe.ui.form.on("Asset Request", {
       ) {
         if (!frm.doc.stage_1_emp_id) {
           frm.trigger("Set_Employee_Details");
-          frm.save();
+          //frm.save();
         }
       }
     }

@@ -38,6 +38,8 @@
   "district",
   "column_break_h47cn",
   "phone",
+  "section_break_8bah8",
+  "details_html",
   "approval_details_tab",
   "level_1_section",
   "level_1_user_id",
@@ -88,7 +90,7 @@
    "depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\"",
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
-   "label": "Employee Details"
+   "label": "Details"
   },
   {
    "depends_on": "eval:doc.email_category==\"Employee\"",
@@ -162,11 +164,11 @@
    "options": "\nMale\nFemale"
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" || doc.email_category==\"Department\"",
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" || doc.email_category==\"Department\" || doc.email_category==\"Branch\"",
    "fieldname": "division",
    "fieldtype": "Select",
    "label": "Division",
-   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Department\") || (doc.request_type==\"Delete\" && doc.email_category==\"Department\")\n",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Department\") || (doc.request_type==\"Delete\" && doc.email_category==\"Department\")|| (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")\n",
    "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool"
   },
   {
@@ -290,12 +292,21 @@
    "fieldname": "creator_name",
    "fieldtype": "Data",
    "label": "Creator Name"
+  },
+  {
+   "fieldname": "section_break_8bah8",
+   "fieldtype": "Section Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "details_html",
+   "fieldtype": "HTML"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-24 14:11:18.124140",
+ "modified": "2024-07-26 18:10:17.436404",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

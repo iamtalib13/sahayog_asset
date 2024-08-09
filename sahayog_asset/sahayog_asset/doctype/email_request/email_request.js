@@ -26,6 +26,7 @@ frappe.ui.form.on("Email Request", {
     } else if (!frm.is_new()) {
       if (status !== "Draft") {
         frm.trigger("approval_pending_intro_messages");
+        frm.trigger("email_details_intro_messages");
       } else {
       }
       frm.trigger("read_only_from_hr");
@@ -213,7 +214,356 @@ frappe.ui.form.on("Email Request", {
     frm.set_value("creator_name", full_name);
     frm.refresh_field("creator_name");
   },
+  async email_details_intro_messages(frm) {
+    // Extract additional form values
+    const employee_id = frm.doc.employee_id || null;
+    const branch = frm.doc.branch || null;
+    const department = frm.doc.department || null;
+    const employee_name = frm.doc.employee_name || null;
+    const region = frm.doc.region || null;
+    const division = frm.doc.division || null;
+    const designation = frm.doc.designation || null;
+    const zone = frm.doc.zone || null;
+    const gender = frm.doc.gender || null;
+    const district = frm.doc.district || null;
+    const phone = frm.doc.phone || null;
 
+    // Initialize content for each field
+    let content = "";
+
+    // Conditionally append each field if it is specified
+    if (employee_id)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Employee ID:</div>
+            <div style="margin-top: 20px;">${employee_id}</div>
+        </div>
+    `;
+    if (employee_name)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Employee Name:</div>
+            <div style="margin-top: 20px;">${employee_name}</div>
+        </div>
+    `;
+    if (designation)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Designation:</div>
+            <div style="margin-top: 20px;">${designation}</div>
+        </div>
+    `;
+    if (gender)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Gender:</div>
+            <div style="margin-top: 20px;">${gender}</div>
+        </div>
+    `;
+    if (phone)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Phone:</div>
+            <div style="margin-top: 20px;">${phone}</div>
+        </div>
+    `;
+    if (branch)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Branch:</div>
+            <div style="margin-top: 20px;">${branch}</div>
+        </div>
+    `;
+    if (region)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Region:</div>
+            <div style="margin-top: 20px;">${region}</div>
+        </div>
+    `;
+    if (zone)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Zone:</div>
+            <div style="margin-top: 20px;">${zone}</div>
+        </div>
+    `;
+    if (district)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">District:</div>
+            <div style="margin-top: 20px;">${district}</div>
+        </div>
+    `;
+    if (department)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Department:</div>
+            <div style="margin-top: 20px;">${department}</div>
+        </div>
+    `;
+
+    if (division)
+      content += `
+        <div style="
+            border: 1px solid gray;
+            background-color: transparent;
+            padding: 12px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-sizing: border-box;
+        ">
+            <div style="
+                position: absolute;
+                top: -10px;
+                left: 12px;
+                background-color: white;
+                padding: 0 8px;
+                font-weight: bold;
+                color: gray;
+                border: 1px solid gray;
+                border-radius: 4px;
+                z-index: 1;
+            ">Division:</div>
+            <div style="margin-top: 20px;">${division}</div>
+        </div>
+    `;
+
+    // Generate HTML for grid layout
+    let html = `
+        <div style="
+            background-color: transparent; 
+            width: 100%; /* Full width */
+            text-align: left;
+            box-sizing: border-box; /* Ensure padding and border are included in width */
+            padding: 16px;
+        ">
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+            ">
+                ${content}
+            </div>
+        </div>
+    `;
+
+    // Set the HTML as Summary HTML
+    frm.set_df_property("details_html", "options", html);
+  },
   mandatory_controls: function (frm) {},
   Approval_email: function (frm) {
     frm.add_custom_button(__("Send Email for Approval"), function () {

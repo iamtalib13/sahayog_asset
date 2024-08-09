@@ -11,14 +11,19 @@
   "employee",
   "employee_id",
   "employee_name",
-  "email_id"
+  "email_id",
+  "for_branch_section",
+  "branch_employee",
+  "branch_employee_id",
+  "branch_employee_name",
+  "branch_email_id"
  ],
  "fields": [
   {
    "collapsible": 1,
    "fieldname": "level_1_section",
    "fieldtype": "Section Break",
-   "label": "Level 1"
+   "label": "For Employee"
   },
   {
    "fieldname": "employee",
@@ -43,12 +48,41 @@
    "fieldname": "email_id",
    "fieldtype": "Data",
    "label": "Email ID"
+  },
+  {
+   "fieldname": "for_branch_section",
+   "fieldtype": "Section Break",
+   "label": "For Branch"
+  },
+  {
+   "fieldname": "branch_employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "branch_employee.user_id",
+   "fieldname": "branch_employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID"
+  },
+  {
+   "fetch_from": "branch_employee.employee_name",
+   "fieldname": "branch_employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fetch_from": "branch_employee.company_email",
+   "fieldname": "branch_email_id",
+   "fieldtype": "Data",
+   "label": "Email ID"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-07-22 12:30:54.306361",
+ "modified": "2024-07-27 11:45:29.212221",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Approval",
