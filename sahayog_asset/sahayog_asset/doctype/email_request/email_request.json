@@ -15,7 +15,10 @@
   "status",
   "return_remark",
   "request_type",
+  "column_break_acce6",
   "delete_reason",
+  "email_designation",
+  "email_usage",
   "column_break_arvor",
   "delivered_date",
   "email_details_section",
@@ -117,7 +120,7 @@
    "in_list_view": 1,
    "label": "Zone",
    "mandatory_depends_on": "eval:(doc.request_type==\"New\" && doc.email_category==\"Employee\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"Delete\" && doc.email_category==\"Branch\")\n",
-   "options": "\nZone-1\nZone-2\nZone-3\nZone-4"
+   "options": "\nZone-1\nZone-2\nZone-3\nZone-4\nZone-5"
   },
   {
    "depends_on": "eval:(doc.request_type==\"Delete\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Branch\") || (doc.request_type==\"New\" && doc.email_category==\"Employee\")",
@@ -262,7 +265,8 @@
   {
    "fieldname": "section_break_mm0dh",
    "fieldtype": "Section Break",
-   "label": "Request Details"
+   "label": "Request Details",
+   "read_only_depends_on": "eval:frappe.user.has_role(\"IT Store Manager\")"
   },
   {
    "fieldname": "approval_html_section",
@@ -296,17 +300,38 @@
   {
    "fieldname": "section_break_8bah8",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Details"
   },
   {
    "fieldname": "details_html",
    "fieldtype": "HTML"
+  },
+  {
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
+   "fieldname": "email_designation",
+   "fieldtype": "Select",
+   "label": "Email Allocation Designation",
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
+   "options": "\nBelow RM\nRM & Above"
+  },
+  {
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" && doc.email_designation==\"Below RM\"",
+   "fieldname": "email_usage",
+   "fieldtype": "Select",
+   "label": "Email Usage",
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" && doc.email_designation==\"Below RM\"",
+   "options": "\nExternal Usage\nInternal Usage"
+  },
+  {
+   "fieldname": "column_break_acce6",
+   "fieldtype": "Column Break"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-26 18:10:17.436404",
+ "modified": "2024-09-11 16:36:00.341789",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

@@ -51,6 +51,7 @@ frappe.ui.form.on("Email Request", {
           frm.disable_form();
         }
       } else if (status == "Pending From IT") {
+        frm.disable_save();
         frm.trigger("pending_intro_messages");
 
         if (frappe.user.has_role("IT Store Manager")) {
@@ -1077,6 +1078,9 @@ frappe.ui.form.on("Email Request", {
   },
   read_only_from_it_store_manager: function (frm) {
     if (frm.doc.request_type == "New") {
+      frm.set_df_property("email_designation", "read_only", 1);
+      frm.set_df_property("email_usage", "read_only", 1);
+      frm.set_df_property("email_category", "read_only", 1);
       frm.set_df_property("delete_reason", "read_only", 1);
       frm.set_df_property("email", "read_only", 0);
       frm.set_df_property("employee_id", "read_only", 1);
@@ -1091,6 +1095,7 @@ frappe.ui.form.on("Email Request", {
       frm.set_df_property("division", "read_only", 1);
       frm.set_df_property("department", "read_only", 1);
     } else if (frm.doc.request_type == "Delete") {
+      frm.set_df_property("email_category", "read_only", 1);
       frm.set_df_property("delete_reason", "read_only", 1);
       frm.set_df_property("email", "read_only", 1);
       frm.set_df_property("employee_id", "read_only", 1);
