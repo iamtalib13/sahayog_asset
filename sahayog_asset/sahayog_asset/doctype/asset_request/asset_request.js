@@ -176,9 +176,20 @@ frappe.ui.form.on("Asset Request", {
   },
 
   before_save: function (frm) {
-    if (frm.doc.status == "Draft") {
+    frm.trigger("set_approval_tracker");
+    frm.trigger("zero_trim_child_table");
+    //frm.trigger("check_rank");
+    // frm.trigger("set_Approval_levels");
+
+    frm.trigger("combined_function");
+
+    frm.set_value("first_intro", "Done");
+  },
+
+  set_approval_tracker: function (frm) {
+    if (frm.doc.status == "Draft" || frm.is_new()) {
       if (frm.doc.employee_department == "Information Technology") {
-        frm.set_value("stage_3_emp_status", "Skip");
+        // frm.set_value("stage_3_emp_status", "Skip");
         frm.set_value("stage_6_emp_status", "Skip");
       }
 
@@ -215,10 +226,83 @@ frappe.ui.form.on("Asset Request", {
         // No match, do nothing
       }
     }
-    frm.trigger("zero_trim_child_table");
-    frm.trigger("set_Approval_levels");
+  },
 
-    frm.set_value("first_intro", "Done");
+  combined_function: function (frm) {
+    const pendingStatus = "Pending";
+    let highest_rank_from_asset = 0; // Initialize to 0 as ranks are between 1 to 4
+    let pendingLevels = [];
+
+    // Step 1: Determine the highest approval rank from the asset child table
+    for (let row of frm.doc.asset) {
+      if (row.approval_rank && !isNaN(row.approval_rank)) {
+        let current_rank = parseInt(row.approval_rank, 10);
+        if (current_rank > highest_rank_from_asset) {
+          highest_rank_from_asset = current_rank;
+        }
+      }
+    }
+
+    // Log the highest approval rank for debugging
+    console.log(
+      "Highest Approval Rank from Asset Table:",
+      highest_rank_from_asset
+    );
+
+    // Step 2: Determine the pending levels based on the form status fields
+    for (let i = 1; i <= 5; i++) {
+      const status = frm.doc[`stage_${i}_emp_status`];
+      if (status === pendingStatus) {
+        pendingLevels.push(i);
+      }
+    }
+
+    if (pendingLevels.length > 0) {
+      console.log("Pending Levels: ", pendingLevels.join(", "));
+    } else {
+      console.log("No pending levels found.");
+    }
+
+    // Step 3: Determine the higher level to be updated
+    let higherLevel;
+    if (pendingLevels.includes(highest_rank_from_asset)) {
+      higherLevel = highest_rank_from_asset;
+      console.log(
+        `Highest Approval Rank ${highest_rank_from_asset} is present in pending levels.`
+      );
+    } else {
+      higherLevel = pendingLevels.find(
+        (level) => level > highest_rank_from_asset
+      );
+      if (higherLevel !== undefined) {
+        console.log(`Immediate higher pending level found: ${higherLevel}`);
+      } else {
+        console.log(
+          `Highest Approval Rank ${highest_rank_from_asset} is not present in any of the pending levels.`
+        );
+      }
+    }
+
+    console.log("Higher Level is - ", higherLevel);
+
+    // Step 4: Update stages based on the higher level
+    if (higherLevel === 1) {
+      console.log("Stages 2/3/4 are skipped");
+      frm.set_value("stage_2_emp_status", "Skip");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (higherLevel === 2) {
+      console.log("Stages 3/4 are skipped");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (higherLevel === 3) {
+      console.log("Stage 4 is skipped");
+      frm.set_value("stage_4_emp_status", "Skip");
+    }
+
+    // Set and refresh the field for highest approval level
+    frm.set_value("highest_approval_level", highest_rank_from_asset);
+    frm.refresh_field("highest_approval_level");
   },
   rejection_intro: function (frm) {
     let stages = [
@@ -284,6 +368,19 @@ frappe.ui.form.on("Asset Request", {
   },
 
   refresh: function (frm) {
+    frm.trigger("populate_progress_html");
+    if (
+      frappe.user.has_role("System Manager") ||
+      frappe.user.has_role("IT Support Executive") ||
+      frappe.user.has_role("Admin Support Executive") ||
+      frappe.user.has_role("Stationery Store & Support Manager")
+    ) {
+      if (frm.doc.status == "Draft") {
+        frm.trigger("add_item_button");
+      }
+    }
+
+    frm.trigger("set_temporary_dispatch");
     frm.trigger("hide_timeline");
     frm.trigger("disbale_add_new");
     frm.trigger("add_form_color");
@@ -308,6 +405,7 @@ frappe.ui.form.on("Asset Request", {
     //   frm.set_df_property("asset", "read_only", 1);
     // }
     // frm.trigger("set_Approval_levels");
+    // frm.trigger("check_rank");
     if (frappe.user.has_role("System Manager")) {
       frm.enable_save();
 
@@ -345,105 +443,119 @@ frappe.ui.form.on("Asset Request", {
       frm.doc.status === "Pending From Store Manager" ||
       frm.doc.status === "Partially Dispatched"
     ) {
-      let introMessage = "";
-      let introMessage2 = "";
+      {
+        let introMessage = "";
+        let introMessage2 = "";
 
-      let stages = [
-        {
-          stage: "Stage 1",
-          emp: frm.doc.stage_1_emp_name,
-          status: frm.doc.stage_1_emp_status,
-        },
-        {
-          stage: "Stage 2",
-          emp: frm.doc.stage_2_emp_name,
-          status: frm.doc.stage_2_emp_status,
-        },
-        {
-          stage: "Stage 3",
-          emp: frm.doc.stage_3_emp_name,
-          status: frm.doc.stage_3_emp_status,
-        },
-        {
-          stage: "Stage 4",
-          emp: frm.doc.stage_4_emp_name,
-          status: frm.doc.stage_4_emp_status,
-        },
-        {
-          stage: "Stage 5",
-          emp: frm.doc.stage_5_emp_name,
-          status: frm.doc.stage_5_emp_status,
-        },
-        {
-          stage: "Stage 6",
-          emp: frm.doc.stage_6_emp_name,
-          status: frm.doc.stage_6_emp_status,
-          request: frm.doc.stage_6_request,
-        },
-        {
-          stage: "Stage 7",
-          emp: frm.doc.stage_7_emp_name,
-          status: frm.doc.stage_7_emp_status,
-          request: frm.doc.stage_7_request,
-        },
-      ];
-      let rightArrowSymbol = "&rarr;";
-      let imgTag = `<span style="font-size: 17px;">${rightArrowSymbol}</span>`;
+        let stages = [
+          {
+            stage: "Stage 1",
+            emp: frm.doc.stage_1_emp_name,
+            status: frm.doc.stage_1_emp_status,
+          },
+          {
+            stage: "Stage 2",
+            emp: frm.doc.stage_2_emp_name,
+            status: frm.doc.stage_2_emp_status,
+          },
+          {
+            stage: "Stage 3",
+            emp: frm.doc.stage_3_emp_name,
+            status: frm.doc.stage_3_emp_status,
+          },
+          {
+            stage: "Stage 4",
+            emp: frm.doc.stage_4_emp_name,
+            status: frm.doc.stage_4_emp_status,
+          },
+          {
+            stage: "Stage 5",
+            emp: frm.doc.stage_5_emp_name,
+            status: frm.doc.stage_5_emp_status,
+          },
+          {
+            stage: "Stage 6",
+            emp: frm.doc.stage_6_emp_name,
+            status: frm.doc.stage_6_emp_status,
+            request: frm.doc.stage_6_request,
+          },
+          {
+            stage: "Stage 7",
+            emp: frm.doc.stage_7_emp_name,
+            status: frm.doc.stage_7_emp_status,
+            request: frm.doc.stage_7_request,
+          },
+        ];
+        let rightArrowSymbol = "&rarr;";
+        let imgTag = `<span style="font-size: 17px;">${rightArrowSymbol}</span>`;
 
-      // Loop for intro 1
-      let introHeading1 =
-        "<b style='color: black;'><u>Approval Tracker</u></b>";
+        // Loop for intro 1
+        let introHeading1 =
+          "<b style='color: black;'><u>Approval Tracker</u></b>";
 
-      let pendingFound = false;
-      for (let i = 0; i < Math.min(stages.length, 4); i++) {
-        let emp = stages[i].emp;
-        let status = stages[i].status;
+        let pendingFound = false;
+        for (let i = 0; i < Math.min(stages.length, 4); i++) {
+          let emp = stages[i].emp;
+          let status = stages[i].status;
 
-        // Determine the color based on the value of the status
-        // Determine the color based on the value of the status
-        let fontColor =
-          status === "Approved"
+          // Determine the color based on the value of the status
+          // Determine the color based on the value of the status
+          let fontColor =
+            status === "Approved"
+              ? "green"
+              : status === "Pending" && !pendingFound
+              ? ((pendingFound = true), "red")
+              : "gray";
+
+          // Check if the status is "Skip"; if yes, skip adding details for this stage
+          if (status === "Skip") {
+            continue;
+          }
+
+          // Add the employee details for "Stage 1" to "Stage 4" to intro 1 message
+          introMessage += `<span style="color: ${fontColor}; font-size: 14px;">${emp}</span>`;
+
+          // Add the image link after each stage except the last one in "Stage 1" to "Stage 4"
+          if (i < 3 && i < stages.length - 1) {
+            introMessage += ` ${imgTag}`;
+          }
+          introMessage += "\n";
+        }
+
+        // Add "Stage 5" to intro 1 message based on conditions
+        let stage5Emp = stages[4].emp;
+        let stage5Status = stages[4].status;
+        let stage5FontColor =
+          stage5Status === "Pending"
+            ? "red"
+            : stage5Status === "Approved"
             ? "green"
-            : status === "Pending" && !pendingFound
-            ? ((pendingFound = true), "red")
-            : "gray";
+            : "";
 
-        // Check if the status is "Skip"; if yes, skip adding details for this stage
-        if (status === "Skip") {
-          continue;
+        if (stage5Status !== "Skip") {
+          introMessage += `<span> ${imgTag}</span><span style="color: ${stage5FontColor}; font-size: 14px;">${stage5Emp}</span>\n`;
         }
 
-        // Add the employee details for "Stage 1" to "Stage 4" to intro 1 message
-        introMessage += `<span style="color: ${fontColor}; font-size: 14px;">${emp}</span>`;
+        // Add separator line after Intro 1
+        introMessage += "<hr>";
+        let store_status;
+        let store_status_color;
 
-        // Add the image link after each stage except the last one in "Stage 1" to "Stage 4"
-        if (i < 3 && i < stages.length - 1) {
-          introMessage += ` ${imgTag}`;
-        }
-        introMessage += "\n";
-      }
-
-      // Add "Stage 5" to intro 1 message based on conditions
-      let stage5Emp = stages[4].emp;
-      let stage5Status = stages[4].status;
-      let stage5FontColor =
-        stage5Status === "Pending"
-          ? "red"
-          : stage5Status === "Approved"
-          ? "green"
-          : "";
-
-      if (stage5Status !== "Skip") {
-        introMessage += `<span> ${imgTag}</span><span style="color: ${stage5FontColor}; font-size: 14px;">${stage5Emp}</span>\n`;
-      }
-
-      // Add separator line after Intro 1
-      introMessage += "<hr>";
-      let store_status;
-      let store_status_color;
-
-      if (frm.doc.select_department == "IT") {
-        if (frm.doc.stage_6_request == "Pending") {
+        if (frm.doc.select_department == "IT") {
+          if (frm.doc.stage_6_request == "Pending") {
+            store_status = "Waiting for Approval";
+            store_status_color = "gray";
+          } else if (frm.doc.stage_7_emp_status == "Pending") {
+            store_status = "Approval Received";
+            store_status_color = "green";
+          } else if (frm.doc.stage_7_emp_status == "Dispatched") {
+            store_status = "Dispatched";
+            store_status_color = "green";
+          } else if (frm.doc.stage_7_emp_status == "Pending From Purchase") {
+            store_status = "Pending From Purchase";
+            store_status_color = "gray";
+          }
+        } else if (frm.doc.stage_7_request == "Pending") {
           store_status = "Waiting for Approval";
           store_status_color = "gray";
         } else if (frm.doc.stage_7_emp_status == "Pending") {
@@ -456,105 +568,92 @@ frappe.ui.form.on("Asset Request", {
           store_status = "Pending From Purchase";
           store_status_color = "gray";
         }
-      } else if (frm.doc.stage_7_request == "Pending") {
-        store_status = "Waiting for Approval";
-        store_status_color = "gray";
-      } else if (frm.doc.stage_7_emp_status == "Pending") {
-        store_status = "Approval Received";
-        store_status_color = "green";
-      } else if (frm.doc.stage_7_emp_status == "Dispatched") {
-        store_status = "Dispatched";
-        store_status_color = "green";
-      } else if (frm.doc.stage_7_emp_status == "Pending From Purchase") {
-        store_status = "Pending From Purchase";
-        store_status_color = "gray";
-      }
 
-      // Loop for intro 2
-      let introHeading2 =
-        "<b style='color: black;'><u>Fullfillment Tracker</u> : </b>";
+        // Loop for intro 2
+        let introHeading2 =
+          "<b style='color: black;'><u>Fullfillment Tracker</u> : </b>";
 
-      if (
-        ["Pending From Purchase", "Pending"].includes(
-          frm.doc.stage_7_emp_status
-        )
-      ) {
-        introHeading2 += `<span style='color: ${store_status_color}; font-size: 13px;'>${store_status}</span>`;
-      } else if (frm.doc.stage_7_emp_status === "Dispatched") {
-        introHeading2 += `<span style='color: ${store_status_color}; font-size: 13px;'>${store_status}</span>`;
-      } else {
-        introHeading2 += store_status;
-      }
-      let fontColor;
-      let pendingdetect = false;
-      for (let i = 5; i < stages.length; i++) {
-        let emp = stages[i].emp;
-        let status = stages[i].status;
+        if (
+          ["Pending From Purchase", "Pending"].includes(
+            frm.doc.stage_7_emp_status
+          )
+        ) {
+          introHeading2 += `<span style='color: ${store_status_color}; font-size: 13px;'>${store_status}</span>`;
+        } else if (frm.doc.stage_7_emp_status === "Dispatched") {
+          introHeading2 += `<span style='color: ${store_status_color}; font-size: 13px;'>${store_status}</span>`;
+        } else {
+          introHeading2 += store_status;
+        }
+        let fontColor;
+        let pendingdetect = false;
+        for (let i = 5; i < stages.length; i++) {
+          let emp = stages[i].emp;
+          let status = stages[i].status;
 
-        // Determine the color based on the value of the status
+          // Determine the color based on the value of the status
 
-        fontColor =
-          status === "Approved"
-            ? "green"
-            : status === "Pending" && !pendingFound
-            ? ((pendingFound = true), "red")
-            : "gray";
+          fontColor =
+            status === "Approved"
+              ? "green"
+              : status === "Pending" && !pendingFound
+              ? ((pendingFound = true), "red")
+              : "gray";
 
-        // Check if the status is "Skip"; if yes, skip adding details for this stage
-        if (status === "Skip") {
-          continue;
+          // Check if the status is "Skip"; if yes, skip adding details for this stage
+          if (status === "Skip") {
+            continue;
+          }
+
+          // Add the employee details for "Stage 6" and "Stage 7" to intro 2 message
+          introMessage2 += `<span style="color: ${fontColor}; font-size: 14px;">${emp}</span>`;
+          // Add the image link after each stage except the last one in "Stage 6" and "Stage 7"
+          if (i < stages.length - 1) {
+            introMessage2 += ` ${imgTag}`;
+          }
+          introMessage2 += "\n";
         }
 
-        // Add the employee details for "Stage 6" and "Stage 7" to intro 2 message
-        introMessage2 += `<span style="color: ${fontColor}; font-size: 14px;">${emp}</span>`;
-        // Add the image link after each stage except the last one in "Stage 6" and "Stage 7"
-        if (i < stages.length - 1) {
-          introMessage2 += ` ${imgTag}`;
+        // Set the intro with the custom message and blue color for intro 1
+        frm.set_intro(introHeading1 + "<br>" + "\n" + introMessage, "blue");
+
+        // Set the intro with the custom message for intro 2 if it has content
+        if (introMessage2 !== "") {
+          frm.set_intro(introHeading2 + "<br>" + "\n" + introMessage2, "blue");
         }
-        introMessage2 += "\n";
-      }
 
-      // Set the intro with the custom message and blue color for intro 1
-      frm.set_intro(introHeading1 + "<br>" + "\n" + introMessage, "blue");
+        // let user = frappe.session.user;
+        // if (
+        //   user === frm.doc.stage_7_emp_id &&
+        //   frm.doc.purchase_request == "Done"
+        // ) {
+        //   frm.set_intro(
+        //     `<u><strong><span style='color: black;'>OTP :</span></strong></u> ${frm.doc.store_otp}`,
+        //     "blue"
+        //   );
+        // }
 
-      // Set the intro with the custom message for intro 2 if it has content
-      if (introMessage2 !== "") {
-        frm.set_intro(introHeading2 + "<br>" + "\n" + introMessage2, "blue");
-      }
+        // Add a separator <hr> after the second intro message if purchase_request is "Done"
+        // Add a separator <hr> after the second intro message if purchase_request is "Done"
+        if (frm.doc.purchase_request === "Done") {
+          frm.set_intro("<hr>", "blue");
 
-      // let user = frappe.session.user;
-      // if (
-      //   user === frm.doc.stage_7_emp_id &&
-      //   frm.doc.purchase_request == "Done"
-      // ) {
-      //   frm.set_intro(
-      //     `<u><strong><span style='color: black;'>OTP :</span></strong></u> ${frm.doc.store_otp}`,
-      //     "blue"
-      //   );
-      // }
+          // Define color mappings for different status values
+          const statusColors = {
+            Pending: "red",
+            "Delivered To Store": "green",
+            // Add more status colors here if needed
+          };
 
-      // Add a separator <hr> after the second intro message if purchase_request is "Done"
-      // Add a separator <hr> after the second intro message if purchase_request is "Done"
-      if (frm.doc.purchase_request === "Done") {
-        frm.set_intro("<hr>", "blue");
+          // Get the color based on the status value
+          const statusColor = statusColors[frm.doc.purchase_status] || "black";
 
-        // Define color mappings for different status values
-        const statusColors = {
-          Pending: "red",
-          "Delivered To Store": "green",
-          // Add more status colors here if needed
-        };
+          frm.set_intro(
+            `<strong style='color:black'><u>Purchase Department:</strong></u> <span style='color: ${statusColor};'>${frm.doc.purchase_status}</span>`,
+            "blue"
+          );
 
-        // Get the color based on the status value
-        const statusColor = statusColors[frm.doc.purchase_status] || "black";
-
-        frm.set_intro(
-          `<strong style='color:black'><u>Purchase Department:</strong></u> <span style='color: ${statusColor};'>${frm.doc.purchase_status}</span>`,
-          "blue"
-        );
-
-        // Use cards for Estimate Days and Remark if they are not blank
-        const cardStyles = `
+          // Use cards for Estimate Days and Remark if they are not blank
+          const cardStyles = `
             border: 1px solid #e5e5e5;
             background-color: #f5f5f5;
             border-radius: 5px;
@@ -562,43 +661,44 @@ frappe.ui.form.on("Asset Request", {
             margin: 5px 0; /* Adjust the top and bottom margins */
         `;
 
-        let cardContent = ""; // Initialize an empty string to hold the card content
+          let cardContent = ""; // Initialize an empty string to hold the card content
 
-        if (
-          frm.doc.estimated_date &&
-          frm.doc.status !== "Pending From Store Manager"
-        ) {
-          const dateObj = new Date(frm.doc.estimated_date);
-          const formattedEstimatedDate = `${dateObj.getDate()}-${
-            dateObj.getMonth() + 1
-          }-${dateObj.getFullYear()}`;
+          if (
+            frm.doc.estimated_date &&
+            frm.doc.status !== "Pending From Store Manager"
+          ) {
+            const dateObj = new Date(frm.doc.estimated_date);
+            const formattedEstimatedDate = `${dateObj.getDate()}-${
+              dateObj.getMonth() + 1
+            }-${dateObj.getFullYear()}`;
 
-          cardContent += `
+            cardContent += `
                 <div style='${cardStyles}'>
                     <strong>Estimated Date: </strong>${formattedEstimatedDate}
                 </div>
             `;
-        }
+          }
 
-        if (
-          frm.doc.purchase_remark &&
-          frm.doc.status !== "Pending From Store Manager"
-        ) {
-          cardContent += `
+          if (
+            frm.doc.purchase_remark &&
+            frm.doc.status !== "Pending From Store Manager"
+          ) {
+            cardContent += `
                 <div style='${cardStyles}'>
                     <strong>Remark: </strong>${frm.doc.purchase_remark}
                 </div>
             `;
-        }
+          }
 
-        if (cardContent) {
-          frm.set_intro(cardContent, "blue");
-        } else if (frm.doc.status == "Pending From Purchase") {
-          // Show the message if both Estimate Days and Remark are blank
-          frm.set_intro(
-            `<b><p style="color: #D9512C;">The Purchase Department has not provided an estimated time</p></b>`,
-            "blue"
-          );
+          if (cardContent) {
+            frm.set_intro(cardContent, "blue");
+          } else if (frm.doc.status == "Pending From Purchase") {
+            // Show the message if both Estimate Days and Remark are blank
+            frm.set_intro(
+              `<b><p style="color: #D9512C;">The Purchase Department has not provided an estimated time</p></b>`,
+              "blue"
+            );
+          }
         }
       }
     } else if (frm.doc.status === "Approved") {
@@ -695,16 +795,23 @@ frappe.ui.form.on("Asset Request", {
 
       if (!frm.is_new()) {
         if (frm.doc.status == "Draft") {
-          console.log("Employee Matched at Stage 0 :" + frm.doc.employee_user);
+          if (user === frm.doc.employee_user) {
+            console.log(
+              "Employee Matched at Stage 0 :" + frm.doc.employee_user
+            );
+          } else {
+            console.log("Executive Matched");
+          }
           //<Send for Approval , this button is only for Asset Requester Owner>
           if (!frm.doc.asset || frm.doc.asset.length === 0) {
-            // frappe.throw({
-            //   title: __("Please Add Asset Item"),
-            //   indicator: "red",
-            //   message: __("Please Add At Least One Asset Item"),
-            // });
+            frappe.throw({
+              title: __("Please Add Asset Item"),
+              indicator: "red",
+              message: __("Please Add At Least One Asset Item"),
+            });
           } else {
             console.log("ready to send");
+            //frm.trigger("check_rank");
 
             frm.add_custom_button(__("Send for Approval"), function () {
               // Add your button's functionality here
@@ -797,7 +904,7 @@ frappe.ui.form.on("Asset Request", {
 
                   //</PR is Shared with RM using API Call>
                 } else {
-                  frappe.msgprint("Approval Already Sent");
+                  frappe.msgprint("Approval Already Sent from 0");
                 }
               }
             });
@@ -2186,6 +2293,165 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
+  async populate_progress_html(frm) {
+    // Dynamically generate the HTML content using JavaScript
+    let stages = [];
+    for (let i = 1; i <= 6; i++) {
+      const status = frm.doc[`stage_${i}_emp_status`];
+      const data = frm.doc[`stage_${i}_data`] || ""; // Fetch any additional data you need
+      if (status !== "Skip") {
+        // Include only stages that are not skipped
+        stages.push({ originalStep: i, status: status, data: data });
+      }
+    }
+
+    // Renumber stages serially
+    stages = stages.map((stage, index) => ({
+      ...stage,
+      step: index + 1,
+    }));
+
+    // Build the HTML content
+    let html = `
+        <h2>Progress</h2>
+        <div class="progress-container">
+            <div class="progress-bar-container progress-bar-success">
+                <div class="progress-bar-bar"></div>
+            </div>
+            <ul class="custom-steps">
+                ${stages
+                  .map(
+                    (stage) => `
+                        <li class="${
+                          stage.step === 1 ? "is-active" : ""
+                        }" data-step="${stage.step}">
+                            <div class="step-circle">${stage.step}</div>
+                            <div class="step-info">
+                                <div class="step-status">${stage.status}</div>
+                                <div class="step-data">${stage.data}</div>
+                            </div>
+                        </li>
+                    `
+                  )
+                  .join("")}
+            </ul>
+        </div>
+        <br />
+        <button onClick="nextStep()">Next Step</button>
+        <script>
+            let currentStep = 1;
+
+            function updateProgress(step) {
+                const steps = document.querySelectorAll('.custom-steps > li');
+                const progressBarBar = document.querySelector('.progress-bar-bar');
+
+                steps.forEach((li, index) => {
+                    li.classList.toggle('is-active', index + 1 === step);
+                });
+
+                const stepCount = steps.length;
+                const progress = ((step - 1) / (stepCount - 1)) * 100;
+                progressBarBar.style.width = progress + '%';
+            }
+
+            function nextStep() {
+                const steps = document.querySelectorAll('.custom-steps > li');
+                if (currentStep < steps.length) {
+                    currentStep++;
+                    updateProgress(currentStep);
+                }
+            }
+
+            // Initialize the progress bar based on currentStep
+            updateProgress(currentStep);
+        </script>
+        <style>
+            .progress-container {
+                position: relative;
+                width: 100%;
+            }
+            .progress-bar-container {
+                width: 100%;
+                background-color: #e0e0e0;
+                height: 10px;
+                margin-top: 10px;
+                position: absolute;
+                top: 0%;
+                left: 0;
+                z-index: 1;
+            }
+            .progress-bar-bar {
+                height: 100%;
+                background-color: green;
+                width: 0%;
+                transition: width 0.3s;
+            }
+            .custom-steps {
+                list-style-type: none;
+                padding: 0;
+                display: flex;
+                justify-content: space-between;
+                position: relative;
+                z-index: 2;
+            }
+            .custom-steps > li {
+                position: relative;
+                text-align: center;
+            }
+            .step-circle {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background-color: gray;
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto;
+                font-weight: bold;
+                z-index: 3; /* Ensure it’s above the progress bar */
+                position: relative;
+            }
+            .custom-steps > li.is-active .step-circle {
+                background-color: green;
+            }
+            .step-info {
+                margin-top: 5px;
+            }
+            .step-status {
+                font-weight: bold;
+            }
+            .step-data {
+                color: #666;
+            }
+        </style>
+    `;
+
+    // Set the generated HTML as the Summary HTML in Frappe
+    frm.set_df_property("multistep_progress", "options", html);
+  },
+  temporary_dispatch: function (frm) {
+    frm.trigger("set_temporary_dispatch");
+  },
+
+  set_temporary_dispatch: function (frm) {
+    let check = frm.doc.temporary_dispatch;
+    console.log("check value:", check);
+    if (check == 1) {
+      frm.set_df_property(
+        "temporary_dispatch",
+        "description",
+        "<p style='color:darkgreen;'>Only Support & Store Executive can check when an asset needs to be temporarily used by an employee.</p>"
+      );
+    } else {
+      frm.set_df_property(
+        "temporary_dispatch",
+        "description",
+        "<p style='color:darkgreen;'></p>"
+      );
+    }
+  },
+
   add_form_color: function (frm) {
     frm.fields_dict["section_break_hitna"].wrapper.css(
       "background-color",
@@ -2228,9 +2494,9 @@ frappe.ui.form.on("Asset Request", {
   zero_trim_child_table: function (frm) {
     // Iterate through each row of the "asset" child table
     frm.doc.asset.forEach(function (row, index) {
-      // Trim leading zeros from the quantity field
-      var trimmedQuantity = row.quantity.replace(/^0+/, "");
-      // Update the quantity field in the "asset" child table with trimmed value
+      // Convert the quantity to a string and trim leading zeros
+      var trimmedQuantity = row.quantity.toString().replace(/^0+/, "");
+      // Update the quantity field in the "asset" child table with the trimmed value
       frm.doc.asset[index].quantity = trimmedQuantity;
     });
     // Refresh the "asset" child table field to reflect the changes
@@ -2301,33 +2567,62 @@ frappe.ui.form.on("Asset Request", {
           frm.set_value("district", r.message[0].district);
           frm.set_value("emp_name", r.message[0].employee_name);
           frm.set_value("phone", r.message[0].cell_number);
-          frm.set_value("stage_1_emp_name", r.message[0].reporting_employee);
-          frm.set_value(
-            "stage_1_emp_id",
-            r.message[0].reporting_employee_user_id
-          );
-
-          frm.set_value(
-            "stage_1_emp_email",
-            r.message[0].reporting_employee_email
-          );
-          frm.set_value(
-            "rp_designation",
-            r.message[0].reporting_person_designation
-          );
           frm.set_value("designation", r.message[0].designation);
           frm.set_value("zone", r.message[0].zone);
+          let reports_to = r.message[0].reports_to;
+
+          console.log("reporting-", reports_to);
+
+          if (reports_to) {
+            frappe.db
+              .get_value("Employee", reports_to, [
+                "user_id",
+                "employee_name",
+                "company_email",
+                "designation",
+              ])
+              .then((result) => {
+                if (result && result.message) {
+                  const { user_id, employee_name, company_email, designation } =
+                    result.message;
+
+                  console.log("Reports To", user_id);
+
+                  if (user_id) {
+                    frm.set_value("stage_1_emp_id", user_id);
+                    frm.set_value("stage_1_emp_name", employee_name);
+                    frm.set_value("stage_1_emp_email", company_email);
+                    frm.set_value("rp_designation", designation);
+                  } else {
+                    console.error(
+                      "User ID not found for the reports_to employee."
+                    );
+                  }
+                } else {
+                  console.error(
+                    "No employee data found for reports_to:",
+                    reports_to
+                  );
+                }
+              })
+              .catch((error) => {
+                console.error("Error retrieving employee data:", error);
+              });
+          } else {
+            console.error("Reports To value is invalid or undefined.");
+          }
+
           console.log("setting reporting");
 
           //<Email Setup>
           if (frm.is_new() || frm.doc.status == "Draft") {
             if (frm.doc.division === "Microfinance") {
               if (frm.doc.region === "Region-1") {
-                frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Sachin Chandewar");
                 frm.set_value(
                   "stage_2_emp_email",
-                  "vijay.k@sahayogmultistate.com"
+                  "sachin.c@sahayogmultistate.co.in"
                 );
               } else if (frm.doc.region === "Region-2") {
                 frm.set_value("stage_2_emp_id", "102@sahayog.com");
@@ -2337,27 +2632,27 @@ frappe.ui.form.on("Asset Request", {
                   "akash.j@sahayogmultistate.com"
                 );
               } else if (frm.doc.region === "Region-3") {
-                if (frm.doc.district === "Chandrapur") {
-                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "vijay.k@sahayogmultistate.com"
-                  );
-                } else {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
-                  );
-                }
-              } else if (frm.doc.region === "Region-4") {
-                frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                // if (frm.doc.district === "Chandrapur") {
+                //   frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                //   frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                //   frm.set_value(
+                //     "stage_2_emp_email",
+                //     "vijay.k@sahayogmultistate.com"
+                //   );
+                // } else {
+                frm.set_value("stage_2_emp_id", "317@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Rashtrapal Kamble");
                 frm.set_value(
                   "stage_2_emp_email",
-                  "sachin.c@sahayogmultistate.co.in"
+                  "rashtrapal.k@sahayogmultistate.com"
+                );
+                //}
+              } else if (frm.doc.region === "Region-4") {
+                frm.set_value("stage_2_emp_id", "317@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Rashtrapal Kamble");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "rashtrapal.k@sahayogmultistate.com"
                 );
               }
             } else if (
@@ -2395,11 +2690,11 @@ frappe.ui.form.on("Asset Request", {
                       "nishant.s@sahayogmultistate.com"
                     );
                   } else if (frm.doc.region == "Region-3") {
-                    frm.set_value("stage_2_emp_id", "521@sahayog.com");
-                    frm.set_value("stage_2_emp_name", "Amish Tarale");
+                    frm.set_value("stage_2_emp_id", "145@sahayog.com");
+                    frm.set_value("stage_2_emp_name", "Nishant Shelare");
                     frm.set_value(
                       "stage_2_emp_email",
-                      "amish.t@sahayogmultistate.com"
+                      "nishant.s@sahayogmultistate.com"
                     );
                   } else if (frm.doc.region == "Region-4") {
                     frm.set_value("stage_2_emp_id", "1348@sahayog.com");
@@ -2417,11 +2712,11 @@ frappe.ui.form.on("Asset Request", {
                     "sunil.r@sahayogmultistate.com"
                   );
                 } else if (frm.doc.division == "Microfinance") {
-                  frm.set_value("stage_2_emp_id", "2553@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Dillipkumar Mishra");
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
                   frm.set_value(
                     "stage_2_emp_email",
-                    "dillip.m@sahayogmultistate.com"
+                    "sachin.c@sahayogmultistate.co.in"
                   );
                 }
               } else {
@@ -2456,12 +2751,7 @@ frappe.ui.form.on("Asset Request", {
                     "nishant.s@sahayogmultistate.com"
                   );
                 } else if (frm.doc.region == "Region-3") {
-                  frm.set_value("stage_2_emp_id", "521@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Amish Tarale");
-                  frm.set_value(
-                    "stage_2_emp_email",
-                    "amish.t@sahayogmultistate.com"
-                  );
+                  adm;
                 } else if (frm.doc.region == "Region-4") {
                   frm.set_value("stage_2_emp_id", "1348@sahayog.com");
                   frm.set_value("stage_2_emp_name", "Manish Patil");
@@ -2479,11 +2769,11 @@ frappe.ui.form.on("Asset Request", {
                 );
               } else if (frm.doc.division == "Microfinance") {
                 if (frm.doc.region === "Region-1") {
-                  frm.set_value("stage_2_emp_id", "49@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
                   frm.set_value(
                     "stage_2_emp_email",
-                    "vijay.k@sahayogmultistate.com"
+                    "sachin.c@sahayogmultistate.co.in"
                   );
                 } else if (frm.doc.region === "Region-2") {
                   frm.set_value("stage_2_emp_id", "102@sahayog.com");
@@ -2493,18 +2783,27 @@ frappe.ui.form.on("Asset Request", {
                     "akash.j@sahayogmultistate.com"
                   );
                 } else if (frm.doc.region === "Region-3") {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  // if (frm.doc.district === "Chandrapur") {
+                  //   frm.set_value("stage_2_emp_id", "49@sahayog.com");
+                  //   frm.set_value("stage_2_emp_name", "Vijay Kotriwar");
+                  //   frm.set_value(
+                  //     "stage_2_emp_email",
+                  //     "vijay.k@sahayogmultistate.com"
+                  //   );
+                  // } else {
+                  frm.set_value("stage_2_emp_id", "317@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Rashtrapal Kamble");
                   frm.set_value(
                     "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
+                    "rashtrapal.k@sahayogmultistate.com"
                   );
+                  //}
                 } else if (frm.doc.region === "Region-4") {
-                  frm.set_value("stage_2_emp_id", "3261@sahayog.com");
-                  frm.set_value("stage_2_emp_name", "Sachin Chandewar");
+                  frm.set_value("stage_2_emp_id", "317@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Rashtrapal Kamble");
                   frm.set_value(
                     "stage_2_emp_email",
-                    "sachin.c@sahayogmultistate.co.in"
+                    "rashtrapal.k@sahayogmultistate.com"
                   );
                 }
               }
@@ -2626,47 +2925,6 @@ frappe.ui.form.on("Asset Request", {
             //set from Asset Deparment
             //<set stage 7 user>
           }
-
-          if (frm.doc.status == "Draft") {
-            console.log("Working refresh");
-            if (frm.doc.employee_department == "Information Technology") {
-              frm.set_value("stage_3_emp_status", "Skip");
-              frm.set_value("stage_6_emp_status", "Skip");
-            }
-
-            if (frm.doc.stage_1_emp_id == frm.doc.stage_5_emp_id) {
-              frm.set_value("stage_1_emp_status", "Skip");
-              frm.set_value("stage_2_emp_status", "Skip");
-              frm.set_value("stage_3_emp_status", "Skip");
-              frm.set_value("stage_4_emp_status", "Skip");
-              frm.set_value("stage_5_emp_status", "Pending");
-            } else if (frm.doc.stage_2_emp_id == frm.doc.stage_5_emp_id) {
-              frm.set_value("stage_2_emp_status", "Skip");
-              frm.set_value("stage_3_emp_status", "Skip");
-              frm.set_value("stage_4_emp_status", "Skip");
-            } else if (frm.doc.stage_2_emp_id == frm.doc.stage_3_emp_id) {
-              frm.set_value("stage_2_emp_status", "Skip");
-              frm.set_value("stage_3_emp_status", "Pending");
-            } else if (frm.doc.stage_3_emp_id == frm.doc.stage_5_emp_id) {
-              frm.set_value("stage_3_emp_status", "Skip");
-              frm.set_value("stage_4_emp_status", "Skip");
-            } else if (frm.doc.stage_4_emp_id == frm.doc.stage_5_emp_id) {
-              frm.set_value("stage_4_emp_status", "Skip");
-            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_4_emp_id) {
-              frm.set_value("stage_1_emp_status", "Skip");
-              frm.set_value("stage_2_emp_status", "Skip");
-              frm.set_value("stage_3_emp_status", "Skip");
-            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_3_emp_id) {
-              frm.set_value("stage_1_emp_status", "Skip");
-              frm.set_value("stage_2_emp_status", "Skip");
-            } else if (frm.doc.stage_1_emp_id == frm.doc.stage_2_emp_id) {
-              frm.set_value("stage_1_emp_status", "Skip");
-              // Code to handle the case where stage_1_emp_id is equal to stage_2_emp_id
-            } else {
-              // No match, do nothing
-            }
-            frm.trigger("set_Approval_levels");
-          }
         }
       },
     });
@@ -2728,6 +2986,43 @@ frappe.ui.form.on("Asset Request", {
     }
     //frm.save();
   },
+  check_rank: function (frm) {
+    let highest_rank = 0; // Initialize to 0 as ranks are between 1 to 4
+
+    // Iterate over each row in the asset child table
+    for (let row of frm.doc.asset) {
+      // Ensure that approval_rank is a number and greater than the current highest_rank
+      if (row.approval_rank && !isNaN(row.approval_rank)) {
+        let current_rank = parseInt(row.approval_rank, 10);
+        if (current_rank > highest_rank) {
+          highest_rank = current_rank;
+        }
+      }
+    }
+
+    // Log the highest rank for debugging
+    console.log("Highest Approval Rank:", highest_rank);
+
+    // Update stages based on the highest rank
+    if (highest_rank == 1) {
+      console.log("2/3/4 are skip");
+      frm.set_value("stage_2_emp_status", "Skip");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (highest_rank == 2) {
+      console.log("3/4 are skip");
+      frm.set_value("stage_3_emp_status", "Skip");
+      frm.set_value("stage_4_emp_status", "Skip");
+    } else if (highest_rank == 3) {
+      frm.set_value("stage_4_emp_status", "Skip");
+      console.log("4 are skip");
+    }
+
+    // Set and refresh the field for highest approval level
+    frm.set_value("highest_approval_level", highest_rank);
+    frm.refresh_field("highest_approval_level");
+  },
+
   select_department: function (frm) {
     if (!frappe.user.has_role("Administrator")) {
       // Your code here
@@ -3856,7 +4151,9 @@ frappe.ui.form.on("Asset Request", {
         frm.save(); // Save the form
         return;
       }
-
+      // let username = frappe.session.user_fullname;
+      // frm.set_value("stage_7_emp_id", user);
+      // frm.set_value("stage_7_emp_name", username);
       // Continue with other operations if no condition was met
       // ...
 
@@ -4046,4 +4343,224 @@ frappe.ui.form.on("Asset Request", "refresh", function (frm) {
       });
     }
   });
+});
+frappe.ui.form.on("Asset Request", {
+  add_item_button: function (frm) {
+    // frm.add_custom_button("Store Entry", function () {
+    //   frm.call({
+    //     method: "store_entry",
+    //     args: {
+    //       branch: frm.doc.branch,
+    //       category: frm.doc.select_department,
+    //       asset: JSON.stringify(
+    //         frm.doc.asset.map((row) => ({
+    //           item_name: row.item_name,
+    //           quantity: row.quantity,
+    //         }))
+    //       ),
+    //     },
+    //     callback: function (r) {
+    //       if (!r.exc) {
+    //         // Optionally handle success
+    //       }
+    //     },
+    //   });
+    // });
+
+    // Add custom button labeled "Add Item"
+    frm.add_custom_button("Add Item", function () {
+      // Open the dialog when the button is clicked
+      open_dialog(frm);
+    });
+
+    function open_dialog(frm) {
+      // Create a new dialog for entering item details
+      let d = new frappe.ui.Dialog({
+        title: "Enter Item Details",
+        fields: [
+          {
+            label: "Item",
+            fieldname: "item",
+            fieldtype: "Link",
+            options: "Sahayog Item",
+            reqd: 1,
+            get_query: function () {
+              return {
+                filters: {
+                  category: frm.doc.select_department, // Apply filter for category
+                },
+              };
+            },
+          },
+          {
+            fieldtype: "Section Break",
+          },
+
+          {
+            label: "Approval Required",
+            fieldname: "approval_level",
+            fieldtype: "Data",
+            read_only: 1, // Make this field read-only
+          },
+          {
+            fieldtype: "Column Break",
+          },
+
+          {
+            label: "Current Stock",
+            fieldname: "current_stock",
+            fieldtype: "Data",
+            read_only: 1, // Make this field read-only
+          },
+          {
+            fieldtype: "Column Break",
+          },
+          {
+            label: "Quantity",
+            fieldname: "quantity",
+            fieldtype: "Int",
+            reqd: 1,
+          },
+
+          {
+            fieldtype: "Section Break",
+            hidden: 1,
+          },
+          {
+            label: "Approval Rank",
+            fieldname: "approval_rank",
+            fieldtype: "Int",
+            read_only: 1, // Make this field read-only
+            hidden: 1,
+          },
+          {
+            fieldtype: "Section Break",
+          },
+          {
+            label: "Item Description",
+            fieldname: "item_description",
+            fieldtype: "Small Text",
+            reqd: 1,
+          },
+          {
+            fieldtype: "Column Break",
+          },
+          {
+            label: "Item Purpose",
+            fieldname: "item_purpose",
+            fieldtype: "Small Text",
+            reqd: 1,
+          },
+        ],
+        primary_action_label: "Add Item",
+        primary_action: function (values) {
+          // Calculate approval rank based on approval level
+          let approval_rank = get_approval_rank(values.approval_level);
+          values.approval_rank = approval_rank;
+
+          // Call a function to add the entered data to the child table
+          add_item_to_child_table(frm, values);
+          d.hide();
+        },
+      });
+
+      // Function to fetch current stock and approval level based on the selected item
+      function fetch_item_details(item_code) {
+        if (item_code) {
+          frappe.call({
+            method: "frappe.client.get",
+            args: {
+              doctype: "Sahayog Item",
+              name: item_code,
+            },
+            callback: function (response) {
+              if (response.message) {
+                d.set_value("current_stock", response.message.current_stock);
+                d.set_value("approval_level", response.message.approval_level);
+
+                // Set approval rank based on the approval level
+                let approval_rank = get_approval_rank(
+                  response.message.approval_level
+                );
+                d.set_value("approval_rank", approval_rank);
+              }
+            },
+          });
+        } else {
+          d.set_value("current_stock", "");
+          d.set_value("approval_level", "");
+          d.set_value("approval_rank", "");
+        }
+      }
+
+      // Function to calculate approval rank based on approval level
+      function get_approval_rank(approval_level) {
+        let rank = 0;
+        if (approval_level === "Reporting-Person") {
+          rank = 1;
+        } else if (approval_level === "HOD/RM") {
+          rank = 2;
+        } else if (approval_level === "GM") {
+          rank = 3;
+        } else if (approval_level === "CFO") {
+          rank = 4;
+        }
+        return rank;
+      }
+
+      // Set up event listener for item field change
+      d.get_field("item").df.onchange = function () {
+        let item_code = d.get_value("item");
+        fetch_item_details(item_code);
+      };
+
+      d.show();
+    }
+
+    function add_item_to_child_table(frm, values) {
+      // Add the entered item details to the "asset" child table
+      let child = frm.add_child("asset");
+
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_name",
+        values.item
+      );
+      frappe.model.set_value(child.doctype, child.name, "item_id", values.item);
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "quantity",
+        values.quantity
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "approval_level",
+        values.approval_level
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "approval_rank",
+        values.approval_rank
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_description",
+        values.item_description
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_purpose",
+        values.item_purpose
+      );
+
+      frm.refresh_field("asset");
+      frm.save();
+    }
+  },
 });

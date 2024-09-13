@@ -102,13 +102,11 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+    "Store Entry": {
+        "on_update": "sahayog_asset.automation.update_stocks",
+    }
+}
 
 # Scheduled Tasks
 # ---------------

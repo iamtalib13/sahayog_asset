@@ -7,7 +7,9 @@
  "engine": "InnoDB",
  "field_order": [
   "item_details_section",
+  "item_id",
   "item_name",
+  "asset_name",
   "column_break_tebhh",
   "quantity",
   "uom",
@@ -33,16 +35,21 @@
   "purchase_manager",
   "purchase",
   "approval_level_details_section",
-  "approval_level"
+  "approval_level",
+  "column_break_wzfye",
+  "approval_rank"
  ],
  "fields": [
   {
    "columns": 2,
    "fieldname": "item_name",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Item Name",
-   "read_only_depends_on": "eval:frappe.user.has_role('Store Manager') || frappe.user.has_role('Purchase Department') || doc.status!==\"New\""
+   "options": "Sahayog Item",
+   "read_only": 1,
+   "read_only_depends_on": "//eval:frappe.user.has_role('Store Manager') || frappe.user.has_role('Purchase Department') || doc.status!==\"New\""
   },
   {
    "columns": 1,
@@ -50,7 +57,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Qty",
-   "read_only_depends_on": "eval: frappe.user.has_role('Purchase Department')  || doc.dispatched_status === \"Self-Purchase\" || doc.dispatched_status === \"Skip\" || doc.dispatched_status === \"Dispatch\"\n"
+   "read_only_depends_on": "eval: doc.dispatched_status === \"Self-Purchase\" || doc.dispatched_status === \"Skip\" || doc.dispatched_status === \"Dispatch\"\n"
   },
   {
    "columns": 1,
@@ -89,14 +96,13 @@
   },
   {
    "columns": 1,
-   "depends_on": "eval:doc.dispatched_status==\"Pending\"",
+   "depends_on": "eval:doc.dispatched_status==\"Pending\" || doc.status==\"Pending from Purchase\"",
    "fieldname": "purchase",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Purchase",
    "mandatory_depends_on": "eval:frappe.user.has_role('Purchase Department') && doc.dispatched_status==\"Pending\" && !frappe.user.has_role('System Manager')",
    "options": "\nPending\nDispatch",
-   "permlevel": 2,
    "read_only_depends_on": "eval:frappe.user.has_role('Store Manager') || doc.dispatched_status==\"Dispatch\""
   },
   {
@@ -128,7 +134,7 @@
    "fieldtype": "Select",
    "label": "Mode of Transport",
    "mandatory_depends_on": "eval:doc.dispatched_status == \"Dispatch\"",
-   "options": "\nCourier\nBus\nTrain\nTruck\nCar\nBike\nBy Hand",
+   "options": "\nCourier\nBus\nTrain\nTruck\nCar\nBike\nBy Hand\nBy Vendor",
    "permlevel": 1
   },
   {
@@ -149,9 +155,9 @@
    "label": "Approval Level"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "approval_level_details_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Approval Level Details"
   },
   {
@@ -194,11 +200,13 @@
    "label": "Other Details"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('IT Store Executive')",
    "fieldname": "company",
    "fieldtype": "Data",
    "label": "Item Company"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('IT Store Executive')",
    "fieldname": "serial_no",
    "fieldtype": "Data",
    "label": "Serial No"
@@ -208,20 +216,49 @@
    "fieldtype": "Column Break"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('IT Store Executive')",
    "fieldname": "windows_key",
    "fieldtype": "Data",
    "label": "Windows Key"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('IT Store Executive')",
    "fieldname": "office_key",
    "fieldtype": "Data",
    "label": "Office Key"
+  },
+  {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
+   "fieldname": "item_id",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item ID",
+   "options": "Sahayog Item"
+  },
+  {
+   "fieldname": "column_break_wzfye",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approval_rank",
+   "fieldtype": "Data",
+   "label": "Approval Rank"
+  },
+  {
+   "columns": 2,
+   "fetch_from": "item_name.item_name",
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Name",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-08-07 13:02:11.189068",
+ "modified": "2024-08-20 17:10:04.772249",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset List",

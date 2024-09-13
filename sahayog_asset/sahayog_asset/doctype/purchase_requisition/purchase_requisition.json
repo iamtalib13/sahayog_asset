@@ -11,25 +11,21 @@
   "status",
   "section_break_xiifo",
   "emp_user",
-  "division",
-  "column_break_6",
-  "employee_department",
-  "column_break_aed1x",
-  "branch",
-  "column_break_8",
-  "region",
   "date",
   "section_break_7",
   "section_break_5pufi",
   "select_department",
   "employee_details_section",
-  "admin_save",
   "employee_id",
-  "column_break_4",
   "emp_name",
-  "column_break_edpye",
   "designation",
-  "column_break_3",
+  "column_break_8",
+  "employee_department",
+  "branch",
+  "division",
+  "column_break_6",
+  "region",
+  "zone",
   "phone",
   "section_break_asset_adder",
   "list",
@@ -44,7 +40,9 @@
   "column_break_6aghk",
   "add_item",
   "section_break_crbxo",
+  "dispatch_all",
   "asset",
+  "admin_save",
   "approval_details_tab",
   "naming_series",
   "request",
@@ -75,11 +73,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4"
-  },
-  {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
+   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4\nHead Office"
   },
   {
    "fieldname": "section_break_7",
@@ -147,10 +141,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
    "fetch_from": "employee_id.user_id",
    "fieldname": "emp_user",
    "fieldtype": "Data",
@@ -214,10 +204,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "column_break_aed1x",
-   "fieldtype": "Column Break"
-  },
-  {
    "fetch_from": "employee_id.department",
    "fieldname": "employee_department",
    "fieldtype": "Data",
@@ -248,11 +234,8 @@
   },
   {
    "fieldname": "section_break_asset_adder",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_edpye",
-   "fieldtype": "Column Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
    "fetch_from": "employee_id.cell_number",
@@ -317,17 +300,32 @@
   },
   {
    "fieldname": "section_break_qbkdq",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "hidden": 1
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "admin_save",
    "fieldtype": "Button",
    "label": "Admin Save"
+  },
+  {
+   "fetch_from": "employee_id.zone",
+   "fieldname": "zone",
+   "fieldtype": "Data",
+   "label": "Zone"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:frappe.user.has_role('Purchase Department')",
+   "fieldname": "dispatch_all",
+   "fieldtype": "Check",
+   "label": "Dispatch All ?"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-13 11:32:28.201071",
+ "modified": "2024-08-22 11:19:19.018038",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",

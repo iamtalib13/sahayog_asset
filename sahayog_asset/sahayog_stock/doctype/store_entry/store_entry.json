@@ -13,16 +13,22 @@
   "column_break_92uju",
   "date",
   "section_break_rdkwo",
+  "category",
   "item_code",
   "column_break_xurrh",
   "item_name",
+  "item_id",
   "quantity",
-  "section_break_i8lvw",
   "column_break_ahkmp",
+  "item_company",
+  "serial_no",
+  "windows_key",
+  "office_key",
+  "section_break_i8lvw",
+  "temporary_dispatch",
   "location_type",
   "column_break_uzxqb",
-  "branch",
-  "location"
+  "branch"
  ],
  "fields": [
   {
@@ -55,12 +61,6 @@
    "fieldname": "item_name",
    "fieldtype": "Data",
    "label": "Item Name"
-  },
-  {
-   "depends_on": "eval:doc.entry_type",
-   "fieldname": "location",
-   "fieldtype": "Data",
-   "label": "Location"
   },
   {
    "depends_on": "eval:doc.location_type==\"Branch\"",
@@ -97,7 +97,7 @@
    "fieldname": "location_type",
    "fieldtype": "Select",
    "label": "Location Type",
-   "options": "\nDepartment Store\nBranch"
+   "options": "\nStore\nBranch"
   },
   {
    "fieldname": "naming_series",
@@ -113,14 +113,53 @@
   {
    "depends_on": "eval:doc.entry_type",
    "fieldname": "quantity",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "label": "Quantity"
+  },
+  {
+   "fetch_from": "item_code.item_id",
+   "fieldname": "item_id",
+   "fieldtype": "Data",
+   "label": "item_id"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Item Category",
+   "reqd": 1
+  },
+  {
+   "fieldname": "office_key",
+   "fieldtype": "Data",
+   "label": "Office Key"
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Data",
+   "label": "Serial No"
+  },
+  {
+   "fieldname": "windows_key",
+   "fieldtype": "Data",
+   "label": "Windows Key"
+  },
+  {
+   "fieldname": "item_company",
+   "fieldtype": "Data",
+   "label": "Item Company"
+  },
+  {
+   "default": "0",
+   "fieldname": "temporary_dispatch",
+   "fieldtype": "Check",
+   "label": "Temporary Dispatch"
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-05-25 17:47:56.488849",
+ "modified": "2024-08-22 14:00:12.201363",
  "modified_by": "Administrator",
  "module": "Sahayog Stock",
  "name": "Store Entry",
@@ -138,9 +177,31 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Store Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
   }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Red",
+   "title": "STOCK-OUT"
+  },
+  {
+   "color": "Green",
+   "title": "STOCK-IN"
+  }
+ ]
 }

@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"lA03aMK74X\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>IT Store Management</b></span>\",\"col\":12}},{\"id\":\"YwbwEM4anM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"sg6KjOzJ9e\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\">Status-Wise</span>\",\"col\":12}},{\"id\":\"jjcTiayJla\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval Pending\",\"col\":3}},{\"id\":\"lizBC-ww7g\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"DUQwCxYE8K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"RqiW_CkRlv\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"eloX3ZvBAm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"JNWGb-odho\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"wC-lq0PIBe\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Recent\",\"col\":12}}]",
+ "content": "[{\"id\":\"lA03aMK74X\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>IT Store Management</b></span>\",\"col\":12}},{\"id\":\"YwbwEM4anM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"sg6KjOzJ9e\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\">Status-Wise</span>\",\"col\":12}},{\"id\":\"Yv_yEHFNuz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Draft\",\"col\":3}},{\"id\":\"jjcTiayJla\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval Pending\",\"col\":3}},{\"id\":\"lizBC-ww7g\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"DUQwCxYE8K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"RqiW_CkRlv\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"eloX3ZvBAm\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"JNWGb-odho\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"qoMeMrza1f\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Inventory Management</b></span>\",\"col\":12}},{\"id\":\"vXyDOxnUFH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item List\",\"col\":3}},{\"id\":\"lsEPjLn6OA\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock Entry\",\"col\":3}}]",
  "creation": "2024-05-02 15:27:09.729063",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "IT Store",
  "links": [],
- "modified": "2024-07-04 17:41:32.710596",
+ "modified": "2024-08-22 10:52:22.659505",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "IT Store",
@@ -20,13 +20,7 @@
  "owner": "Administrator",
  "parent_page": "Asset Requisition",
  "public": 1,
- "quick_lists": [
-  {
-   "document_type": "Asset Request",
-   "label": "Recent",
-   "quick_list_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false]]"
-  }
- ],
+ "quick_lists": [],
  "roles": [
   {
    "role": "IT Store Executive"
@@ -65,12 +59,30 @@
    "type": "DocType"
   },
   {
+   "color": "Grey",
+   "doc_view": "List",
+   "format": "{} Draft",
+   "label": "Draft",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Draft\",false],[\"Asset Request\",\"select_department\",\"=\",\"IT\",false]]",
+   "type": "DocType"
+  },
+  {
    "color": "Green",
    "doc_view": "List",
    "format": "{}",
    "label": "Dispatched",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false],[\"Asset Request\",\"status\",\"=\",\"Dispatched\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Stock Entry",
+   "link_to": "Store Entry",
+   "stats_filter": "[[\"Store Entry\",\"category\",\"=\",\"IT\",false]]",
    "type": "DocType"
   },
   {
@@ -90,6 +102,13 @@
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"IT\",false],[\"Asset Request\",\"status\",\"=\",\"Received\",false]]",
    "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Item List",
+   "link_to": "Item List",
+   "type": "Report"
   }
  ],
  "title": "IT Store"

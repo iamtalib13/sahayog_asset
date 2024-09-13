@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"X5XPydKEAk\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Stationery Store Management</b></span>\",\"col\":12}},{\"id\":\"MN6e5Ye1bx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"_VZWwuztGa\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Items List\",\"col\":3}},{\"id\":\"vX2hR5YFLc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\"><b>Status-Wise</b></span>\",\"col\":12}},{\"id\":\"ZWS6DHb5AR\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval Pending\",\"col\":3}},{\"id\":\"KsXwi6-Jiy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"FKcVxGW98K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"pJ8nZT3KCD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"nhlJcK5RWy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"siXl6dPJCg\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hoy1FTH7VQ\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Recent Stationery Requests\",\"col\":12}}]",
+ "content": "[{\"id\":\"X5XPydKEAk\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Stationery Store Management</b></span>\",\"col\":12}},{\"id\":\"MN6e5Ye1bx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Store Approval\",\"col\":3}},{\"id\":\"vX2hR5YFLc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h2\\\"><b>Status-Wise</b></span>\",\"col\":12}},{\"id\":\"ZWS6DHb5AR\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Approval Pending\",\"col\":3}},{\"id\":\"KsXwi6-Jiy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase\",\"col\":3}},{\"id\":\"FKcVxGW98K\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"OTP\",\"col\":3}},{\"id\":\"pJ8nZT3KCD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"nhlJcK5RWy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"siXl6dPJCg\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"9jMcaE6I81\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Inventory Management</b></span>\",\"col\":12}},{\"id\":\"cY_KCntnFn\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item\",\"col\":3}},{\"id\":\"QeBDeuCA9p\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock\",\"col\":3}},{\"id\":\"K921y-7WA9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Item List\",\"col\":3}}]",
  "creation": "2024-05-02 15:53:16.363412",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "Stationery Store",
  "links": [],
- "modified": "2024-08-09 12:03:36.309231",
+ "modified": "2024-08-20 11:50:12.572163",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Stationery Store",
@@ -20,13 +20,7 @@
  "owner": "Administrator",
  "parent_page": "Asset Requisition",
  "public": 1,
- "quick_lists": [
-  {
-   "document_type": "Asset Request",
-   "label": "Recent Stationery Requests",
-   "quick_list_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]"
-  }
- ],
+ "quick_lists": [],
  "roles": [
   {
    "role": "Stationery Store Executive"
@@ -38,12 +32,28 @@
  "sequence_id": 26.0,
  "shortcuts": [
   {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Item List",
+   "link_to": "Item List",
+   "type": "Report"
+  },
+  {
    "color": "Red",
    "doc_view": "List",
    "format": "{}",
    "label": "Approval Pending",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false],[\"Asset Request\",\"stage_7_request\",\"=\",\"Pending\",false],[\"Asset Request\",\"status\",\"in\",[\"Draft\",\"Pending\",null],false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Item",
+   "link_to": "Sahayog Item",
+   "stats_filter": "[[\"Sahayog Item\",\"category\",\"=\",\"Stationery\",false]]",
    "type": "DocType"
   },
   {
@@ -77,15 +87,6 @@
    "color": "Green",
    "doc_view": "List",
    "format": "{}",
-   "label": "Items List",
-   "link_to": "Sahayog Item",
-   "stats_filter": "[[\"Sahayog Item\",\"category\",\"=\",\"Stationery\",false]]",
-   "type": "DocType"
-  },
-  {
-   "color": "Green",
-   "doc_view": "List",
-   "format": "{}",
    "label": "Dispatched",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Dispatched\",false],[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]",
@@ -98,6 +99,15 @@
    "label": "OTP",
    "link_to": "Asset Request",
    "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Received\",false],[\"Asset Request\",\"select_department\",\"=\",\"Stationery\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Stock",
+   "link_to": "Store Entry",
+   "stats_filter": "[[\"Store Entry\",\"category\",\"=\",\"Stationery\",false]]",
    "type": "DocType"
   }
  ],

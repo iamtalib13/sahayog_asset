@@ -3,8 +3,9 @@
 
 frappe.ui.form.on("Sahayog Item", {
   after_save: function (frm) {
-    frm.set_value("item_id", frm.doc.name);
-    frm.save();
+    // frm.set_value("item_id", frm.doc.name);
+    // frm.save();
+    window.location.href = "/app/query-report/Item%20List";
   },
 
   tax: function (frm) {
@@ -74,6 +75,11 @@ frappe.ui.form.on("Sahayog Item", {
   },
 
   refresh: function (frm) {
+    if (!frm.is_new()) {
+      frm.trigger("current_stock");
+    }
+    frm.trigger("section_colors");
+
     if (!frappe.user.has_role("System Manager")) {
       if (frappe.user.has_role("Stationery Asset Admin")) {
         if (frm.is_new()) {
@@ -100,5 +106,49 @@ frappe.ui.form.on("Sahayog Item", {
         }
       }
     }
+  },
+
+  current_stock: function (frm) {
+    let current_stock = frm.doc.current_stock;
+    let min_stock = frm.doc.min_qty;
+
+    // Determine the color for the current stock card
+    let stock_color = current_stock < 0 ? "red" : "black";
+
+    // Setting the intro with two different cards
+    frm.set_intro(`
+        <div style="display: flex; gap: 10px;">
+            <!-- Current Stock Card -->
+            <div style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f8f9fa; flex: 1;">
+                <p style="margin: 0; font-weight: bold;">Current Stock</p>
+                <p style="margin: 0; color: ${stock_color}; font-size: 1.2em;">${current_stock}</p>
+            </div>
+            <!-- Minimum Stock Card -->
+            <div style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; background-color: #f8f9fa; flex: 1;">
+                <p style="margin: 0; font-weight: bold;">Minimum Stock</p>
+                <p style="margin: 0; font-size: 1.2em;">${min_stock}</p>
+            </div>
+        </div>
+    `);
+  },
+
+  section_colors: function (frm) {
+    //form border color
+    $(".form-control").css("border", "1px solid #d3d3d3");
+
+    //section_colors
+    frm.fields_dict["approval_details_section"].wrapper.css(
+      "background-color",
+      "#F0F8FF"
+    );
+    frm.fields_dict["item_details_section"].wrapper.css(
+      "background-color",
+      "#E1EBEE"
+    );
+
+    frm.fields_dict["stock_details_section"].wrapper.css(
+      "background-color",
+      "#F0F8FF"
+    );
   },
 });

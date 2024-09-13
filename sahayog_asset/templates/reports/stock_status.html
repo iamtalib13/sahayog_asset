@@ -1,0 +1,61 @@
+<div class="stock-status-report">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Low Stock</h5>
+          <h2 class="card-text text-warning">{{ total_low_stock }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Out of Stock</h5>
+          <h2 class="card-text text-danger">{{ total_out_of_stock }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Item Code</th>
+        <th>Item Name</th>
+        <th>Current Stock</th>
+        <th>Min Qty</th>
+        <th>Category</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in data %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.item_name }}</td>
+        <td>{{ item.current_stock }}</td>
+        <td>{{ item.min_qty }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .stock-status-report .card {
+    margin-bottom: 20px;
+  }
+  .stock-status-report .card-title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .stock-status-report .card-text {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .stock-status-report .table {
+    margin-top: 20px;
+  }
+</style>

@@ -8,14 +8,23 @@ frappe.ui.form.on("Store Entry", {
     } else if (frm.doc.entry_type === "STOCK-OUT") {
       frm.set_value("location_type", "Branch");
     }
+
+    frm.disable_form();
+    frm.disable_save();
+  },
+  refresh: function (frm) {
+    if (!frm.is_new()) {
+      frm.disable_form();
+      frm.disable_save();
+    }
   },
 
-  before_save: function (frm) {
-    if (frm.doc.entry_type === "STOCK-IN") {
-      frm.set_value("location", "Department Store");
-    }
-    if (frm.doc.entry_type === "STOCK-OUT") {
-      frm.set_value("location", frm.doc.branch);
-    }
-  },
+  // before_save: function (frm) {
+  //   if (frm.doc.entry_type === "STOCK-IN") {
+  //     frm.set_value("location", "Department Store");
+  //   }
+  //   if (frm.doc.entry_type === "STOCK-OUT") {
+  //     frm.set_value("location", frm.doc.branch);
+  //   }
+  // },
 });

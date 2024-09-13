@@ -2,6 +2,25 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Purchase Requisition", {
+  dispatch_all: function (frm) {
+    // Check the value of the dispatch_all field
+    let check = frm.doc.dispatch_all;
+
+    // Iterate through the child table "asset"
+    frm.doc.asset.forEach((row) => {
+      // If dispatch_all is checked, set the purchase field to "Dispatch"
+      // If dispatch_all is unchecked, set the purchase field to "Pending"
+      frappe.model.set_value(
+        row.doctype,
+        row.name,
+        "purchase",
+        check ? "Dispatch" : "Pending"
+      );
+    });
+
+    // Refresh the field in the form to reflect the changes
+    frm.refresh_field("asset");
+  },
   admin_save: function (frm) {
     if (frappe.user.has_role("Administrator")) {
       frm.save();
@@ -107,7 +126,7 @@ frappe.ui.form.on("Purchase Requisition", {
 
     if (!frm.is_new()) {
       if (frm.doc.status !== "Draft") {
-        frm.set_df_property("asset", "read_only", 1);
+        //frm.set_df_property("asset", "read_only", 1);
         frm.disable_save();
       }
     }
@@ -306,8 +325,10 @@ frappe.ui.form.on("Purchase Requisition", {
         if (
           frm.doc.status !== "Dispatched" &&
           frm.doc.status !== "Received" &&
-          user !== "1299@sahayog.com"
+          frappe.user.has_role("Purchase Department")
         ) {
+          frm.set_df_property("asset", "read_only", 0);
+          console.log("only for purchase Department");
           frm.trigger("dispatch");
         }
 
@@ -880,4 +901,194 @@ frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
       };
     });
   }
+});
+
+frappe.ui.form.on("Purchase Requisition", {
+  refresh: function (frm) {
+    // Add custom button labeled "Add Item"
+
+    if (frm.doc.status == "Draft" || frm.is_new()) {
+      frm.add_custom_button("Add Item", function () {
+        console.log("Add Item button clicked"); // Debugging line
+        // Open the dialog when the button is clicked
+        open_dialog(frm);
+      });
+    }
+
+    function open_dialog(frm) {
+      // Create a new dialog for entering item details
+      let d = new frappe.ui.Dialog({
+        title: "Enter Item Details",
+        fields: [
+          {
+            label: "Item",
+            fieldname: "item",
+            fieldtype: "Link",
+            options: "Sahayog Item",
+            reqd: 1,
+            get_query: function () {
+              return {
+                filters: {
+                  category: frm.doc.select_department, // Apply filter for category
+                },
+              };
+            },
+          },
+          { fieldtype: "Section Break" },
+          {
+            label: "Approval Required",
+            fieldname: "approval_level",
+            fieldtype: "Data",
+            read_only: 1, // Make this field read-only
+          },
+          { fieldtype: "Column Break" },
+          {
+            label: "Current Stock",
+            fieldname: "current_stock",
+            fieldtype: "Data",
+            read_only: 1, // Make this field read-only
+          },
+          { fieldtype: "Column Break" },
+          {
+            label: "Quantity",
+            fieldname: "quantity",
+            fieldtype: "Int",
+            reqd: 1,
+          },
+          { fieldtype: "Section Break", hidden: 1 },
+          {
+            label: "Approval Rank",
+            fieldname: "approval_rank",
+            fieldtype: "Int",
+            read_only: 1, // Make this field read-only
+            hidden: 1,
+          },
+          { fieldtype: "Section Break" },
+          {
+            label: "Item Description",
+            fieldname: "item_description",
+            fieldtype: "Small Text",
+            reqd: 1,
+          },
+          { fieldtype: "Column Break" },
+          {
+            label: "Item Purpose",
+            fieldname: "item_purpose",
+            fieldtype: "Small Text",
+            reqd: 1,
+          },
+        ],
+        primary_action_label: "Add Item",
+        primary_action: function (values) {
+          console.log("Primary action triggered"); // Debugging line
+          // Calculate approval rank based on approval level
+          let approval_rank = get_approval_rank(values.approval_level);
+          values.approval_rank = approval_rank;
+
+          // Call a function to add the entered data to the child table
+          add_item_to_child_table(frm, values);
+          d.hide();
+        },
+      });
+
+      // Function to fetch current stock and approval level based on the selected item
+      function fetch_item_details(item_code) {
+        if (item_code) {
+          frappe.call({
+            method: "frappe.client.get",
+            args: {
+              doctype: "Sahayog Item",
+              name: item_code,
+            },
+            callback: function (response) {
+              if (response.message) {
+                d.set_value("current_stock", response.message.current_stock);
+                d.set_value("approval_level", response.message.approval_level);
+
+                // Set approval rank based on the approval level
+                let approval_rank = get_approval_rank(
+                  response.message.approval_level
+                );
+                d.set_value("approval_rank", approval_rank);
+              }
+            },
+          });
+        } else {
+          d.set_value("current_stock", "");
+          d.set_value("approval_level", "");
+          d.set_value("approval_rank", "");
+        }
+      }
+
+      // Function to calculate approval rank based on approval level
+      function get_approval_rank(approval_level) {
+        let rank = 0;
+        if (approval_level === "Reporting-Person") {
+          rank = 1;
+        } else if (approval_level === "HOD/RM") {
+          rank = 2;
+        } else if (approval_level === "GM") {
+          rank = 3;
+        } else if (approval_level === "CFO") {
+          rank = 4;
+        }
+        return rank;
+      }
+
+      // Set up event listener for item field change
+      d.get_field("item").df.onchange = function () {
+        let item_code = d.get_value("item");
+        fetch_item_details(item_code);
+      };
+
+      d.show();
+    }
+
+    function add_item_to_child_table(frm, values) {
+      console.log("Adding item to child table"); // Debugging line
+      // Add the entered item details to the "asset" child table
+      let child = frm.add_child("asset");
+
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_name",
+        values.item
+      );
+      frappe.model.set_value(child.doctype, child.name, "item_id", values.item);
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "quantity",
+        values.quantity
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "approval_level",
+        values.approval_level
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "approval_rank",
+        values.approval_rank
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_description",
+        values.item_description
+      );
+      frappe.model.set_value(
+        child.doctype,
+        child.name,
+        "item_purpose",
+        values.item_purpose
+      );
+
+      frm.refresh_field("asset");
+      frm.save();
+    }
+  },
 });

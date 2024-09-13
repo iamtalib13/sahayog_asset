@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_import": 1,
  "allow_rename": 1,
  "autoname": "format:STM{####}",
  "creation": "2023-03-27 15:57:49.458144",
@@ -10,12 +9,18 @@
  "engine": "InnoDB",
  "field_order": [
   "add_item_form_tab",
+  "approval_details_section",
   "approval_level",
-  "item_details",
+  "item_details_section",
   "category",
   "item_name",
+  "column_break_s85el",
   "enable",
   "other",
+  "stock_details_section",
+  "current_stock",
+  "column_break_xv2ae",
+  "min_qty",
   "other_details_tab",
   "item_id",
   "item_description",
@@ -38,6 +43,8 @@
    "fieldname": "item_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
    "label": "Item Name",
    "reqd": 1
   },
@@ -65,8 +72,7 @@
   {
    "fieldname": "item_id",
    "fieldtype": "Data",
-   "label": "Item ID",
-   "read_only": 1
+   "label": "Item ID"
   },
   {
    "fieldname": "type_of_supply",
@@ -96,11 +102,6 @@
    "fieldname": "statutory_information",
    "fieldtype": "Heading",
    "label": "STATUTORY INFORMATION"
-  },
-  {
-   "fieldname": "item_details",
-   "fieldtype": "Heading",
-   "label": "ITEM DETAILS"
   },
   {
    "fieldname": "sgst",
@@ -155,10 +156,9 @@
   {
    "fieldname": "add_item_form_tab",
    "fieldtype": "Tab Break",
-   "label": "Add Item Form"
+   "label": "Item Details"
   },
   {
-   "depends_on": "eval:frappe.user.has_role('System Manager')",
    "fieldname": "other_details_tab",
    "fieldtype": "Tab Break",
    "label": "Other Details"
@@ -168,12 +168,52 @@
    "fieldtype": "Select",
    "label": "Approval Level",
    "options": "\nReporting-Person\nHOD/RM\nGM\nCFO"
+  },
+  {
+   "fieldname": "current_stock",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Current Stock",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approval_details_section",
+   "fieldtype": "Section Break",
+   "label": "<h3 style=\"color: #0096FF;\">Approval Details </h3>"
+  },
+  {
+   "fieldname": "column_break_s85el",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_details_section",
+   "fieldtype": "Section Break",
+   "label": "<h3 style=\"color: #0096FF;\">Item Details </h3>"
+  },
+  {
+   "fieldname": "stock_details_section",
+   "fieldtype": "Section Break",
+   "label": "<h3 style=\"color: #0096FF;\">Stock Details </h3>"
+  },
+  {
+   "fieldname": "column_break_xv2ae",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "min_qty",
+   "fieldtype": "Int",
+   "label": "Minimum Quantity"
   }
  ],
- "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2024-07-05 16:09:10.422762",
+ "links": [
+  {
+   "group": "Inventory",
+   "link_doctype": "Store Entry",
+   "link_fieldname": "item_id"
+  }
+ ],
+ "modified": "2024-08-22 14:00:50.517370",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Sahayog Item",
@@ -214,6 +254,19 @@
    "read": 1,
    "report": 1,
    "role": "Employee",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Store Manager",
    "select": 1,
    "share": 1,
    "write": 1
