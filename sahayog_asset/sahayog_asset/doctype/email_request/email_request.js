@@ -10,7 +10,7 @@ frappe.ui.form.on("Email Request", {
       frappe.set_route("app/email-management");
     } else if (frappe.user.has_role("HR Support Head")) {
       frappe.set_route("app/hr-email-request");
-    } else if (frappe.user.has_role("IT Store Manager")) {
+    } else if (frappe.user.has_role("Email Creator")) {
       frappe.set_route("app/email-requests");
     }
   },
@@ -36,9 +36,9 @@ frappe.ui.form.on("Email Request", {
           frm.trigger("submit_button");
           frm.trigger("correction_intro_messages");
         }
-        if (frappe.user.has_role("IT Store Manager")) {
+        if (frappe.user.has_role("Email Creator")) {
           frm.disable_save();
-          frm.disable_form();
+          //frm.disable_form();
         }
       } else if (status == "Draft" || status == "Correction-Required") {
         frm.trigger("draft_intro_messages");
@@ -46,7 +46,7 @@ frappe.ui.form.on("Email Request", {
         if (frappe.user.has_role("HR Support Executive")) {
           frm.trigger("submit_button");
         }
-        if (frappe.user.has_role("IT Store Manager")) {
+        if (frappe.user.has_role("Email Creator")) {
           frm.disable_save();
           frm.disable_form();
         }
@@ -54,7 +54,7 @@ frappe.ui.form.on("Email Request", {
         frm.disable_save();
         frm.trigger("pending_intro_messages");
 
-        if (frappe.user.has_role("IT Store Manager")) {
+        if (frappe.user.has_role("Email Creator")) {
           frm.trigger("read_only_from_it_store_manager");
 
           if (frm.doc.request_type == "New") {
@@ -69,7 +69,7 @@ frappe.ui.form.on("Email Request", {
                   frm.set_df_property(
                     "otp",
                     "description",
-                    "<b style='color:red;'>Please fill OTP</b>"
+                    "<b style='color:red;'>Please fill Password</b>"
                   );
                 } else if (!frm.doc.email) {
                   frm.set_df_property(
@@ -81,7 +81,7 @@ frappe.ui.form.on("Email Request", {
                   frm.set_df_property(
                     "otp",
                     "description",
-                    "<b style='color:red;'>Please fill OTP</b>"
+                    "<b style='color:red;'>Please fill Password</b>"
                   );
                 } else {
                   frappe.confirm(
@@ -220,7 +220,7 @@ frappe.ui.form.on("Email Request", {
     const employee_id = frm.doc.employee_id || null;
     const branch = frm.doc.branch || null;
     const department = frm.doc.department || null;
-    const employee_name = frm.doc.employee_name || null;
+    const first_name = frm.doc.first_name || null;
     const region = frm.doc.region || null;
     const division = frm.doc.division || null;
     const designation = frm.doc.designation || null;
@@ -261,7 +261,7 @@ frappe.ui.form.on("Email Request", {
             <div style="margin-top: 20px;">${employee_id}</div>
         </div>
     `;
-    if (employee_name)
+    if (first_name)
       content += `
         <div style="
             border: 1px solid gray;
@@ -286,7 +286,7 @@ frappe.ui.form.on("Email Request", {
                 border-radius: 4px;
                 z-index: 1;
             ">Employee Name:</div>
-            <div style="margin-top: 20px;">${employee_name}</div>
+            <div style="margin-top: 20px;">${first_name}</div>
         </div>
     `;
     if (designation)
@@ -675,6 +675,11 @@ frappe.ui.form.on("Email Request", {
   },
 
   section_colors: function (frm) {
+    // Very light blue gradient for email details section
+    frm.fields_dict["approval_html_section"].wrapper.css(
+      "background",
+      "linear-gradient(to right, #e0f7fa, #b2ebf2)" // Very light blue gradient
+    );
     // Extremely light blue gradient for approval_html_section
     frm.fields_dict["approval_html_section"].wrapper.css(
       "background",
@@ -684,7 +689,7 @@ frappe.ui.form.on("Email Request", {
     // Slightly darker blue gradient for the third section
     frm.fields_dict["section_break_mm0dh"].wrapper.css(
       "background",
-      "linear-gradient(to right, #f0faff, #e6f7ff)" // Most lightest blue gradient
+      "linear-gradient(to right, #cce7ff, #a3d9ff)" // Slightly lighter blue gradient
     );
 
     // Very light blue gradient for email details section
@@ -723,29 +728,29 @@ frappe.ui.form.on("Email Request", {
     }
 
     // Generate HTML for card view
-    let html = `
-        <div style="
-            background-color: transparent; 
-            width: 100%; /* Full width */
-            text-align: left;
-            box-sizing: border-box; /* Ensure padding and border are included in width */
-        ">
-            <h4 style="margin: 0 0 8px 0; font-size: var(--text-base);font-weight:Bold  ">Approval Tracker</h4>
-            <div style="
-                border: 1px solid #ddd; 
-                border-radius: 4px; 
-                padding: 8px; 
-                display: flex; 
-                align-items: center;
-            ">
-                <img src='/files/user.png' style="width: 50px; height: 50px; border-radius: 50%; margin-right: 16px;"></img>
-                <div>
-                    <p style="margin: 0; font-weight: bold;">${first_last_name}</p>
-                    <p style="margin: 0; color: ${status_color};">${status}</p>
-                </div>
-            </div>
-            <hr>
+    let html = `<div style="
+    background: linear-gradient(to right, #e0f7fa, #b2ebf2); 
+    width: 100%; /* Full width */
+    text-align: left;
+    box-sizing: border-box; /* Ensure padding and border are included in width */
+">
+    <h4 style="margin: 0 0 8px 0; font-size: var(--text-base); font-weight: bold;">Approval Tracker</h4>
+    <div style="
+        border: 1px solid #ddd; 
+        border-radius: 4px; 
+        padding: 8px; 
+        display: flex; 
+        align-items: center;
+    ">
+        <img src="/files/user.png" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 16px;">
+        <div>
+            <p style="margin: 0; font-weight: bold;">${first_last_name}</p>
+            <p style="margin: 0; color: ${status_color};">${status}</p>
         </div>
+    </div>
+    <hr>
+</div>
+
     `;
 
     // Set the HTML as Summary HTML
@@ -798,7 +803,7 @@ frappe.ui.form.on("Email Request", {
         "green"
       );
     }
-    if (frappe.user.has_role("IT Store Manager")) {
+    if (frappe.user.has_role("Email Creator")) {
       let request_type = frm.doc.request_type;
       let action = "";
 
@@ -809,7 +814,7 @@ frappe.ui.form.on("Email Request", {
       }
 
       frm.set_intro(
-        `Please ${action} an Email Account for - <b><font color='black'>${frm.doc.employee_name}</font></b>`,
+        `Please ${action} an Email Account for - <b><font color='black'>${frm.doc.first_name}</font></b>`,
         "red"
       );
     }
@@ -833,7 +838,7 @@ frappe.ui.form.on("Email Request", {
         "<b>Email Account</b> - " +
           frm.doc.email +
           " <b>for</b> " +
-          frm.doc.employee_name +
+          frm.doc.first_name +
           " <b>" +
           action +
           " Successfully</b>",
@@ -841,7 +846,7 @@ frappe.ui.form.on("Email Request", {
       );
     }
 
-    if (frappe.user.has_role("IT Store Manager")) {
+    if (frappe.user.has_role("Email Creator")) {
       let request_type = frm.doc.request_type;
       let action = "";
       let color = "";
@@ -855,7 +860,7 @@ frappe.ui.form.on("Email Request", {
       }
 
       frm.set_intro(
-        `Email Account - <b>${frm.doc.email}</b> for <b>${frm.doc.employee_name}</b> ${action} successfully.`,
+        `Email Account - <b>${frm.doc.email}</b> for <b>${frm.doc.first_name}</b> ${action} successfully.`,
         color
       );
     }
@@ -872,7 +877,7 @@ frappe.ui.form.on("Email Request", {
       );
     }
 
-    if (frappe.user.has_role("IT Store Manager")) {
+    if (frappe.user.has_role("Email Creator")) {
       if (frappe.user.has_role("HR Support Executive")) {
         frm.set_intro(
           "<b><font color='black'>Correction Remark from IT Department:</font></b><br>" +
@@ -947,7 +952,7 @@ frappe.ui.form.on("Email Request", {
       }
     });
 
-    frm.fields_dict["employee_name"].$input.on("keydown", function (event) {
+    frm.fields_dict["first_name"].$input.on("keydown", function (event) {
       var key = event.key;
 
       // Check if the key pressed is a special character or a numeric value
@@ -956,13 +961,13 @@ frappe.ui.form.on("Email Request", {
         event.preventDefault();
         // Set a description to inform the user
         frm.set_df_property(
-          "employee_name",
+          "first_name",
           "description",
           "<b style='color:red;'>Special characters and numeric values are not allowed</b>"
         );
       } else {
         // If input is valid, remove the description
-        frm.set_df_property("employee_name", "description", "");
+        frm.set_df_property("first_name", "description", "");
       }
     });
 
@@ -1083,8 +1088,10 @@ frappe.ui.form.on("Email Request", {
       frm.set_df_property("email_category", "read_only", 1);
       frm.set_df_property("delete_reason", "read_only", 1);
       frm.set_df_property("email", "read_only", 0);
+      frm.set_df_property("otp", "read_only", 0);
       frm.set_df_property("employee_id", "read_only", 1);
-      frm.set_df_property("employee_name", "read_only", 1);
+      frm.set_df_property("first_name", "read_only", 1);
+      frm.set_df_property("last_name", "read_only", 1);
       frm.set_df_property("gender", "read_only", 1);
       frm.set_df_property("phone", "read_only", 1);
       frm.set_df_property("zone", "read_only", 1);
@@ -1094,12 +1101,14 @@ frappe.ui.form.on("Email Request", {
       frm.set_df_property("designation", "read_only", 1);
       frm.set_df_property("division", "read_only", 1);
       frm.set_df_property("department", "read_only", 1);
+      frm.set_df_property("request_type", "read_only", 1);
     } else if (frm.doc.request_type == "Delete") {
       frm.set_df_property("email_category", "read_only", 1);
       frm.set_df_property("delete_reason", "read_only", 1);
       frm.set_df_property("email", "read_only", 1);
       frm.set_df_property("employee_id", "read_only", 1);
-      frm.set_df_property("employee_name", "read_only", 1);
+      frm.set_df_property("first_name", "read_only", 1);
+      frm.set_df_property("last_name", "read_only", 1);
     }
   },
   read_only_from_hr: function (frm) {

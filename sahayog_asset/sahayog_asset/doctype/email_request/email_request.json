@@ -31,6 +31,8 @@
   "department",
   "column_break_gwykf",
   "employee_name",
+  "first_name",
+  "last_name",
   "region",
   "division",
   "column_break_6k7pj",
@@ -51,7 +53,8 @@
   "level_1_status",
   "level_1_remark",
   "creator_details_section",
-  "creator_name"
+  "creator_name",
+  "mode"
  ],
  "fields": [
   {
@@ -62,19 +65,18 @@
    "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
   },
   {
-   "depends_on": "eval:doc.request_type==\"New\"",
    "fieldname": "otp",
    "fieldtype": "Data",
-   "label": "Email OTP",
-   "mandatory_depends_on": "eval:frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\" && doc.request_type==\"New\" ",
-   "read_only_depends_on": "eval:!frappe.user.has_role('IT Store Manager')"
+   "label": "Password",
+   "mandatory_depends_on": "eval:(frappe.user.has_role('Email Creator') && doc.status==\"Pending From IT\") && doc.request_type==\"New\" || (frappe.user.has_role('HR Support Manager') && doc.request_type==\"Delete\")",
+   "read_only_depends_on": "eval:!frappe.user.has_role('Email Creator')"
   },
   {
    "depends_on": "eval:doc.request_type",
    "fieldname": "email",
    "fieldtype": "Data",
    "label": "Email ID",
-   "mandatory_depends_on": "eval:(frappe.user.has_role('IT Store Manager') && doc.status==\"Pending\") && doc.request_type==\"New\" || (frappe.user.has_role('HR Support Manager') && doc.request_type==\"Delete\")"
+   "mandatory_depends_on": "eval:(frappe.user.has_role('Email Creator') && doc.status==\"Pending From IT\") && doc.request_type==\"New\" || (frappe.user.has_role('HR Support Manager') && doc.request_type==\"Delete\")"
   },
   {
    "fieldname": "email_details_section",
@@ -94,13 +96,6 @@
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
    "label": "Details"
-  },
-  {
-   "depends_on": "eval:doc.email_category==\"Employee\"",
-   "fieldname": "employee_name",
-   "fieldtype": "Data",
-   "label": "Employee Name",
-   "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
   },
   {
    "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\" ",
@@ -203,7 +198,6 @@
    "fieldtype": "Select",
    "label": "Request Type",
    "options": "\nNew\nDelete",
-   "read_only_depends_on": "eval:doc.status !== \"Draft\" && frappe.user.has_role('IT Store Manager')",
    "reqd": 1
   },
   {
@@ -326,12 +320,39 @@
   {
    "fieldname": "column_break_acce6",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Mode",
+   "options": "\nA\nD\nM"
+  },
+  {
+   "depends_on": "eval:doc.email_category==\"Employee\"",
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
+  },
+  {
+   "depends_on": "eval:doc.email_category==\"Employee\"",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.email_category==\"Employee\"",
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-11 16:36:00.341789",
+ "modified": "2024-09-20 17:43:33.974787",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",
