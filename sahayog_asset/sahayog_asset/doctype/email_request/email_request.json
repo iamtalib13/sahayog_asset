@@ -89,7 +89,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nApproval Pending\nPending From IT\nDelivered\nDeleted\nCorrection-Required\nRejected"
+   "options": "\nDraft\nApproval Pending\nPending From IT\nDelivered\nDeleted\nCorrection-Required\nRejected"
   },
   {
    "depends_on": "eval:doc.request_type==\"New\" || doc.request_type==\"Delete\"",
@@ -352,7 +352,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-20 17:43:33.974787",
+ "modified": "2024-09-21 14:04:41.940458",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

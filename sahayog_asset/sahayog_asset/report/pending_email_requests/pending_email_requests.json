@@ -1,0 +1,95 @@
+{
+ "add_total_row": 0,
+ "columns": [
+  {
+   "fieldname": "name",
+   "fieldtype": "Data",
+   "label": "ID",
+   "width": 0
+  },
+  {
+   "fieldname": "request_type",
+   "fieldtype": "Data",
+   "label": "Request Type",
+   "width": 0
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "width": 0
+  },
+  {
+   "fieldname": "  employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID",
+   "width": 0
+  },
+  {
+   "fieldname": "  employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name",
+   "width": 0
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department",
+   "width": 0
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation",
+   "width": 0
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Data",
+   "label": "Division",
+   "width": 0
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Data",
+   "label": "Branch",
+   "width": 0
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District",
+   "width": 0
+  }
+ ],
+ "creation": "2024-09-19 15:35:10.180009",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Sahayog",
+ "modified": "2024-09-19 15:57:41.337462",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Pending Email Requests",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT \n    name,\n    request_type,\n    status,\n    employee_id, \n    employee_name,\n    department,\n    designation,\n    division,\n    branch,\n    district\nFROM \n    `tabEmail Request`\nWHERE \n    status NOT IN ('Delivered', 'Deleted', 'Rejected');\n",
+ "ref_doctype": "Email Request",
+ "report_name": "Pending Email Requests",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "CTO"
+  }
+ ]
+}

@@ -176,49 +176,149 @@ frappe.ui.form.on("Asset Request", {
   },
 
   before_save: function (frm) {
-    frm.trigger("set_approval_tracker");
     frm.trigger("zero_trim_child_table");
-    //frm.trigger("check_rank");
-    // frm.trigger("set_Approval_levels");
-
-    frm.trigger("combined_function");
+    frm.trigger("Set_Employee_Details");
+    frm.trigger("set_Approval_and_Skip_Levels");
 
     frm.set_value("first_intro", "Done");
   },
 
-  set_approval_tracker: function (frm) {
-    if (frm.doc.status == "Draft" || frm.is_new()) {
-      if (frm.doc.employee_department == "Information Technology") {
-        // frm.set_value("stage_3_emp_status", "Skip");
-        frm.set_value("stage_6_emp_status", "Skip");
+  set_Approval_and_Skip_Levels: function (frm) {
+    const pendingStatus = "Pending";
+    const approvedStatus = "Approved"; // New constant for approved status
+    let highestRank = 0;
+    let pendingLevels = [];
+    const empIds = []; // Array to collect employee IDs
+
+    // Log the approval levels and employee IDs for debugging
+    console.log("Initial Stage Statuses:", {
+      stage_1: frm.doc.stage_1_emp_status,
+      stage_2: frm.doc.stage_2_emp_status,
+      stage_3: frm.doc.stage_3_emp_status,
+      stage_4: frm.doc.stage_4_emp_status,
+      stage_5: frm.doc.stage_5_emp_status,
+    });
+
+    // Gather all pending levels
+    for (let i = 1; i <= 5; i++) {
+      // Loop until stage 5
+      const status = frm.doc[`stage_${i}_emp_status`];
+      if (status === pendingStatus) {
+        pendingLevels.push(i);
+      }
+      // Collect employee IDs
+      empIds.push(frm.doc[`stage_${i}_emp_id`]);
+    }
+
+    // Check ranks from child table if present
+    if (frm.doc.asset && frm.doc.asset.length > 0) {
+      for (let row of frm.doc.asset) {
+        if (row.approval_rank && !isNaN(row.approval_rank)) {
+          let currentRank = parseInt(row.approval_rank, 10);
+          if (currentRank > highestRank) {
+            highestRank = currentRank;
+          }
+        }
+      }
+    }
+
+    console.log("Pending Levels:", pendingLevels.join(", "));
+    console.log("Highest Approval Rank from Child Table:", highestRank);
+
+    // Compare employee IDs across stages and skip lower stages if a match is found
+    for (let i = 1; i <= 5; i++) {
+      // Loop until stage 5
+      const currentEmpId = frm.doc[`stage_${i}_emp_id`];
+
+      // Check against higher stages
+      for (let j = i + 1; j <= 5; j++) {
+        // Loop until stage 5
+        const higherEmpId = frm.doc[`stage_${j}_emp_id`];
+        if (currentEmpId && currentEmpId === higherEmpId) {
+          // If a match is found, skip the lower stage
+          frm.set_value(`stage_${i}_emp_status`, "Skip");
+          console.log(
+            `Stage ${i} skipped due to employee ID match with stage ${j}`
+          );
+          break; // Exit the inner loop if a match is found
+        }
+      }
+    }
+
+    // Determine the highest pending level or rank to consider for approval levels
+    let highestPendingLevel =
+      pendingLevels.length > 0 ? Math.min(...pendingLevels) : 0;
+    if (
+      highestRank > 0 &&
+      (highestRank > highestPendingLevel || highestPendingLevel === 0)
+    ) {
+      highestPendingLevel = highestRank;
+    }
+
+    console.log("Highest Pending Level to act upon:", highestPendingLevel);
+
+    // Ensure stages up to the highest approval rank are set to "Pending"
+    for (let i = 1; i <= 5; i++) {
+      // Loop until stage 5
+      const currentStatus = frm.doc[`stage_${i}_emp_status`];
+
+      // Check if any status is already Approved
+      if (currentStatus === approvedStatus) {
+        console.log(`Stage ${i} is already Approved, skipping update.`);
+        continue; // Skip this stage if it's already Approved
       }
 
-      if (frm.doc.stage_1_emp_id == frm.doc.stage_5_emp_id) {
+      if (i <= highestPendingLevel) {
+        if (currentStatus !== pendingStatus) {
+          frm.set_value(`stage_${i}_emp_status`, pendingStatus);
+          console.log(`Stage ${i} marked as Pending`);
+        }
+      } else if (currentStatus !== "Skip") {
+        frm.set_value(`stage_${i}_emp_status`, "Skip");
+        console.log(`Stage ${i} marked as Skip`);
+      }
+    }
+
+    // Check for duplicate employee IDs
+    const empIdCounts = {};
+    empIds.forEach((id) => {
+      if (id) {
+        // Only consider non-empty IDs
+        empIdCounts[id] = (empIdCounts[id] || 0) + 1;
+      }
+    });
+    if (frm.is_new() || !frm.is_new()) {
+      // Skip lower stages for duplicates
+      if (frm.doc.employee_department === "Information Technology") {
+        frm.set_value("stage_5_emp_status", "Skip"); // Adjusted to match stages 1-5
+      }
+      // Duplicate checks and status updates
+      if (frm.doc.stage_1_emp_id === frm.doc.stage_5_emp_id) {
         frm.set_value("stage_1_emp_status", "Skip");
         frm.set_value("stage_2_emp_status", "Skip");
         frm.set_value("stage_3_emp_status", "Skip");
         frm.set_value("stage_4_emp_status", "Skip");
         frm.set_value("stage_5_emp_status", "Pending");
-      } else if (frm.doc.stage_2_emp_id == frm.doc.stage_5_emp_id) {
+      } else if (frm.doc.stage_2_emp_id === frm.doc.stage_5_emp_id) {
         frm.set_value("stage_2_emp_status", "Skip");
         frm.set_value("stage_3_emp_status", "Skip");
         frm.set_value("stage_4_emp_status", "Skip");
-      } else if (frm.doc.stage_3_emp_id == frm.doc.stage_5_emp_id) {
+      } else if (frm.doc.stage_3_emp_id === frm.doc.stage_5_emp_id) {
         frm.set_value("stage_3_emp_status", "Skip");
         frm.set_value("stage_4_emp_status", "Skip");
-      } else if (frm.doc.stage_4_emp_id == frm.doc.stage_5_emp_id) {
+      } else if (frm.doc.stage_4_emp_id === frm.doc.stage_5_emp_id) {
         frm.set_value("stage_4_emp_status", "Skip");
-      } else if (frm.doc.stage_1_emp_id == frm.doc.stage_4_emp_id) {
+      } else if (frm.doc.stage_1_emp_id === frm.doc.stage_4_emp_id) {
         frm.set_value("stage_1_emp_status", "Skip");
         frm.set_value("stage_2_emp_status", "Skip");
         frm.set_value("stage_3_emp_status", "Skip");
-      } else if (frm.doc.stage_1_emp_id == frm.doc.stage_3_emp_id) {
+      } else if (frm.doc.stage_1_emp_id === frm.doc.stage_3_emp_id) {
         frm.set_value("stage_1_emp_status", "Skip");
         frm.set_value("stage_2_emp_status", "Skip");
-      } else if (frm.doc.stage_1_emp_id == frm.doc.stage_2_emp_id) {
+      } else if (frm.doc.stage_1_emp_id === frm.doc.stage_2_emp_id) {
         frm.set_value("stage_1_emp_status", "Skip");
         // Code to handle the case where stage_1_emp_id is equal to stage_2_emp_id
-      } else if (frm.doc.stage_2_emp_id == frm.doc.stage_4_emp_id) {
+      } else if (frm.doc.stage_2_emp_id === frm.doc.stage_4_emp_id) {
         frm.set_value("stage_2_emp_status", "Skip");
         frm.set_value("stage_3_emp_status", "Skip");
         frm.set_value("stage_4_emp_status", "Pending");
@@ -226,84 +326,13 @@ frappe.ui.form.on("Asset Request", {
         // No match, do nothing
       }
     }
-  },
-
-  combined_function: function (frm) {
-    const pendingStatus = "Pending";
-    let highest_rank_from_asset = 0; // Initialize to 0 as ranks are between 1 to 4
-    let pendingLevels = [];
-
-    // Step 1: Determine the highest approval rank from the asset child table
-    for (let row of frm.doc.asset) {
-      if (row.approval_rank && !isNaN(row.approval_rank)) {
-        let current_rank = parseInt(row.approval_rank, 10);
-        if (current_rank > highest_rank_from_asset) {
-          highest_rank_from_asset = current_rank;
-        }
-      }
-    }
-
-    // Log the highest approval rank for debugging
-    console.log(
-      "Highest Approval Rank from Asset Table:",
-      highest_rank_from_asset
-    );
-
-    // Step 2: Determine the pending levels based on the form status fields
-    for (let i = 1; i <= 5; i++) {
-      const status = frm.doc[`stage_${i}_emp_status`];
-      if (status === pendingStatus) {
-        pendingLevels.push(i);
-      }
-    }
-
-    if (pendingLevels.length > 0) {
-      console.log("Pending Levels: ", pendingLevels.join(", "));
-    } else {
-      console.log("No pending levels found.");
-    }
-
-    // Step 3: Determine the higher level to be updated
-    let higherLevel;
-    if (pendingLevels.includes(highest_rank_from_asset)) {
-      higherLevel = highest_rank_from_asset;
-      console.log(
-        `Highest Approval Rank ${highest_rank_from_asset} is present in pending levels.`
-      );
-    } else {
-      higherLevel = pendingLevels.find(
-        (level) => level > highest_rank_from_asset
-      );
-      if (higherLevel !== undefined) {
-        console.log(`Immediate higher pending level found: ${higherLevel}`);
-      } else {
-        console.log(
-          `Highest Approval Rank ${highest_rank_from_asset} is not present in any of the pending levels.`
-        );
-      }
-    }
-
-    console.log("Higher Level is - ", higherLevel);
-
-    // Step 4: Update stages based on the higher level
-    if (higherLevel === 1) {
-      console.log("Stages 2/3/4 are skipped");
-      frm.set_value("stage_2_emp_status", "Skip");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (higherLevel === 2) {
-      console.log("Stages 3/4 are skipped");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (higherLevel === 3) {
-      console.log("Stage 4 is skipped");
-      frm.set_value("stage_4_emp_status", "Skip");
-    }
-
-    // Set and refresh the field for highest approval level
-    frm.set_value("highest_approval_level", highest_rank_from_asset);
+    // Set and refresh the highest approval level
+    frm.set_value("highest_approval_level", highestPendingLevel);
     frm.refresh_field("highest_approval_level");
+
+    console.log("Updated Highest Approval Level:", highestPendingLevel);
   },
+
   rejection_intro: function (frm) {
     let stages = [
       {
@@ -406,7 +435,10 @@ frappe.ui.form.on("Asset Request", {
     // }
     // frm.trigger("set_Approval_levels");
     // frm.trigger("check_rank");
-    if (frappe.user.has_role("System Manager")) {
+    if (
+      frappe.user.has_role("System Manager") ||
+      frappe.user.has_role("IT Support Executive")
+    ) {
       frm.enable_save();
 
       frm.add_custom_button(__("Employee Correct"), function () {
@@ -417,7 +449,9 @@ frappe.ui.form.on("Asset Request", {
 
         frm.set_value("employee_id", null);
         frm.set_value("employee_id", employee_id);
+
         frm.trigger("Set_Employee_Details");
+        frm.trigger("set_Approval_and_Skip_Levels");
         frm.save();
       });
     }
@@ -432,7 +466,7 @@ frappe.ui.form.on("Asset Request", {
 
     // END Apply dynamic CSS styles using querySelector
 
-    if (frm.doc.status === "Draft") {
+    if (frm.doc.status === "") {
       if (!frm.is_new() && frm.doc.first_intro == "Done") {
         frm.set_intro("Please Verify and Send for Approval", "blue");
         frm.set_df_property("asset", "read_only", 0);
@@ -441,7 +475,8 @@ frappe.ui.form.on("Asset Request", {
       frm.doc.status === "Pending" ||
       frm.doc.status === "Pending From Purchase" ||
       frm.doc.status === "Pending From Store Manager" ||
-      frm.doc.status === "Partially Dispatched"
+      frm.doc.status === "Partially Dispatched" ||
+      frm.doc.status === "Draft"
     ) {
       {
         let introMessage = "";
@@ -803,16 +838,11 @@ frappe.ui.form.on("Asset Request", {
             console.log("Executive Matched");
           }
           //<Send for Approval , this button is only for Asset Requester Owner>
-          if (!frm.doc.asset || frm.doc.asset.length === 0) {
-            frappe.throw({
-              title: __("Please Add Asset Item"),
-              indicator: "red",
-              message: __("Please Add At Least One Asset Item"),
-            });
-          } else {
-            console.log("ready to send");
-            //frm.trigger("check_rank");
 
+          console.log("ready to send");
+          //frm.trigger("check_rank");
+          if (frm.doc.asset && frm.doc.asset.length > 0) {
+            console.log("asset table is not empty");
             frm.add_custom_button(__("Send for Approval"), function () {
               // Add your button's functionality here
               let rm_stage;
@@ -855,11 +885,11 @@ frappe.ui.form.on("Asset Request", {
 
                 if (rm_stage_status == "Pending") {
                   if (!frm.doc.asset || frm.doc.asset.length === 0) {
-                    // frappe.throw({
-                    //   title: __("Please Add Asset Item"),
-                    //   indicator: "red",
-                    //   message: __("Please Add At Least One Asset Item"),
-                    // });
+                    frappe.throw({
+                      title: __("Please Add Asset Item"),
+                      indicator: "red",
+                      message: __("Please Add At Least One Asset Item"),
+                    });
                   } else {
                     frappe.confirm(
                       "<i>Do you want to send for Approval?</i>",
@@ -892,6 +922,8 @@ frappe.ui.form.on("Asset Request", {
                               frm.set_value("status", "Pending");
                               frm.set_value("asset_lock", "True");
                             }
+                            frm.trigger("Set_Employee_Details");
+                            frm.trigger("set_Approval_and_Skip_Levels");
                             frm.save();
                           },
                         });
@@ -909,7 +941,6 @@ frappe.ui.form.on("Asset Request", {
               }
             });
           }
-
           frm.change_custom_button_type("Send for Approval", null, "primary");
           //</Send for Approval , this button is only for Asset Requester Owner>
         } else if (frm.doc.status == "Dispatched") {
@@ -2220,8 +2251,12 @@ frappe.ui.form.on("Asset Request", {
     let p2 = "40@sahayog.com";
     let p3 = "2481@sahayog.com";
     let p4 = "2946@sahayog.com";
-    if (frappe.user.has_role("Purchase Department")) {
+    if (
+      frappe.user.has_role("Purchase Department") &&
+      !frappe.user.has_role("System Manager")
+    ) {
       console.log("Purchase department logged in");
+
       if (frm.doc.status == "Pending From Purchase") {
         console.log("Pending from purchase");
         frm.set_df_property("asset", "read_only", 0);
@@ -2293,143 +2328,143 @@ frappe.ui.form.on("Asset Request", {
 
     frm.trigger("hide_childtable_Edit_Setting");
   },
-  async populate_progress_html(frm) {
-    // Dynamically generate the HTML content using JavaScript
-    let stages = [];
-    for (let i = 1; i <= 6; i++) {
-      const status = frm.doc[`stage_${i}_emp_status`];
-      const data = frm.doc[`stage_${i}_data`] || ""; // Fetch any additional data you need
-      if (status !== "Skip") {
-        // Include only stages that are not skipped
-        stages.push({ originalStep: i, status: status, data: data });
-      }
-    }
+  // async populate_progress_html(frm) {
+  //   // Dynamically generate the HTML content using JavaScript
+  //   let stages = [];
+  //   for (let i = 1; i <= 6; i++) {
+  //     const status = frm.doc[`stage_${i}_emp_status`];
+  //     const data = frm.doc[`stage_${i}_data`] || ""; // Fetch any additional data you need
+  //     if (status !== "Skip") {
+  //       // Include only stages that are not skipped
+  //       stages.push({ originalStep: i, status: status, data: data });
+  //     }
+  //   }
 
-    // Renumber stages serially
-    stages = stages.map((stage, index) => ({
-      ...stage,
-      step: index + 1,
-    }));
+  //   // Renumber stages serially
+  //   stages = stages.map((stage, index) => ({
+  //     ...stage,
+  //     step: index + 1,
+  //   }));
 
-    // Build the HTML content
-    let html = `
-        <h2>Progress</h2>
-        <div class="progress-container">
-            <div class="progress-bar-container progress-bar-success">
-                <div class="progress-bar-bar"></div>
-            </div>
-            <ul class="custom-steps">
-                ${stages
-                  .map(
-                    (stage) => `
-                        <li class="${
-                          stage.step === 1 ? "is-active" : ""
-                        }" data-step="${stage.step}">
-                            <div class="step-circle">${stage.step}</div>
-                            <div class="step-info">
-                                <div class="step-status">${stage.status}</div>
-                                <div class="step-data">${stage.data}</div>
-                            </div>
-                        </li>
-                    `
-                  )
-                  .join("")}
-            </ul>
-        </div>
-        <br />
-        <button onClick="nextStep()">Next Step</button>
-        <script>
-            let currentStep = 1;
+  //   // Build the HTML content
+  //   let html = `
+  //       <h2>Progress</h2>
+  //       <div class="progress-container">
+  //           <div class="progress-bar-container progress-bar-success">
+  //               <div class="progress-bar-bar"></div>
+  //           </div>
+  //           <ul class="custom-steps">
+  //               ${stages
+  //                 .map(
+  //                   (stage) => `
+  //                       <li class="${
+  //                         stage.step === 1 ? "is-active" : ""
+  //                       }" data-step="${stage.step}">
+  //                           <div class="step-circle">${stage.step}</div>
+  //                           <div class="step-info">
+  //                               <div class="step-status">${stage.status}</div>
+  //                               <div class="step-data">${stage.data}</div>
+  //                           </div>
+  //                       </li>
+  //                   `
+  //                 )
+  //                 .join("")}
+  //           </ul>
+  //       </div>
+  //       <br />
+  //       <button onClick="nextStep()">Next Step</button>
+  //       <script>
+  //           let currentStep = 1;
 
-            function updateProgress(step) {
-                const steps = document.querySelectorAll('.custom-steps > li');
-                const progressBarBar = document.querySelector('.progress-bar-bar');
+  //           function updateProgress(step) {
+  //               const steps = document.querySelectorAll('.custom-steps > li');
+  //               const progressBarBar = document.querySelector('.progress-bar-bar');
 
-                steps.forEach((li, index) => {
-                    li.classList.toggle('is-active', index + 1 === step);
-                });
+  //               steps.forEach((li, index) => {
+  //                   li.classList.toggle('is-active', index + 1 === step);
+  //               });
 
-                const stepCount = steps.length;
-                const progress = ((step - 1) / (stepCount - 1)) * 100;
-                progressBarBar.style.width = progress + '%';
-            }
+  //               const stepCount = steps.length;
+  //               const progress = ((step - 1) / (stepCount - 1)) * 100;
+  //               progressBarBar.style.width = progress + '%';
+  //           }
 
-            function nextStep() {
-                const steps = document.querySelectorAll('.custom-steps > li');
-                if (currentStep < steps.length) {
-                    currentStep++;
-                    updateProgress(currentStep);
-                }
-            }
+  //           function nextStep() {
+  //               const steps = document.querySelectorAll('.custom-steps > li');
+  //               if (currentStep < steps.length) {
+  //                   currentStep++;
+  //                   updateProgress(currentStep);
+  //               }
+  //           }
 
-            // Initialize the progress bar based on currentStep
-            updateProgress(currentStep);
-        </script>
-        <style>
-            .progress-container {
-                position: relative;
-                width: 100%;
-            }
-            .progress-bar-container {
-                width: 100%;
-                background-color: #e0e0e0;
-                height: 10px;
-                margin-top: 10px;
-                position: absolute;
-                top: 0%;
-                left: 0;
-                z-index: 1;
-            }
-            .progress-bar-bar {
-                height: 100%;
-                background-color: green;
-                width: 0%;
-                transition: width 0.3s;
-            }
-            .custom-steps {
-                list-style-type: none;
-                padding: 0;
-                display: flex;
-                justify-content: space-between;
-                position: relative;
-                z-index: 2;
-            }
-            .custom-steps > li {
-                position: relative;
-                text-align: center;
-            }
-            .step-circle {
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                background-color: gray;
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto;
-                font-weight: bold;
-                z-index: 3; /* Ensure it’s above the progress bar */
-                position: relative;
-            }
-            .custom-steps > li.is-active .step-circle {
-                background-color: green;
-            }
-            .step-info {
-                margin-top: 5px;
-            }
-            .step-status {
-                font-weight: bold;
-            }
-            .step-data {
-                color: #666;
-            }
-        </style>
-    `;
+  //           // Initialize the progress bar based on currentStep
+  //           updateProgress(currentStep);
+  //       </script>
+  //       <style>
+  //           .progress-container {
+  //               position: relative;
+  //               width: 100%;
+  //           }
+  //           .progress-bar-container {
+  //               width: 100%;
+  //               background-color: #e0e0e0;
+  //               height: 10px;
+  //               margin-top: 10px;
+  //               position: absolute;
+  //               top: 0%;
+  //               left: 0;
+  //               z-index: 1;
+  //           }
+  //           .progress-bar-bar {
+  //               height: 100%;
+  //               background-color: green;
+  //               width: 0%;
+  //               transition: width 0.3s;
+  //           }
+  //           .custom-steps {
+  //               list-style-type: none;
+  //               padding: 0;
+  //               display: flex;
+  //               justify-content: space-between;
+  //               position: relative;
+  //               z-index: 2;
+  //           }
+  //           .custom-steps > li {
+  //               position: relative;
+  //               text-align: center;
+  //           }
+  //           .step-circle {
+  //               width: 30px;
+  //               height: 30px;
+  //               border-radius: 50%;
+  //               background-color: gray;
+  //               color: white;
+  //               display: flex;
+  //               align-items: center;
+  //               justify-content: center;
+  //               margin: 0 auto;
+  //               font-weight: bold;
+  //               z-index: 3; /* Ensure it’s above the progress bar */
+  //               position: relative;
+  //           }
+  //           .custom-steps > li.is-active .step-circle {
+  //               background-color: green;
+  //           }
+  //           .step-info {
+  //               margin-top: 5px;
+  //           }
+  //           .step-status {
+  //               font-weight: bold;
+  //           }
+  //           .step-data {
+  //               color: #666;
+  //           }
+  //       </style>
+  //   `;
 
-    // Set the generated HTML as the Summary HTML in Frappe
-    frm.set_df_property("multistep_progress", "options", html);
-  },
+  //   // Set the generated HTML as the Summary HTML in Frappe
+  //   frm.set_df_property("multistep_progress", "options", html);
+  // },
   temporary_dispatch: function (frm) {
     frm.trigger("set_temporary_dispatch");
   },
@@ -2615,7 +2650,7 @@ frappe.ui.form.on("Asset Request", {
           console.log("setting reporting");
 
           //<Email Setup>
-          if (frm.is_new() || frm.doc.status == "Draft") {
+          if (frm.is_new() || !frm.is_new()) {
             if (frm.doc.division === "Microfinance") {
               if (frm.doc.region === "Region-1") {
                 frm.set_value("stage_2_emp_id", "3261@sahayog.com");
@@ -2928,99 +2963,6 @@ frappe.ui.form.on("Asset Request", {
         }
       },
     });
-  },
-
-  set_Approval_levels: function (frm) {
-    const highest_approval_level = frm.doc.highest_approval_level;
-    const pendingStatus = "Pending";
-    let higherLevel;
-
-    console.log("Highest Level want - ", highest_approval_level);
-
-    let pendingLevels = [];
-
-    for (let i = 1; i <= 5; i++) {
-      const status = frm.doc[`stage_${i}_emp_status`];
-      if (status === pendingStatus) {
-        pendingLevels.push(i);
-      }
-    }
-
-    if (pendingLevels.length > 0) {
-      console.log("Pending Levels: ", pendingLevels.join(", "));
-    } else {
-      console.log("No pending levels found.");
-    }
-
-    if (pendingLevels.includes(parseInt(highest_approval_level))) {
-      higherLevel = highest_approval_level;
-      console.log(`Highest Level ${highest_approval_level} is present.`);
-    } else {
-      // Find the immediate higher pending level
-      higherLevel = pendingLevels.find(
-        (level) => level > highest_approval_level
-      );
-      if (higherLevel !== undefined) {
-        console.log(`Immediate higher pending level found: ${higherLevel}`);
-      } else {
-        console.log(
-          `Highest Level ${highest_approval_level} is not present in any of the pending levels.`
-        );
-      }
-    }
-
-    console.log("Higher Level is - ", higherLevel);
-
-    if (higherLevel == 1) {
-      console.log("2/3/4 are skip");
-      frm.set_value("stage_2_emp_status", "Skip");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (higherLevel == 2) {
-      console.log("3/4 are skip");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (higherLevel == 3) {
-      frm.set_value("stage_4_emp_status", "Skip");
-      console.log("4 are skip");
-    }
-    //frm.save();
-  },
-  check_rank: function (frm) {
-    let highest_rank = 0; // Initialize to 0 as ranks are between 1 to 4
-
-    // Iterate over each row in the asset child table
-    for (let row of frm.doc.asset) {
-      // Ensure that approval_rank is a number and greater than the current highest_rank
-      if (row.approval_rank && !isNaN(row.approval_rank)) {
-        let current_rank = parseInt(row.approval_rank, 10);
-        if (current_rank > highest_rank) {
-          highest_rank = current_rank;
-        }
-      }
-    }
-
-    // Log the highest rank for debugging
-    console.log("Highest Approval Rank:", highest_rank);
-
-    // Update stages based on the highest rank
-    if (highest_rank == 1) {
-      console.log("2/3/4 are skip");
-      frm.set_value("stage_2_emp_status", "Skip");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (highest_rank == 2) {
-      console.log("3/4 are skip");
-      frm.set_value("stage_3_emp_status", "Skip");
-      frm.set_value("stage_4_emp_status", "Skip");
-    } else if (highest_rank == 3) {
-      frm.set_value("stage_4_emp_status", "Skip");
-      console.log("4 are skip");
-    }
-
-    // Set and refresh the field for highest approval level
-    frm.set_value("highest_approval_level", highest_rank);
-    frm.refresh_field("highest_approval_level");
   },
 
   select_department: function (frm) {

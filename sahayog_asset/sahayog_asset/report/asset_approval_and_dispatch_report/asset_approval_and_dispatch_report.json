@@ -84,7 +84,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Sahayog",
- "modified": "2023-09-19 13:51:09.323660",
+ "modified": "2024-09-19 15:24:04.195411",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Approval and Dispatch Report",
@@ -106,6 +106,9 @@
   },
   {
    "role": "Analytics"
+  },
+  {
+   "role": "CTO"
   }
  ]
 }

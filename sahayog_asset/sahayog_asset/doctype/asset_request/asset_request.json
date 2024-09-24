@@ -294,6 +294,7 @@
    "options": "Asset List"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "approval_details_tab",
    "fieldtype": "Tab Break",
    "label": "Approval Details"
@@ -432,11 +433,13 @@
    "label": "Stage 6"
   },
   {
+   "default": "1299@sahayog.com",
    "fieldname": "stage_6_emp_id",
    "fieldtype": "Data",
    "label": "CTO ID"
   },
   {
+   "default": "Kamlesh Waghmare",
    "fieldname": "stage_6_emp_name",
    "fieldtype": "Data",
    "label": "Name"
@@ -721,6 +724,7 @@
    "label": "Email"
   },
   {
+   "default": "kamlesh.w@sahayogmultistate.com",
    "fieldname": "stage_6_emp_email",
    "fieldtype": "Data",
    "label": "Email"
@@ -881,9 +885,9 @@
    "label": "Highest Approval Level"
   },
   {
+   "depends_on": "eval:frappe.user.has_role('System Manager')  ",
    "fieldname": "asset_item_approval_level_section",
    "fieldtype": "Section Break",
-   "hidden": 1,
    "label": "Asset Item Approval Level"
   },
   {
@@ -943,7 +947,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-22 14:52:00.203881",
+ "modified": "2024-09-24 15:31:26.564852",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

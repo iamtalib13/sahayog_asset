@@ -1,13 +1,43 @@
 import frappe
 from frappe.model.document import Document
-import json
 
 class AssetRequest(Document):
+    def before_insert(self):
+        self.set_employees_on_stages()
+
+    def set_employees_on_stages(self):
+        # Get employee record based on the employee_id in AssetRequest
+        employee = frappe.get_doc("Employee", self.employee_id)
+        
+        # Retrieve the 'reports_to' field from the employee record
+        reports_to = employee.reports_to
+        
+        if reports_to:
+            # Fetch the reporting employee details based on 'reports_to'
+            reporting_emp = frappe.get_doc("Employee", reports_to)
+            
+            # Retrieve employee_name, company_email, and designation from the reporting employee
+            reporting_emp_name = reporting_emp.employee_name
+            reporting_emp_email = reporting_emp.company_email
+            reporting_emp_designation = reporting_emp.designation
+            
+            # Create the user_id in the format reports_to@sahayog.com
+            reporting_user_id = f"{reports_to}@sahayog.com"
+
+            # Set values to the fields in the AssetRequest document
+            self.stage_1_emp_name = reporting_emp_name
+            self.stage_1_emp_id = reporting_user_id
+            self.stage_1_emp_email = reporting_emp_email
+            self.rp_designation = reporting_emp_designation
+
+
+
     def validate(self):
-        pass
-        # Check if the child table is empty
-        # if not self.asset:
-        #     frappe.throw("Asset table is empty")
+        # Check if the status is not "Draft"
+        if self.status != "Draft":
+            # Ensure that the asset table is not empty
+            if not self.asset or len(self.asset) == 0:
+                frappe.throw("Asset table is empty")
 
     def on_change(self):
         # Check if status is "Dispatched"
