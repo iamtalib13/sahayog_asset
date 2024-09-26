@@ -2607,47 +2607,6 @@ frappe.ui.form.on("Asset Request", {
 
           console.log("reporting-", reports_to);
 
-          if (reports_to) {
-            frappe.db
-              .get_value("Employee", reports_to, [
-                "user_id",
-                "employee_name",
-                "company_email",
-                "designation",
-              ])
-              .then((result) => {
-                if (result && result.message) {
-                  const { user_id, employee_name, company_email, designation } =
-                    result.message;
-
-                  console.log("Reports To", user_id);
-
-                  if (user_id) {
-                    frm.set_value("stage_1_emp_id", user_id);
-                    frm.set_value("stage_1_emp_name", employee_name);
-                    frm.set_value("stage_1_emp_email", company_email);
-                    frm.set_value("rp_designation", designation);
-                  } else {
-                    console.error(
-                      "User ID not found for the reports_to employee."
-                    );
-                  }
-                } else {
-                  console.error(
-                    "No employee data found for reports_to:",
-                    reports_to
-                  );
-                }
-              })
-              .catch((error) => {
-                console.error("Error retrieving employee data:", error);
-              });
-          } else {
-            console.error("Reports To value is invalid or undefined.");
-          }
-
-          console.log("setting reporting");
-
           //<Email Setup>
           if (frm.is_new() || !frm.is_new()) {
             if (frm.doc.division === "Microfinance") {

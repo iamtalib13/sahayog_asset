@@ -2,6 +2,9 @@ import frappe
 from frappe.model.document import Document
 
 class AssetRequest(Document):
+    def before_save(self):
+        self.set_employees_on_stages()
+    
     def before_insert(self):
         self.set_employees_on_stages()
 
