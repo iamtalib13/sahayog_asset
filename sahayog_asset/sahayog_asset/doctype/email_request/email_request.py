@@ -9,13 +9,15 @@ class EmailRequest(Document):
         self.status = "Draft"
     
     def before_save(self):
+    # Check if first_name and last_name have values
+        if self.first_name and self.last_name:
         # Convert first_name and last_name to lowercase
-        self.first_name = self.first_name.lower()
-        self.last_name = self.last_name.lower()
-        
+           self.first_name = self.first_name.lower()
+           self.last_name = self.last_name.lower()
+
         # Concatenate first_name and last_name with a space
-        full_name = self.first_name + " " + self.last_name
-        self.employee_name = full_name
+           full_name = self.first_name + " " + self.last_name
+           self.employee_name = full_name
         
         # Set mode based on request_type
         request_type_value = self.request_type

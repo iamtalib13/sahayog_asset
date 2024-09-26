@@ -466,7 +466,7 @@ frappe.ui.form.on("Asset Request", {
 
     // END Apply dynamic CSS styles using querySelector
 
-    if (frm.doc.status === "") {
+    if (frm.doc.status === "Draft") {
       if (!frm.is_new() && frm.doc.first_intro == "Done") {
         frm.set_intro("Please Verify and Send for Approval", "blue");
         frm.set_df_property("asset", "read_only", 0);
@@ -475,8 +475,7 @@ frappe.ui.form.on("Asset Request", {
       frm.doc.status === "Pending" ||
       frm.doc.status === "Pending From Purchase" ||
       frm.doc.status === "Pending From Store Manager" ||
-      frm.doc.status === "Partially Dispatched" ||
-      frm.doc.status === "Draft"
+      frm.doc.status === "Partially Dispatched"
     ) {
       {
         let introMessage = "";
