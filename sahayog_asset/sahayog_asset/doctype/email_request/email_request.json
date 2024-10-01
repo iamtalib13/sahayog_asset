@@ -197,7 +197,7 @@
    "fieldname": "request_type",
    "fieldtype": "Select",
    "label": "Request Type",
-   "options": "\nNew\nDelete",
+   "options": "\nNew\nDelete\nModify",
    "reqd": 1
   },
   {
@@ -352,7 +352,7 @@
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-21 14:04:41.940458",
+ "modified": "2024-09-28 12:30:49.642287",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",

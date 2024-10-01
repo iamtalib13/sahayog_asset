@@ -19,83 +19,62 @@ def execute(filters=None):
             "name": d.name,
             "mode": d.mode,
             "employee_id": d.employee_id,
-            "first_name": d.first_name,
-            "last_name": d.last_name,
-            "designation": d.designation,
-            "department": d.department,
+            "first_name": capitalize_if_present(d.first_name),
+            "last_name": capitalize_if_present(d.last_name),
+            "designation": capitalize_if_present(d.designation),
+            "department": capitalize_if_present(d.department),
             "phone": d.phone,
-            # Create Login ID
-            "login_id": f"{d.first_name}.{d.last_name}@sahayogmultistate.com"
+            "login_id": create_login_id(d),
+            "branch": capitalize_if_present(d.branch),
+            "email_category": d.email_category,
+            "email_usage": d.email_usage  # Include email_usage in the data
         }
         data.append(row)
 
     return columns, data
 
 
+def clean_string(s):
+    """Remove spaces and convert string to lowercase."""
+    return s.replace(" ", "").lower() if s else ''
+
+
+def capitalize_if_present(s):
+    """Capitalize the first letter of the string if present."""
+    return s.capitalize() if s else ''
+
+
+def create_login_id(d):
+    """Create a login ID based on email category: Branch, Department, or Employee."""
+    if d.email_category == 'Branch' and d.branch:
+        return f"{clean_string(d.branch)}@sahayogmultistate.com"
+    elif d.email_category == 'Employee' and d.first_name and d.last_name:
+        return f"{clean_string(d.first_name)}.{clean_string(d.last_name)}@sahayogmultistate.com"
+    elif d.email_category == 'Department' and d.department:
+        return f"{clean_string(d.department)}@sahayogmultistate.com"
+    return None  # Return None if no criteria are met
+
+
 def get_columns():
     """Define the columns for the report."""
     return [
-        {
-            "fieldname": "name",
-            "label": "Request ID",
-            "fieldtype": "Link",
-            "options": "Email Request",
-            "width": "150",
-        },
-        {
-            "fieldname": "mode",
-            "label": "Mode",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "employee_id",
-            "label": "Employee ID",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "first_name",
-            "label": "First Name",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "last_name",
-            "label": "Last Name",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "designation",
-            "label": "Designation",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "department",
-            "label": "Department",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "phone",
-            "label": "Phone",
-            "fieldtype": "Data",
-            "width": "100",
-        },
-        {
-            "fieldname": "login_id",
-            "label": "Login ID",
-            "fieldtype": "Data",
-            "width": "200",
-        }
+        {"fieldname": "name", "label": "Request ID", "fieldtype": "Link", "options": "Email Request", "width": "150"},
+        {"fieldname": "mode", "label": "Mode", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "employee_id", "label": "Employee ID", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "first_name", "label": "First Name", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "last_name", "label": "Last Name", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "designation", "label": "Designation", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "department", "label": "Department", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "phone", "label": "Phone", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "login_id", "label": "Login ID", "fieldtype": "Data", "width": "200"},
+        {"fieldname": "branch", "label": "Branch", "fieldtype": "Data", "width": "100"},
+        {"fieldname": "email_category", "label": "Email Category", "fieldtype": "Data", "width": "150"},
+        {"fieldname": "email_usage", "label": "Email Usage", "fieldtype": "Data", "width": "150"}  # Add email_usage column
     ]
 
 
 def get_email_request_data():
     """Fetch the data using raw SQL query with status condition."""
-    # SQL query to fetch the specified fields from tabEmail Request table
     query = """
         SELECT
             name,
@@ -105,7 +84,10 @@ def get_email_request_data():
             last_name,
             designation,
             department,
-            phone
+            phone,
+            branch,
+            email_category,
+            email_usage  -- Include email_usage in the SQL query
         FROM
             `tabEmail Request`
         WHERE
@@ -114,5 +96,8 @@ def get_email_request_data():
             creation DESC
     """
 
-    # Execute the SQL query and return the result
-    return frappe.db.sql(query, as_dict=True)
+    try:
+        return frappe.db.sql(query, as_dict=True)
+    except Exception as e:
+        frappe.log_error(f"Error fetching email request data: {str(e)}")
+        return []

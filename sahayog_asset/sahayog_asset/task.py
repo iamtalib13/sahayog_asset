@@ -1,4 +1,29 @@
-# import frappe
+import frappe
+
+
+def name():
+     # Fetch all Email Request records where email_category is "Employee"
+    requests = frappe.get_all(
+        "Email Request",
+        filters={"email_category": ["in", ["Employee"]]},
+        fields=["name", "employee_name"]
+    )
+
+    # Update each record with extracted first and last names
+    for request in requests:
+        employee_name = request.get('employee_name')
+        doc_name = request.get('name')  # Get the name (ID) of the document
+
+        if employee_name:
+            # Split the employee name into first and last names
+            name_parts = employee_name.split()
+            first_name = name_parts[0]  # First name
+            last_name = name_parts[-1] if len(name_parts) > 1 else ""  # Last name (if available)
+
+            # Update the document with the new first_name and last_name
+            frappe.db.set_value("Email Request", doc_name, "first_name", first_name, update_modified=False)
+            frappe.db.set_value("Email Request", doc_name, "last_name", last_name, update_modified=False)
+            print(f"Updated {doc_name}: First Name: {first_name}, Last Name: {last_name}")
 
 
 # def delete_all_asset_requests():
