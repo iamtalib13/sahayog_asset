@@ -524,6 +524,7 @@
   {
    "fieldname": "stage_2_emp_status",
    "fieldtype": "Select",
+   "ignore_user_permissions": 1,
    "label": "HOD Approval",
    "options": "Pending\nReject\nApproved\nSkip"
   },
@@ -947,7 +948,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-24 15:31:26.564852",
+ "modified": "2024-12-30 13:16:47.012302",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

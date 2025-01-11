@@ -48,3 +48,26 @@ def name():
 # # Call the function to delete all Asset Request documents
 # result = delete_all_asset_requests()
 # print(result)
+
+
+def update_asset_list_item_name():
+    # Fetch all Asset List records where parenttype is "Purchase Requisition"
+    asset_list = frappe.get_all(
+        "Asset List",
+        filters={"parenttype": "Purchase Requisition"},
+        fields=["name", "item_name", "asset_name"]
+    )
+
+    for asset in asset_list:
+        # Match asset_name in Asset List with name in Sahayog Item
+        sahayog_item = frappe.get_value(
+            "Sahayog Item",
+            {"name": asset['asset_name']},
+            "item_name"
+        )
+
+        # If a match is found, update the asset_name in Asset List with the matched item_name from Sahayog Item
+        if sahayog_item:
+            frappe.db.set_value("Asset List", asset['name'], "asset_name", sahayog_item)
+            print(f"Updated asset_name for Asset List {asset['name']} to {sahayog_item}")
+

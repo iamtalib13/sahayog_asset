@@ -709,6 +709,7 @@ frappe.ui.form.on("Email Request", {
     // Get Approval Tracker details from the form
     const full_name = frm.doc.level_1_name || "Not specified";
     const status = frm.doc.level_1_status || "Not specified";
+    const remark = frm.doc.level_1_remark || "Not Specified";
 
     // Extract the first and last name
     const name_parts = full_name.split(" ");
@@ -746,6 +747,7 @@ frappe.ui.form.on("Email Request", {
         <div>
             <p style="margin: 0; font-weight: bold;">${first_last_name}</p>
             <p style="margin: 0; color: ${status_color};">${status}</p>
+             <div>${remark}</div>
         </div>
     </div>
     <hr>

@@ -14,6 +14,12 @@
    "width": 0
   },
   {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "width": 0
+  },
+  {
    "fieldname": "  employee_id",
    "fieldtype": "Data",
    "label": "Employee ID",
@@ -65,13 +71,13 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": "Sahayog",
- "modified": "2024-09-20 12:50:31.809955",
+ "modified": "2024-10-19 15:28:32.497694",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Delivered Emails",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "SELECT \n    name,\n    status,\n    employee_id, \n    employee_name,\n    department,\n    designation,\n    division,\n    branch,\n    district\nFROM \n    `tabEmail Request`\nWHERE \n    status IN ('Delivered');\n",
+ "query": "SELECT \n    name,\n    status,\n    email,\n    employee_id, \n    employee_name,\n    department,\n    designation,\n    division,\n    branch,\n    district\nFROM \n    `tabEmail Request`\nWHERE \n    status IN ('Delivered');\n",
  "ref_doctype": "Email Request",
  "report_name": "Delivered Emails",
  "report_type": "Query Report",

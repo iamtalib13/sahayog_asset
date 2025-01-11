@@ -1,0 +1,31 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2024-12-30 14:04:42.853667",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Sahayog",
+ "modified": "2024-12-30 14:06:19.399703",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Asset Purchase Report - IT",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT\r\nar.purchase_status AS 'Purchase Status',\r\n    ar.name AS 'Asset Request Name',\r\n    ar.emp_name AS 'Employee Name',\r\n    ar.employee_id AS 'Employee Code',\r\n    ar.date AS 'Request Date',\r\n    ar.delivered_date AS 'Delivered Date',\r\n    ar.branch AS 'Branch',\r\n    ar.employee_department AS 'Department',\r\n    ar.division AS 'Division',\r\n    ar.status AS 'Employee Status',\r\n    ar.emp_received_remark AS 'Employee Received Remark',\r\n    al.mode_of_transport AS 'Dispatched Mode',\r\n    al.dispatched_status AS 'Dispatched Status',\r\n    al.item_name AS 'Item Name',\r\n    al.quantity AS 'Quantity',\r\n    al.serial_no AS 'Serial No',\r\n    ar.select_department AS 'Request to'\r\nFROM\r\n    `tabAsset Request` AS ar\r\nLEFT JOIN\r\n    `tabAsset List` AS al ON ar.name = al.parent\r\nWHERE\r\n    ar.select_department = 'IT' AND\r\n    ar.purchase_status = 'Delivered To Store'\r\nORDER BY\r\n    ar.date ASC;\r\n",
+ "ref_doctype": "Asset Request",
+ "report_name": "Asset Purchase Report - IT",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "All"
+  },
+  {
+   "role": "Employee"
+  }
+ ]
+}

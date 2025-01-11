@@ -2570,7 +2570,11 @@ frappe.ui.form.on("Asset Request", {
       modifiedEmployeeId = "ABPS" + eid;
     } else if (user.includes("MCPS")) {
       modifiedEmployeeId = "MCPS" + eid;
-    } else {
+    }
+    else if (user.includes("NT")) {
+      modifiedEmployeeId = "NT" + eid;
+    }
+    else {
       // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
       modifiedEmployeeId = eid;
     }
@@ -2647,7 +2651,18 @@ frappe.ui.form.on("Asset Request", {
                   "rashtrapal.k@sahayogmultistate.com"
                 );
               }
-            } else if (
+            }  else if (frm.doc.employee_department === "Branding & Marketing") {
+         
+                console.log("checking Branding");
+                frm.set_value("stage_2_emp_id", "914@sahayog.com");
+                frm.set_value("stage_2_emp_name", "Naresh Lulani");
+                frm.set_value(
+                  "stage_2_emp_email",
+                  "naresh.l@sahayogmultistate.com"
+                );
+              
+      
+            }else if (
               frm.doc.employee_department === "Information Technology"
             ) {
               console.log("checking IT");
@@ -2743,7 +2758,13 @@ frappe.ui.form.on("Asset Request", {
                     "nishant.s@sahayogmultistate.com"
                   );
                 } else if (frm.doc.region == "Region-3") {
-                  adm;
+                  frm.set_value("stage_2_emp_id", "317@sahayog.com");
+                  frm.set_value("stage_2_emp_name", "Rashtrapal Kamble");
+                  frm.set_value(
+                    "stage_2_emp_email",
+                    "rashtrapal.k@sahayogmultistate.com"
+                  );
+                  
                 } else if (frm.doc.region == "Region-4") {
                   frm.set_value("stage_2_emp_id", "1348@sahayog.com");
                   frm.set_value("stage_2_emp_name", "Manish Patil");

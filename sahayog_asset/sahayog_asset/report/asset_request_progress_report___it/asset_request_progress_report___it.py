@@ -159,7 +159,7 @@ def get_cs_data(filters):
     ON
         ar.name = al.parent
     WHERE
-        ar.status IN ('Pending', 'Pending From Purchase') AND ar.employee_department NOT IN ('Teaching', 'Non-Teaching')
+        ar.status IN ('Pending', 'Pending From Purchase','Pending From Store Manager') AND ar.employee_department NOT IN ('Teaching', 'Non-Teaching')
          AND ar.select_department = 'IT'
     GROUP BY
         ar.name
