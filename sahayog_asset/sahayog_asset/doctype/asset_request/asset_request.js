@@ -2666,11 +2666,11 @@ frappe.ui.form.on("Asset Request", {
               frm.doc.employee_department === "Information Technology"
             ) {
               console.log("checking IT");
-              frm.set_value("stage_2_emp_id", "1299@sahayog.com");
-              frm.set_value("stage_2_emp_name", "Kamlesh Waghmare");
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
               frm.set_value(
                 "stage_2_emp_email",
-                "kamlesh.w@sahayogmultistate.com"
+                "coo@sahayogmultistate.com"
               );
             } else if (frm.doc.employee_department == "Human Resource") {
               frm.set_value("stage_2_emp_id", "1394@sahayog.com");
@@ -2925,11 +2925,11 @@ frappe.ui.form.on("Asset Request", {
             //</set stage 5 user>
 
             //<set stage 6 user>
-            frm.set_value("stage_6_emp_id", "1299@sahayog.com");
-            frm.set_value("stage_6_emp_name", "Kamlesh Waghmare");
+            frm.set_value("stage_6_emp_id", "914@sahayog.com");
+            frm.set_value("stage_6_emp_name", "Naresh Lulani");
             frm.set_value(
               "stage_6_emp_email",
-              "kamlesh.w@sahayogmultistate.com"
+              "coo@sahayogmultistate.com"
             );
 
             //</set stage 6 user>
