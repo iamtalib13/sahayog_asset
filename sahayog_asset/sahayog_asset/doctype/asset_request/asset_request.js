@@ -2941,6 +2941,8 @@ frappe.ui.form.on("Asset Request", {
         }
       },
     });
+
+    
   },
 
   select_department: function (frm) {
@@ -2976,14 +2978,14 @@ frappe.ui.form.on("Asset Request", {
         });
       }
 
-      if (frm.doc.status === "Draft") {
+      if (frm.doc.status === "Draft" || frm.doc.status === "Pending" ) {
         if (
           department === "IT" &&
           frm.doc.employee_department == "Information Technology"
         ) {
           frm.set_value("stage_6_emp_status", "Skip");
         } else if (department === "IT") {
-          frm.set_value("stage_6_emp_status", "Pending");
+          frm.set_value("stage_6_emp_status", "Skip");
         } else {
           frm.set_value("stage_6_emp_status", "Skip");
         }
