@@ -794,13 +794,14 @@ frappe.ui.form.on("Purchase Requisition", {
       callback: function (response) {
         //Display a message to the user
         frappe.show_alert({
-          message: "Your Purchase Request Sent To CTO Successfully ",
+          message: "Your Purchase Request Sent To Purchase Department Successfully ",
           indicator: "green",
         });
-        frm.set_value("cto_request", "Done");
-        frm.set_value("cto_status", "Pending");
+        //frm.set_value("cto_request", "Done");
+        //frm.set_value("cto_status", "Pending");
 
-        frm.set_value("status", "Pending from CTO");
+        frm.set_value("status", "Pending from Purchase");
+        
 
         frm.save();
       },
