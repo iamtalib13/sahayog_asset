@@ -1555,35 +1555,10 @@ frappe.ui.form.on("Asset Request", {
                 let emp_stage;
                 let emp_stage_request;
                 let emp_stage_status;
-
-                if (
-                  frm.doc.status === "Pending" &&
-                  frm.doc.select_department == "IT" &&
-                  frm.doc.employee_department == "Information Technology"
-                ) {
-                  if (frm.doc.stage_7_emp_status !== "Skip") {
-                    emp_stage = frm.doc.stage_7_emp_id;
-                    emp_stage_request = "stage_7_request";
-                    emp_stage_status = frm.doc.stage_7_emp_status;
-                  }
-                } else if (
-                  frm.doc.status === "Pending" &&
-                  frm.doc.select_department == "IT"
-                ) {
-                  if (frm.doc.stage_6_emp_status !== "Skip") {
-                    emp_stage = frm.doc.stage_6_emp_id;
-                    emp_stage_request = "stage_6_request";
-                    emp_stage_status = frm.doc.stage_6_emp_status;
-                  }
-                } else if (
-                  frm.doc.status === "Pending" &&
-                  frm.doc.select_department !== "IT"
-                ) {
-                  if (frm.doc.stage_7_emp_status !== "Skip") {
-                    emp_stage = frm.doc.stage_7_emp_id;
-                    emp_stage_request = "stage_7_request";
-                    emp_stage_status = frm.doc.stage_7_emp_status;
-                  }
+                if (frm.doc.status === "Pending" && frm.doc.stage_7_emp_status !== "Skip") {
+                  emp_stage = frm.doc.stage_7_emp_id;
+                  emp_stage_request = "stage_7_request";
+                  emp_stage_status = frm.doc.stage_7_emp_status;
                 }
 
                 //</check Next Not Skippable Employee>
@@ -1593,43 +1568,55 @@ frappe.ui.form.on("Asset Request", {
                 let stage = emp_stage;
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
-                  frappe.call({
-                    method: "frappe.share.add",
-                    freeze: true, // Set to true to freeze the UI
-                    freeze_message: "Internet Not Stable, Please Wait...",
-                    args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
-                    },
-                    callback: function (response) {
-                      // Check if the document has been modified
 
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
+                   // Set field values
+                   frm.set_value(emp_stage_request, "Done");
+                   frm.set_value("stage_4_emp_status", "Approved");
+                   if (frm.doc.stage_7_request == "Done") {
+                     frm.set_value("status", "Pending From Store Manager");
+                   } else {
+                     frm.set_value("status", "Pending");
+                   }
 
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_4_emp_status", "Approved");
-                      if (frm.doc.stage_7_request == "Done") {
-                        frm.set_value("status", "Pending From Store Manager");
-                      } else {
-                        frm.set_value("status", "Pending");
-                      }
+                   // Save the form
+                   frm.save();
+                  // frappe.call({
+                  //   method: "frappe.share.add",
+                  //   freeze: true, // Set to true to freeze the UI
+                  //   freeze_message: "Internet Not Stable, Please Wait...",
+                  //   args: {
+                  //     doctype: frm.doctype,
+                  //     name: frm.docname,
+                  //     user: stage,
+                  //     read: 1,
+                  //     write: 1,
+                  //     submit: 0,
+                  //     share: 1,
+                  //     notify: 1,
+                  //     send_email: 0, // Set this to 0 to prevent sending email notifications
+                  //   },
+                  //   callback: function (response) {
+                  //     // Check if the document has been modified
 
-                      // Save the form
-                      frm.save();
-                    },
-                  });
+                  //     // Document share was successful
+                  //     frappe.show_alert({
+                  //       message: "Your Asset Request Sent Successfully",
+                  //       indicator: "green",
+                  //     });
+
+                  //     // Set field values
+                  //     frm.set_value(emp_stage_request, "Done");
+                  //     frm.set_value("stage_4_emp_status", "Approved");
+                  //     if (frm.doc.stage_7_request == "Done") {
+                  //       frm.set_value("status", "Pending From Store Manager");
+                  //     } else {
+                  //       frm.set_value("status", "Pending");
+                  //     }
+
+                  //     // Save the form
+                  //     frm.save();
+                  //   },
+                  // });
 
                   //</PR is Shared with RM using API Call>
                 } else {
