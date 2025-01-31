@@ -1380,94 +1380,50 @@ frappe.ui.form.on("Asset Request", {
               "We are assuming that you verified this Asset Request <br> " +
                 "<b>Are you sure for Approval?</b>",
               () => {
-                //<check Next Not Skippable Employee>
+                // <Check Next Not Skippable Employee>
                 let emp_stage;
                 let emp_stage_request;
                 let emp_stage_status;
 
                 if (frm.doc.status === "Pending") {
                   if (frm.doc.stage_4_emp_status !== "Skip") {
+                    // Assign Stage 4 details
                     emp_stage = frm.doc.stage_4_emp_id;
                     emp_stage_request = "stage_4_request";
                     emp_stage_status = frm.doc.stage_4_emp_status;
-                  } else if (frm.doc.stage_5_emp_status !== "Skip") {
-                    emp_stage = frm.doc.stage_5_emp_id;
-                    emp_stage_request = "stage_5_request";
-                    emp_stage_status = frm.doc.stage_4_emp_status;
-                  } else if (
-                    frm.doc.status === "Pending" &&
-                    frm.doc.select_department == "IT" &&
-                    frm.doc.employee_department == "Information Technology"
-                  ) {
-                    if (frm.doc.stage_7_emp_status !== "Skip") {
-                      emp_stage = frm.doc.stage_7_emp_id;
-                      emp_stage_request = "stage_7_request";
-                      emp_stage_status = frm.doc.stage_7_emp_status;
-                    }
-                  } else if (
-                    frm.doc.status === "Pending" &&
-                    frm.doc.select_department == "IT"
-                  ) {
-                    if (frm.doc.stage_6_emp_status !== "Skip") {
-                      emp_stage = frm.doc.stage_6_emp_id;
-                      emp_stage_request = "stage_6_request";
-                      emp_stage_status = frm.doc.stage_6_emp_status;
-                    }
-                  } else if (
-                    frm.doc.status === "Pending" &&
-                    frm.doc.select_department !== "IT"
-                  ) {
-                    if (frm.doc.stage_7_emp_status !== "Skip") {
-                      emp_stage = frm.doc.stage_7_emp_id;
-                      emp_stage_request = "stage_7_request";
-                      emp_stage_status = frm.doc.stage_7_emp_status;
-                    }
+                  } else if (frm.doc.stage_7_emp_status !== "Skip") {
+                    // Assign Stage 7 details
+                    emp_stage = frm.doc.stage_7_emp_id;
+                    emp_stage_request = "stage_7_request";
+                    emp_stage_status = frm.doc.stage_7_emp_status;
                   }
                 }
+
                 //</check Next Not Skippable Employee>
 
                 // action to perform if Yes is selected
                 // Add your button's functionality here
-                let stage = emp_stage;
+
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
-                  frappe.call({
-                    method: "frappe.share.add",
-                    freeze: true, // Set to true to freeze the UI
-                    freeze_message: "Internet Not Stable, Please Wait...",
-                    args: {
-                      doctype: frm.doctype,
-                      name: frm.docname,
-                      user: stage,
-                      read: 1,
-                      write: 1,
-                      submit: 0,
-                      share: 1,
-                      notify: 1,
-                      send_email: 0, // Set this to 0 to prevent sending email notifications
-                    },
-                    callback: function (response) {
-                      // Check if the document has been modified
-
-                      // Document share was successful
-                      frappe.show_alert({
-                        message: "Your Asset Request Sent Successfully",
-                        indicator: "green",
-                      });
-
-                      // Set field values
-                      frm.set_value(emp_stage_request, "Done");
-                      frm.set_value("stage_3_emp_status", "Approved");
-                      if (frm.doc.stage_7_request == "Done") {
-                        frm.set_value("status", "Pending From Store Manager");
-                      } else {
-                        frm.set_value("status", "Pending");
-                      }
-
-                      // Save the form
-                      frm.save();
-                    },
+                  let stage = emp_stage;
+                  // Document share was successful
+                  frappe.show_alert({
+                    message: "Your Asset Request Sent Successfully",
+                    indicator: "green",
                   });
+
+                  // Set field values
+                  frm.set_value(emp_stage_request, "Done");
+                  frm.set_value("stage_3_emp_status", "Approved");
+                  if (frm.doc.stage_7_request == "Done") {
+                    frm.set_value("status", "Pending From Store Manager");
+                  } else {
+                    frm.set_value("status", "Pending");
+                  }
+
+                  // Save the form
+                  frm.save();
 
                   //</PR is Shared with RM using API Call>
                 } else {
@@ -1555,7 +1511,10 @@ frappe.ui.form.on("Asset Request", {
                 let emp_stage;
                 let emp_stage_request;
                 let emp_stage_status;
-                if (frm.doc.status === "Pending" && frm.doc.stage_7_emp_status !== "Skip") {
+                if (
+                  frm.doc.status === "Pending" &&
+                  frm.doc.stage_7_emp_status !== "Skip"
+                ) {
                   emp_stage = frm.doc.stage_7_emp_id;
                   emp_stage_request = "stage_7_request";
                   emp_stage_status = frm.doc.stage_7_emp_status;
@@ -1568,18 +1527,17 @@ frappe.ui.form.on("Asset Request", {
                 let stage = emp_stage;
                 //<PR is Shared with RM using API Call>
                 if (emp_stage_status == "Pending") {
+                  // Set field values
+                  frm.set_value(emp_stage_request, "Done");
+                  frm.set_value("stage_4_emp_status", "Approved");
+                  if (frm.doc.stage_7_request == "Done") {
+                    frm.set_value("status", "Pending From Store Manager");
+                  } else {
+                    frm.set_value("status", "Pending");
+                  }
 
-                   // Set field values
-                   frm.set_value(emp_stage_request, "Done");
-                   frm.set_value("stage_4_emp_status", "Approved");
-                   if (frm.doc.stage_7_request == "Done") {
-                     frm.set_value("status", "Pending From Store Manager");
-                   } else {
-                     frm.set_value("status", "Pending");
-                   }
-
-                   // Save the form
-                   frm.save();
+                  // Save the form
+                  frm.save();
                   // frappe.call({
                   //   method: "frappe.share.add",
                   //   freeze: true, // Set to true to freeze the UI
@@ -2557,11 +2515,9 @@ frappe.ui.form.on("Asset Request", {
       modifiedEmployeeId = "ABPS" + eid;
     } else if (user.includes("MCPS")) {
       modifiedEmployeeId = "MCPS" + eid;
-    }
-    else if (user.includes("NT")) {
+    } else if (user.includes("NT")) {
       modifiedEmployeeId = "NT" + eid;
-    }
-    else {
+    } else {
       // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
       modifiedEmployeeId = eid;
     }
@@ -2638,27 +2594,21 @@ frappe.ui.form.on("Asset Request", {
                   "rashtrapal.k@sahayogmultistate.com"
                 );
               }
-            }  else if (frm.doc.employee_department === "Branding & Marketing") {
-         
-                console.log("checking Branding");
-                frm.set_value("stage_2_emp_id", "914@sahayog.com");
-                frm.set_value("stage_2_emp_name", "Naresh Lulani");
-                frm.set_value(
-                  "stage_2_emp_email",
-                  "naresh.l@sahayogmultistate.com"
-                );
-              
-      
-            }else if (
+            } else if (frm.doc.employee_department === "Branding & Marketing") {
+              console.log("checking Branding");
+              frm.set_value("stage_2_emp_id", "914@sahayog.com");
+              frm.set_value("stage_2_emp_name", "Naresh Lulani");
+              frm.set_value(
+                "stage_2_emp_email",
+                "naresh.l@sahayogmultistate.com"
+              );
+            } else if (
               frm.doc.employee_department === "Information Technology"
             ) {
               console.log("checking IT");
               frm.set_value("stage_2_emp_id", "914@sahayog.com");
               frm.set_value("stage_2_emp_name", "Naresh Lulani");
-              frm.set_value(
-                "stage_2_emp_email",
-                "coo@sahayogmultistate.com"
-              );
+              frm.set_value("stage_2_emp_email", "coo@sahayogmultistate.com");
             } else if (frm.doc.employee_department == "Human Resource") {
               frm.set_value("stage_2_emp_id", "1394@sahayog.com");
               frm.set_value("stage_2_emp_name", "Harshvardhan Gutke");
@@ -2751,7 +2701,6 @@ frappe.ui.form.on("Asset Request", {
                     "stage_2_emp_email",
                     "rashtrapal.k@sahayogmultistate.com"
                   );
-                  
                 } else if (frm.doc.region == "Region-4") {
                   frm.set_value("stage_2_emp_id", "1348@sahayog.com");
                   frm.set_value("stage_2_emp_name", "Manish Patil");
@@ -2914,10 +2863,7 @@ frappe.ui.form.on("Asset Request", {
             //<set stage 6 user>
             frm.set_value("stage_6_emp_id", "914@sahayog.com");
             frm.set_value("stage_6_emp_name", "Naresh Lulani");
-            frm.set_value(
-              "stage_6_emp_email",
-              "coo@sahayogmultistate.com"
-            );
+            frm.set_value("stage_6_emp_email", "coo@sahayogmultistate.com");
 
             //</set stage 6 user>
             //</Email Setup>
@@ -2928,8 +2874,6 @@ frappe.ui.form.on("Asset Request", {
         }
       },
     });
-
-    
   },
 
   select_department: function (frm) {
@@ -2965,7 +2909,7 @@ frappe.ui.form.on("Asset Request", {
         });
       }
 
-      if (frm.doc.status === "Draft" || frm.doc.status === "Pending" ) {
+      if (frm.doc.status === "Draft" || frm.doc.status === "Pending") {
         if (
           department === "IT" &&
           frm.doc.employee_department == "Information Technology"

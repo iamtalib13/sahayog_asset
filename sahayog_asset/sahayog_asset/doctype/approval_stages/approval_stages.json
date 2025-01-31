@@ -1,0 +1,102 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-01-14 13:51:02.262871",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "stage_number",
+  "stage_name",
+  "role",
+  "employee",
+  "department",
+  "employee_name",
+  "division",
+  "region",
+  "zone",
+  "branch"
+ ],
+ "fields": [
+  {
+   "fieldname": "stage_number",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Stage Number",
+   "options": "\n1\n2\n3\n4\n5\n6\n7\n8"
+  },
+  {
+   "fieldname": "stage_name",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Stage Name",
+   "options": "\nREPORTING\nHOD\nCOO\nCFO\nCEO\nCTO\nSTORE\nPURCHASE"
+  },
+  {
+   "default": "Employee",
+   "fieldname": "role",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Role",
+   "options": "Role"
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
+  },
+  {
+   "fieldname": "division",
+   "fieldtype": "Select",
+   "label": "Division",
+   "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool"
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Link",
+   "label": "Region",
+   "options": "Region"
+  },
+  {
+   "fieldname": "zone",
+   "fieldtype": "Link",
+   "label": "Zone",
+   "options": "Zone"
+  },
+  {
+   "fieldname": "branch",
+   "fieldtype": "Link",
+   "label": "Branch",
+   "options": "Branch"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-01-14 15:42:55.844649",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Approval Stages",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
