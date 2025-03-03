@@ -571,26 +571,26 @@ frappe.ui.form.on("Asset Request", {
         let store_status_color;
 
         if (frm.doc.select_department == "IT") {
-          if (frm.doc.stage_6_request == "Pending") {
+          if (frm.doc.status == "Pending") {
             store_status = "Waiting for Approval";
             store_status_color = "gray";
-          } else if (frm.doc.stage_7_emp_status == "Pending") {
+          } else if (frm.doc.status == "Pending From Store Manager") {
             store_status = "Approval Received";
             store_status_color = "green";
-          } else if (frm.doc.stage_7_emp_status == "Dispatched") {
+          } else if (frm.doc.status == "Dispatched") {
             store_status = "Dispatched";
             store_status_color = "green";
-          } else if (frm.doc.stage_7_emp_status == "Pending From Purchase") {
+          } else if (frm.doc.status == "Pending From Purchase") {
             store_status = "Pending From Purchase";
             store_status_color = "gray";
           }
-        } else if (frm.doc.stage_7_request == "Pending") {
+        } else if (frm.doc.status == "Pending") {
           store_status = "Waiting for Approval";
           store_status_color = "gray";
-        } else if (frm.doc.stage_7_emp_status == "Pending") {
+        } else if (frm.doc.status == "Pending From Store Manager") {
           store_status = "Approval Received";
           store_status_color = "green";
-        } else if (frm.doc.stage_7_emp_status == "Dispatched") {
+        } else if (frm.doc.status == "Dispatched") {
           store_status = "Dispatched";
           store_status_color = "green";
         } else if (frm.doc.stage_7_emp_status == "Pending From Purchase") {
