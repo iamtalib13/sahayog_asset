@@ -12,6 +12,7 @@
   "ticket_details_section",
   "multistep_progress",
   "employee_details_section",
+  "employee_id",
   "emp_name",
   "designation",
   "column_break_jzngo",
@@ -19,18 +20,18 @@
   "phone",
   "column_break_r9uiq",
   "region",
+  "column_break_klg9u",
   "zone",
   "column_sbreak_aed1x",
   "division",
   "branch",
-  "column_break_um3go",
   "district",
+  "column_break_um3go",
   "asset_department_section",
   "section_break_hitna",
   "list",
   "column_break_y1mfa",
   "quantity",
-  "column_break_klg9u",
   "uom",
   "column_break_xogan",
   "item_description",
@@ -51,6 +52,7 @@
   "column_break_excyd",
   "select_department",
   "section_break_liejr",
+  "items",
   "asset",
   "asset_lock",
   "section_break_kkbo3",
@@ -59,7 +61,6 @@
   "purchase_dispatch",
   "admin_save",
   "employee_details_tab",
-  "employee_id",
   "employee_user",
   "column_break_3",
   "first_name",
@@ -158,10 +159,10 @@
   },
   {
    "fieldname": "employee_id",
-   "fieldtype": "Data",
-   "label": "Employee Id",
-   "read_only": 1,
-   "set_only_once": 1
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Employee",
+   "options": "Employee"
   },
   {
    "fieldname": "column_break_3",
@@ -174,8 +175,10 @@
   {
    "fetch_from": "employee_id.designation",
    "fieldname": "designation",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Designation ",
+   "options": "Designation",
    "reqd": 1
   },
   {
@@ -185,19 +188,22 @@
   {
    "fetch_from": "employee_id.division",
    "fieldname": "division",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_standard_filter": 1,
    "label": "Division",
-   "options": "\nMultistate\nMicrofinance\nTwo Wheeler\nSchool",
+   "options": "Division",
    "read_only": 1,
    "reqd": 1
   },
   {
    "fetch_from": "employee_id.branch",
    "fieldname": "branch",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_standard_filter": 1,
    "label": "Branch",
+   "options": "Branch",
    "reqd": 1
   },
   {
@@ -209,12 +215,12 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "employee_id.region",
+   "fetch_from": "employee_id.custom_region",
    "fieldname": "region",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "Region",
-   "options": "\nRegion-1\nRegion-2\nRegion-3\nRegion-4\nHead Office",
+   "options": "Region",
    "reqd": 1
   },
   {
@@ -235,6 +241,7 @@
    "description": "Please Select Department",
    "fieldname": "select_department",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Request To",
@@ -252,6 +259,7 @@
    "depends_on": "eval:doc.select_department",
    "fieldname": "list",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Item",
    "options": "Sahayog Item"
   },
@@ -340,6 +348,7 @@
    "fetch_from": "employee_id.department",
    "fieldname": "employee_department",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Employee Department",
    "options": "Department",
    "reqd": 1
@@ -487,16 +496,18 @@
    "label": "Stage 1"
   },
   {
-   "fetch_from": "employee_id.reporting_employee_user_id",
+   "fetch_from": "stage_1_emp_name.user_id",
    "fieldname": "stage_1_emp_id",
    "fieldtype": "Data",
    "label": "RP user"
   },
   {
-   "fetch_from": "employee_id.reporting_employee",
+   "fetch_from": "employee_id.reports_to",
    "fieldname": "stage_1_emp_name",
-   "fieldtype": "Data",
-   "label": "Reporting Person Name"
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Reporting Person Name",
+   "options": "Employee"
   },
   {
    "default": "Pending",
@@ -597,8 +608,10 @@
   {
    "fetch_from": "employee_id.user_id",
    "fieldname": "employee_user",
-   "fieldtype": "Data",
-   "label": "Emp User"
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Emp User",
+   "options": "User"
   },
   {
    "fieldname": "stage_1_emp_rejection",
@@ -691,13 +704,13 @@
    "options": "Pending\nDone"
   },
   {
-   "fetch_from": "employee_id.reporting_person_designation",
+   "fetch_from": "stage_1_emp_name.designation",
    "fieldname": "rp_designation",
    "fieldtype": "Data",
    "label": "RP Designation"
   },
   {
-   "fetch_from": "employee_id.reporting_employee_email",
+   "fetch_from": "stage_1_emp_name.company_email",
    "fieldname": "stage_1_emp_email",
    "fieldtype": "Data",
    "label": "Email"
@@ -744,9 +757,10 @@
    "default": "NOS",
    "depends_on": "eval:doc.select_department",
    "fieldname": "uom",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Unit",
-   "options": "NOS\nKilogram\nGram\nLitre\nMeter\nSquare Meter\nSquare Feet\nCubic Meter\nCentimetre\nMillimetre"
+   "options": "UOM"
   },
   {
    "collapsible": 1,
@@ -863,13 +877,6 @@
    "label": "Admin Save"
   },
   {
-   "fetch_from": "employee_id.district",
-   "fieldname": "district",
-   "fieldtype": "Data",
-   "label": "District",
-   "reqd": 1
-  },
-  {
    "fetch_from": "list.approval_level",
    "fieldname": "item_approval",
    "fieldtype": "Data",
@@ -900,14 +907,17 @@
   {
    "fieldname": "ticket_id",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Ticket ID",
    "options": "Sahayog Ticket",
    "read_only": 1
   },
   {
    "fieldname": "zone",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Zone",
+   "options": "Zone",
    "read_only": 1
   },
   {
@@ -944,11 +954,23 @@
   {
    "fieldname": "multistep_progress",
    "fieldtype": "HTML"
+  },
+  {
+   "fetch_from": "employee_id.custom_district",
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Material Request Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-30 11:20:53.654981",
+ "modified": "2025-03-03 15:46:23.855924",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",

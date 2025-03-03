@@ -1,0 +1,178 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"4iz8dD8vw9\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Asset Management</b></span>\",\"col\":12}},{\"id\":\"1-4f_lPBD7\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Asset Requests</b></span>\",\"col\":12}},{\"id\":\"CT4wd_9Puq\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pending\",\"col\":3}},{\"id\":\"_6SFbR0qxw\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"XNKjNeK3-4\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"PpK2g5ASdv\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Purchase Requests</b></span>\",\"col\":12}},{\"id\":\"l4Ffs4lmM3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Requests\",\"col\":3}},{\"id\":\"SE78DcBSE3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched\",\"col\":3}},{\"id\":\"aBWJoWkWaN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Received\",\"col\":3}},{\"id\":\"V_a7nmZiOj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Stock Entry\",\"col\":3}},{\"id\":\"4B5sV0G-pa\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"AkhJ12zt2I\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Asset Master</b></span>\",\"col\":12}},{\"id\":\"8FnjM4bpST\",\"type\":\"card\",\"data\":{\"card_name\":\"Asset Details\",\"col\":4}},{\"id\":\"Hcg16HAwym\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase order\",\"col\":4}},{\"id\":\"JDpyuywxF6\",\"type\":\"card\",\"data\":{\"card_name\":\"Company Details\",\"col\":4}},{\"id\":\"yRn3j65Z0x\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Report Master</b><b></b></span>\",\"col\":12}},{\"id\":\"NktNIUhnWr\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pending Assets Requests\",\"col\":3}},{\"id\":\"PJP3_3n_3M\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Dispatched Report\",\"col\":3}}]",
+ "creation": "2024-05-15 10:55:45.272845",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "expenses",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Purchase",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Asset Details",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Items",
+   "link_count": 0,
+   "link_to": "Sahayog Item",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sahayog Item",
+   "link_count": 0,
+   "link_to": "Item Category",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase order",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Order",
+   "link_count": 0,
+   "link_to": "Sahayog PO",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendors",
+   "link_count": 0,
+   "link_to": "Vendor",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Company Details",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Company",
+   "link_count": 0,
+   "link_to": "Company Details",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-03-03 15:01:35.543296",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Purchase",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Purchase Department"
+  }
+ ],
+ "sequence_id": 25.0,
+ "shortcuts": [
+  {
+   "color": "Yellow",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Pending",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"status\",\"=\",\"Pending From Purchase\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Delivered",
+   "label": "Delivered",
+   "link_to": "Asset Request",
+   "stats_filter": "[[\"Asset Request\",\"purchase_status\",\"=\",\"Delivered To Store\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Pending Assets Requests",
+   "link_to": "Purchase And Store Working Report",
+   "type": "Report"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Dispatched",
+   "label": "Dispatched",
+   "link_to": "Purchase Requisition",
+   "stats_filter": "[[\"Purchase Requisition\",\"status\",\"=\",\"Dispatched\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Cyan",
+   "doc_view": "List",
+   "format": "{} Received",
+   "label": "Received",
+   "link_to": "Purchase Requisition",
+   "stats_filter": "[[\"Purchase Requisition\",\"status\",\"=\",\"Received\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Stock Entry",
+   "link_to": "Store Entry",
+   "stats_filter": "[[\"Store Entry\",\"entry_type\",\"=\",\"STOCK-IN\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Requests",
+   "link_to": "Purchase Requisition",
+   "stats_filter": "[[\"Purchase Requisition\",\"status\",\"=\",\"Pending from Purchase\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Dispatched Report",
+   "link_to": "Purchase to Store Dispatched Report",
+   "type": "Report"
+  }
+ ],
+ "title": "Purchase"
+}

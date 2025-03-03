@@ -1,0 +1,43 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"aXA9rRV0Ht\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Operation Stationery Verification</b></span>\",\"col\":12}},{\"id\":\"R1MRa9r5sF\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Pending\",\"col\":6}},{\"id\":\"P_cAcicE9W\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Posted\",\"col\":6}}]",
+ "creation": "2024-11-08 17:21:43.849715",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "stock",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Operation Stationery",
+ "links": [],
+ "modified": "2025-03-03 15:02:04.557135",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Operation Stationery",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Purchase Requisition",
+   "label": "Pending",
+   "quick_list_filter": "[[\"Purchase Requisition\",\"status\",\"=\",\"Pending from Operations\",false]]"
+  },
+  {
+   "document_type": "Purchase Requisition",
+   "label": "Posted",
+   "quick_list_filter": "[[\"Purchase Requisition\",\"status\",\"=\",\"Received\",false],[\"Purchase Requisition\",\"select_department\",\"=\",\"Stationery\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Operation Support & Stationery"
+  }
+ ],
+ "sequence_id": 48.0,
+ "shortcuts": [],
+ "title": "Operation Stationery"
+}

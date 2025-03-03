@@ -1,0 +1,95 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"V2Q0gUF1oc\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Email Management</b></span>\",\"col\":12}},{\"id\":\"UvyIP9bL_V\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Create New\",\"col\":3}},{\"id\":\"mdfEsbRuyX\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"JWsPP-fo1M\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Draft\",\"col\":3}},{\"id\":\"bCrWnA9RBU\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pending\",\"col\":3}},{\"id\":\"Oayo35kFdN\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Correction\",\"col\":3}},{\"id\":\"e-QrtVLPbM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Deleted\",\"col\":3}},{\"id\":\"F5gHQcf2UD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"8lKEF9bWMM\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cA8h3LMNMs\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\">Approval Section</span>\",\"col\":12}},{\"id\":\"drjJNmNUPb\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Approval\",\"col\":3}}]",
+ "creation": "2024-05-14 10:24:17.817207",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "message-1",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Email Management",
+ "links": [],
+ "modified": "2025-03-03 15:01:07.124789",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Email Management",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "HR Support Executive"
+  }
+ ],
+ "sequence_id": 22.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Email Approval",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"level_1_status\",\"=\",\"Pending\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Required",
+   "label": "Correction",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Correction-Required\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "New",
+   "label": "Create New",
+   "link_to": "Email Request",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Cyan",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Pending",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Pending\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "format": "{} Draft",
+   "label": "Draft",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Draft\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Deleted",
+   "label": "Deleted",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Deleted\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Delivered",
+   "label": "Delivered",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Email Management"
+}

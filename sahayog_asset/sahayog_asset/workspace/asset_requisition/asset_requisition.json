@@ -1,0 +1,33 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"w91xRTzdKL\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Asset Dashboard\",\"col\":12}}]",
+ "creation": "2023-09-13 16:30:02.510539",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Asset Dashboard",
+   "label": "Asset Dashboard"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "permission",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Asset Requisition",
+ "links": [],
+ "modified": "2025-03-03 15:00:50.419272",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Asset Requisition",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 21.0,
+ "shortcuts": [],
+ "title": "Asset Requisition"
+}

@@ -1,0 +1,92 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"fpwF5veaQn\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Email Requests</b></span>\",\"col\":12}},{\"id\":\"3p4QquZNj7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pending\",\"col\":3}},{\"id\":\"hGEZUtEaM-\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Correction\",\"col\":3}},{\"id\":\"1Klhv3R00n\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"XXWfhE01H6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Deleted\",\"col\":3}},{\"id\":\"CGr0Dj7e5c\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Pending Requests\",\"col\":4}},{\"id\":\"FgCl9w8YFZ\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Created Emails\",\"col\":4}},{\"id\":\"M_qYA-pai8\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Deleted Email\",\"col\":4}},{\"id\":\"dOboiHpixx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Requests Report\",\"col\":3}}]",
+ "creation": "2024-05-14 12:35:57.782640",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "message-1",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Email Requests",
+ "links": [],
+ "modified": "2025-03-03 15:01:17.721326",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Email Requests",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Email Request",
+   "label": "Pending Requests",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Pending From IT\",false]]"
+  },
+  {
+   "document_type": "Email Request",
+   "label": "Created Emails",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Delivered\",false]]"
+  },
+  {
+   "document_type": "Email Request",
+   "label": "Deleted Email",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Deleted\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Email Creator"
+  }
+ ],
+ "sequence_id": 23.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Email Requests Report",
+   "link_to": "Email Requests Report",
+   "type": "Report"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Required",
+   "label": "Correction",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Correction-Required\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{} Delivered",
+   "label": "Delivered",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Cyan",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Pending",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Pending From IT\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Deleted",
+   "label": "Deleted",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Deleted\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Email Requests"
+}
