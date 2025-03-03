@@ -7,6 +7,6 @@ def get_data():
             "Stock Entry": "custom_asset_request",  # Linking Stock Entry using 'custom_asset_request' field
         },
         "transactions": [
-            {"items": ["Stock Entry"]},  # Linking Stock Entry with Asset Request
+            {"items": ["Stock Entry"]},  # Linking Stock Entry with Asset Requests
         ],
     }
