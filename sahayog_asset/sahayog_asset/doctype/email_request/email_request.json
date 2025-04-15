@@ -20,6 +20,7 @@
   "email_designation",
   "email_usage",
   "column_break_arvor",
+  "email_display_name",
   "delivered_date",
   "email_details_section",
   "email",
@@ -349,12 +350,19 @@
    "fieldtype": "Data",
    "label": "First Name",
    "mandatory_depends_on": "eval:(doc.request_type==\"New\" || doc.request_type==\"Delete\") && doc.email_category==\"Employee\""
+  },
+  {
+   "depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\"",
+   "fieldname": "email_display_name",
+   "fieldtype": "Data",
+   "label": "Email Display Name ",
+   "mandatory_depends_on": "eval:doc.request_type==\"New\" && doc.email_category==\"Employee\""
   }
  ],
  "hide_toolbar": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-02-04 15:33:23.009672",
+ "modified": "2025-04-15 16:40:16.963053",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Email Request",
