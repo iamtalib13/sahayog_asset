@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "IT Store",
  "links": [],
- "modified": "2025-03-25 13:30:24.193937",
+ "modified": "2025-04-23 17:45:40.078427",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "IT Store",
@@ -32,7 +32,7 @@
    "role": "IT Support Executive"
   }
  ],
- "sequence_id": 30.0,
+ "sequence_id": 25.0,
  "shortcuts": [
   {
    "color": "Orange",

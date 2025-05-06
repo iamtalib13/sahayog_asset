@@ -27,7 +27,8 @@ def execute(filters=None):
             "login_id": create_login_id(d),
             "branch": capitalize_if_present(d.branch),
             "email_category": d.email_category,
-            "email_usage": d.email_usage  # Include email_usage in the data
+            "email_usage": d.email_usage,
+            "email_display_name": d.email_display_name  # Added field
         }
         data.append(row)
 
@@ -69,7 +70,8 @@ def get_columns():
         {"fieldname": "login_id", "label": "Login ID", "fieldtype": "Data", "width": "200"},
         {"fieldname": "branch", "label": "Branch", "fieldtype": "Data", "width": "100"},
         {"fieldname": "email_category", "label": "Email Category", "fieldtype": "Data", "width": "150"},
-        {"fieldname": "email_usage", "label": "Email Usage", "fieldtype": "Data", "width": "150"}  # Add email_usage column
+        {"fieldname": "email_usage", "label": "Email Usage", "fieldtype": "Data", "width": "150"},
+        {"fieldname": "email_display_name", "label": "Email Display Name", "fieldtype": "Data", "width": "200"}  # Added column
     ]
 
 
@@ -87,7 +89,8 @@ def get_email_request_data():
             phone,
             branch,
             email_category,
-            email_usage  -- Include email_usage in the SQL query
+            email_usage,
+            email_display_name  -- Added in SQL
         FROM
             `tabEmail Request`
         WHERE
