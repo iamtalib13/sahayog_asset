@@ -189,143 +189,143 @@ frappe.ui.form.on("Asset Request", {
     frm.set_value("first_intro", "Done");
   },
 
-  set_Approval_and_Skip_Levels: function (frm) {
-    const pendingStatus = "Pending";
-    const skipStatus = "Skip";
-    const approvedStatus = "Approved";
-    const rejectedStatus = "Rejected";
+  // set_Approval_and_Skip_Levels: function (frm) {
+  //   const pendingStatus = "Pending";
+  //   const skipStatus = "Skip";
+  //   const approvedStatus = "Approved";
+  //   const rejectedStatus = "Rejected";
 
-    // Function to check for duplicate stages and handle status accordingly
-    function Check_duplicate_stages(frm) {
-      const empIds = [
-        frm.doc.stage_1_emp_id,
-        frm.doc.stage_2_emp_id,
-        frm.doc.stage_3_emp_id,
-        frm.doc.stage_4_emp_id,
-        frm.doc.stage_5_emp_id,
-      ];
+  //   // Function to check for duplicate stages and handle status accordingly
+  //   function Check_duplicate_stages(frm) {
+  //     const empIds = [
+  //       frm.doc.stage_1_emp_id,
+  //       frm.doc.stage_2_emp_id,
+  //       frm.doc.stage_3_emp_id,
+  //       frm.doc.stage_4_emp_id,
+  //       frm.doc.stage_5_emp_id,
+  //     ];
 
-      // Loop through the stages and check for duplicates
-      for (let i = 0; i < empIds.length; i++) {
-        for (let j = i + 1; j < empIds.length; j++) {
-          if (empIds[i] && empIds[i] === empIds[j]) {
-            // If a duplicate is found, skip the earlier stage
-            frm.set_value(`stage_${i + 1}_emp_status`, skipStatus);
-            console.log(
-              `Stage ${i + 1} is duplicate with Stage ${j + 1}: Stage ${
-                i + 1
-              } set to Skip`
-            );
-            // Set the higher stage to Pending if not already Approved/Rejected
-            if (
-              frm.doc[`stage_${j + 1}_emp_status`] !== approvedStatus &&
-              frm.doc[`stage_${j + 1}_emp_status`] !== rejectedStatus
-            ) {
-              frm.set_value(`stage_${j + 1}_emp_status`, pendingStatus);
-              console.log(
-                `Stage ${j + 1} set to Pending (higher stage after duplicate)`
-              );
-            }
-          }
-        }
-      }
-    }
+  //     // Loop through the stages and check for duplicates
+  //     for (let i = 0; i < empIds.length; i++) {
+  //       for (let j = i + 1; j < empIds.length; j++) {
+  //         if (empIds[i] && empIds[i] === empIds[j]) {
+  //           // If a duplicate is found, skip the earlier stage
+  //           frm.set_value(`stage_${i + 1}_emp_status`, skipStatus);
+  //           console.log(
+  //             `Stage ${i + 1} is duplicate with Stage ${j + 1}: Stage ${
+  //               i + 1
+  //             } set to Skip`
+  //           );
+  //           // Set the higher stage to Pending if not already Approved/Rejected
+  //           if (
+  //             frm.doc[`stage_${j + 1}_emp_status`] !== approvedStatus &&
+  //             frm.doc[`stage_${j + 1}_emp_status`] !== rejectedStatus
+  //           ) {
+  //             frm.set_value(`stage_${j + 1}_emp_status`, pendingStatus);
+  //             console.log(
+  //               `Stage ${j + 1} set to Pending (higher stage after duplicate)`
+  //             );
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
 
-    // Function to check for the highest approval rank
-    function Check_higher_rank(frm) {
-      let highestRank = 0; // Initialize highest rank
+  //   // Function to check for the highest approval rank
+  //   function Check_higher_rank(frm) {
+  //     let highestRank = 0; // Initialize highest rank
 
-      // Iterate through the child table "asset"
-      if (frm.doc.asset && frm.doc.asset.length > 0) {
-        frm.doc.asset.forEach((row) => {
-          if (row.approval_rank && !isNaN(row.approval_rank)) {
-            const currentRank = parseInt(row.approval_rank, 10);
-            if (currentRank > highestRank) {
-              highestRank = currentRank; // Update highest rank
-            }
-          }
-        });
-      }
+  //     // Iterate through the child table "asset"
+  //     if (frm.doc.asset && frm.doc.asset.length > 0) {
+  //       frm.doc.asset.forEach((row) => {
+  //         if (row.approval_rank && !isNaN(row.approval_rank)) {
+  //           const currentRank = parseInt(row.approval_rank, 10);
+  //           if (currentRank > highestRank) {
+  //             highestRank = currentRank; // Update highest rank
+  //           }
+  //         }
+  //       });
+  //     }
 
-      console.log("Highest Approval Rank is:", highestRank);
+  //     console.log("Highest Approval Rank is:", highestRank);
 
-      // Check CEO condition before setting statuses
-      if (Check_CEO(frm)) {
-        // If CEO condition is met, set all stages to Skip
-        for (let i = 1; i <= 5; i++) {
-          frm.set_value(`stage_${i}_emp_status`, skipStatus);
-          console.log(`Stage ${i} set to Skip`);
-        }
-      } else {
-        // If highestRank is 0, set stages 1 to 4 to "Pending"
-        if (highestRank === 0) {
-          for (let i = 1; i <= 4; i++) {
-            if (
-              frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
-              frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
-            ) {
-              frm.set_value(`stage_${i}_emp_status`, pendingStatus);
-              console.log(
-                `Stage ${i} set to Pending due to highest rank being 0`
-              );
-            }
-          }
-        } else {
-          // Set the statuses based on the highest rank
-          for (let i = 1; i <= 5; i++) {
-            if (
-              frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
-              frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
-            ) {
-              if (i <= highestRank) {
-                frm.set_value(`stage_${i}_emp_status`, pendingStatus);
-                console.log(`Stage ${i} set to Pending`);
-              } else {
-                frm.set_value(`stage_${i}_emp_status`, skipStatus);
-                console.log(`Stage ${i} set to Skip`);
-              }
-            }
-          }
-        }
-      }
+  //     // Check CEO condition before setting statuses
+  //     if (Check_CEO(frm)) {
+  //       // If CEO condition is met, set all stages to Skip
+  //       for (let i = 1; i <= 5; i++) {
+  //         frm.set_value(`stage_${i}_emp_status`, skipStatus);
+  //         console.log(`Stage ${i} set to Skip`);
+  //       }
+  //     } else {
+  //       // If highestRank is 0, set stages 1 to 4 to "Pending"
+  //       if (highestRank === 0) {
+  //         for (let i = 1; i <= 4; i++) {
+  //           if (
+  //             frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
+  //             frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
+  //           ) {
+  //             frm.set_value(`stage_${i}_emp_status`, pendingStatus);
+  //             console.log(
+  //               `Stage ${i} set to Pending due to highest rank being 0`
+  //             );
+  //           }
+  //         }
+  //       } else {
+  //         // Set the statuses based on the highest rank
+  //         for (let i = 1; i <= 5; i++) {
+  //           if (
+  //             frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
+  //             frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
+  //           ) {
+  //             if (i <= highestRank) {
+  //               frm.set_value(`stage_${i}_emp_status`, pendingStatus);
+  //               console.log(`Stage ${i} set to Pending`);
+  //             } else {
+  //               frm.set_value(`stage_${i}_emp_status`, skipStatus);
+  //               console.log(`Stage ${i} set to Skip`);
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
 
-      return highestRank; // Return the highest rank found
-    }
+  //     return highestRank; // Return the highest rank found
+  //   }
 
-    // Function to check CEO condition
-    function Check_CEO(frm) {
-      const stage1EmpId = frm.doc.stage_1_emp_id;
-      const stage5EmpId = frm.doc.stage_5_emp_id;
-      return stage1EmpId === stage5EmpId; // Return true if they are the same
-    }
+  //   // Function to check CEO condition
+  //   function Check_CEO(frm) {
+  //     const stage1EmpId = frm.doc.stage_1_emp_id;
+  //     const stage5EmpId = frm.doc.stage_5_emp_id;
+  //     return stage1EmpId === stage5EmpId; // Return true if they are the same
+  //   }
 
-    // Set Pending levels and check CEO condition
-    if (Check_CEO(frm)) {
-      // If CEO condition is met, set stages 1 to 4 to "Skip" and stage 5 to "Pending"
-      for (let i = 1; i <= 4; i++) {
-        if (
-          frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
-          frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
-        ) {
-          frm.set_value(`stage_${i}_emp_status`, skipStatus);
-          console.log(`Stage ${i} set to Skip`);
-        }
-      }
-      if (
-        frm.doc[`stage_5_emp_status`] !== approvedStatus &&
-        frm.doc[`stage_5_emp_status`] !== rejectedStatus
-      ) {
-        frm.set_value(`stage_5_emp_status`, pendingStatus);
-        console.log(`Stage 5 initialized to Pending`);
-      }
-    } else {
-      // Call the function to check for the highest approval rank
-      Check_higher_rank(frm);
-    }
+  //   // Set Pending levels and check CEO condition
+  //   if (Check_CEO(frm)) {
+  //     // If CEO condition is met, set stages 1 to 4 to "Skip" and stage 5 to "Pending"
+  //     for (let i = 1; i <= 4; i++) {
+  //       if (
+  //         frm.doc[`stage_${i}_emp_status`] !== approvedStatus &&
+  //         frm.doc[`stage_${i}_emp_status`] !== rejectedStatus
+  //       ) {
+  //         frm.set_value(`stage_${i}_emp_status`, skipStatus);
+  //         console.log(`Stage ${i} set to Skip`);
+  //       }
+  //     }
+  //     if (
+  //       frm.doc[`stage_5_emp_status`] !== approvedStatus &&
+  //       frm.doc[`stage_5_emp_status`] !== rejectedStatus
+  //     ) {
+  //       frm.set_value(`stage_5_emp_status`, pendingStatus);
+  //       console.log(`Stage 5 initialized to Pending`);
+  //     }
+  //   } else {
+  //     // Call the function to check for the highest approval rank
+  //     Check_higher_rank(frm);
+  //   }
 
-    // Finally, check for duplicate stages
-    Check_duplicate_stages(frm);
-  },
+  //   // Finally, check for duplicate stages
+  //   Check_duplicate_stages(frm);
+  // },
 
   rejection_intro: function (frm) {
     let stages = [

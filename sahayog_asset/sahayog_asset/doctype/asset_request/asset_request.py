@@ -13,13 +13,22 @@ class AssetRequest(Document):
         approved_status = "Approved"
         rejected_status = "Rejected"
 
-        # Check for the CEO condition
+        # Helper to safely set stage status while respecting manual override
+        def set_stage_status(stage, status):
+            manual_skip = getattr(self, f"stage_{stage}_manual_skip", False)
+            if manual_skip and status == skip_status:
+                print(f"Stage {stage} manually set to Skip. Skipping automatic update.")
+                return
+            setattr(self, f"stage_{stage}_emp_status", status)
+            print(f"Stage {stage} set to {status}.")
+
+        # Check if CEO is same as stage 1
         def check_CEO():
             stage_1_emp_id = self.stage_1_emp_id
             stage_5_emp_id = self.stage_5_emp_id
             return stage_1_emp_id == stage_5_emp_id
 
-        # Check for duplicate stages
+        # Handle duplicate employees across stages
         def check_duplicate_stages():
             emp_ids = [
                 self.stage_1_emp_id,
@@ -29,37 +38,31 @@ class AssetRequest(Document):
                 self.stage_5_emp_id,
             ]
 
-            # Track the highest approval rank for each stage
             approval_ranks = {stage: None for stage in range(1, 6)}
             for row in self.asset:
                 approval_rank = row.approval_rank
                 if approval_rank in approval_ranks:
                     approval_ranks[approval_rank] = approval_rank
 
-            # Loop through stages and check for duplicates
             for i in range(len(emp_ids)):
                 for j in range(i + 1, len(emp_ids)):
                     if emp_ids[i] and emp_ids[i] == emp_ids[j]:
-                        # Compare ranks between duplicate stages
                         rank_i = approval_ranks[i + 1] or float('inf')
                         rank_j = approval_ranks[j + 1] or float('inf')
 
                         if rank_i < rank_j:
-                            setattr(self, f"stage_{j + 1}_emp_status", skip_status)
-                            print(f"Stage {j + 1} skipped because stage {i + 1} has a higher rank.")
+                            set_stage_status(j + 1, skip_status)
+                            print(f"Stage {j + 1} skipped because stage {i + 1} has higher rank.")
                         elif rank_j < rank_i:
-                            setattr(self, f"stage_{i + 1}_emp_status", skip_status)
-                            print(f"Stage {i + 1} skipped because stage {j + 1} has a higher rank.")
+                            set_stage_status(i + 1, skip_status)
+                            print(f"Stage {i + 1} skipped because stage {j + 1} has higher rank.")
                         else:
-                            # If ranks are equal, skip the later stage
-                            setattr(self, f"stage_{j + 1}_emp_status", skip_status)
+                            set_stage_status(j + 1, skip_status)
                             print(f"Stage {j + 1} skipped due to same rank as stage {i + 1}.")
 
-        # Check for the highest approval rank
+        # Handle approval logic based on highest rank
         def check_higher_rank():
             highest_rank = 0
-
-            # Iterate through the child table "asset"
             if self.asset:
                 for row in self.asset:
                     if row.approval_rank and isinstance(row.approval_rank, int):
@@ -69,52 +72,40 @@ class AssetRequest(Document):
 
             print("Highest Approval Rank is:", highest_rank)
 
-            # If CEO condition is met, set all stages to Skip
             if check_CEO():
                 for i in range(1, 6):
-                    setattr(self, f"stage_{i}_emp_status", skip_status)
-                    print(f"Stage {i} set to Skip due to CEO condition.")
+                    set_stage_status(i, skip_status)
+                print("All stages skipped due to CEO condition.")
             else:
-                # If highest rank is 0, set stages 1 to 4 to "Pending"
                 if highest_rank == 0:
                     for i in range(1, 5):
                         emp_status = getattr(self, f"stage_{i}_emp_status")
                         if emp_status not in [approved_status, rejected_status]:
-                            setattr(self, f"stage_{i}_emp_status", pending_status)
-                            print(f"Stage {i} set to Pending due to highest rank being 0.")
+                            set_stage_status(i, pending_status)
                 elif highest_rank == 1:
-                    # If highest rank is 1, set stage 1 to Pending and skip stages 2 to 5
-                    setattr(self, "stage_1_emp_status", pending_status)
-                    print(f"Stage 1 set to Pending because highest rank is 1.")
+                    set_stage_status(1, pending_status)
                     for i in range(2, 6):
-                        setattr(self, f"stage_{i}_emp_status", skip_status)
-                        print(f"Stage {i} set to Skip because highest rank is 1.")
+                        set_stage_status(i, skip_status)
                 else:
-                    # Set statuses based on the highest rank
                     for i in range(1, 6):
                         emp_status = getattr(self, f"stage_{i}_emp_status")
                         if emp_status not in [approved_status, rejected_status]:
                             if i <= highest_rank:
-                                setattr(self, f"stage_{i}_emp_status", pending_status)
-                                print(f"Stage {i} set to Pending.")
+                                set_stage_status(i, pending_status)
                             else:
-                                setattr(self, f"stage_{i}_emp_status", skip_status)
-                                print(f"Stage {i} set to Skip.")
+                                set_stage_status(i, skip_status)
 
-        # Main flow of the function
+        # Main flow
         if check_CEO():
-            # If CEO condition is met, skip stages 1-4, set stage 5 to Pending
             for i in range(1, 5):
-                setattr(self, f"stage_{i}_emp_status", skip_status)
-                print(f"Stage {i} set to Skip due to CEO condition.")
-            setattr(self, "stage_5_emp_status", pending_status)
-            print("Stage 5 set to Pending due to CEO condition.")
+                set_stage_status(i, skip_status)
+            set_stage_status(5, pending_status)
+            print("CEO condition applied: Stages 1-4 skipped, Stage 5 pending.")
         else:
-            # Check for duplicates first
             check_duplicate_stages()
-            # Check for highest rank and set statuses accordingly
             check_higher_rank()
-            
+
+        # Final check for duplicates again after rank assignment
         check_duplicate_stages()
 
     def before_insert(self):
