@@ -1,0 +1,100 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"C3lrn5oJ5-\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Email Requests</b></span>\",\"col\":12}},{\"id\":\"yUx4pSVMKH\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Pending\",\"col\":3}},{\"id\":\"IxUw9KjKXE\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Correction\",\"col\":3}},{\"id\":\"BP2cbI2MNx\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Delivered\",\"col\":3}},{\"id\":\"4FN94dHPWW\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Deleted\",\"col\":3}},{\"id\":\"J12YTioBkH\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"TZyxoSBLRf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Pending Requests\",\"col\":4}},{\"id\":\"bcYijCU2kS\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Created Emails\",\"col\":4}},{\"id\":\"Q1Vj0W3fls\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Deleted Emails\",\"col\":4}},{\"id\":\"OXgIwBm-rK\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Email Ticket</b></span>\",\"col\":12}},{\"id\":\"SGcBU3ffWZ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Mail\",\"col\":3}},{\"id\":\"wBoyNV5pqO\",\"type\":\"paragraph\",\"data\":{\"text\":\"<span class=\\\"h1\\\"><b>Report</b></span>\",\"col\":12}},{\"id\":\"Sp-TOCR08F\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Email Requests Report\",\"col\":3}}]",
+ "creation": "2024-07-11 10:42:15.762925",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Email Requests",
+ "links": [],
+ "modified": "2025-07-04 13:22:45.288484",
+ "modified_by": "Administrator",
+ "module": "Sahayog Asset",
+ "name": "Email Requests",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Asset Requisition",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Email Request",
+   "label": "Pending Requests",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Pending From IT\",false]]"
+  },
+  {
+   "document_type": "Email Request",
+   "label": "Created Emails",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Delivered\",false]]"
+  },
+  {
+   "document_type": "Email Request",
+   "label": "Deleted Emails",
+   "quick_list_filter": "[[\"Email Request\",\"status\",\"=\",\"Deleted\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Email Creator"
+  }
+ ],
+ "sequence_id": 30.0,
+ "shortcuts": [
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Open",
+   "label": "Mail",
+   "link_to": "Sahayog Ticket",
+   "stats_filter": "[[\"Sahayog Ticket\",\"status\",\"not in\",[\"Resolved\",\"Closed\",\"Cancelled\",null],false],[\"Sahayog Ticket\",\"ticket_type\",\"=\",\"Mail\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "format": "{} Deleted",
+   "label": "Deleted",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Deleted\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Email Requests Report",
+   "link_to": "Email Requests Report",
+   "type": "Report"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Pending",
+   "label": "Pending",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Pending From IT\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "format": "{}",
+   "label": "Delivered",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Delivered\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "format": "{} Required",
+   "label": "Correction",
+   "link_to": "Email Request",
+   "stats_filter": "[[\"Email Request\",\"status\",\"=\",\"Correction-Required\",false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Email Requests"
+}

@@ -166,6 +166,7 @@
    "depends_on": "eval:doc.select_department",
    "fieldname": "list",
    "fieldtype": "Link",
+   "ignore_user_permissions": 1,
    "label": "Item",
    "options": "Sahayog Item"
   },
@@ -326,7 +327,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-24 11:36:43.250371",
+ "modified": "2025-05-30 13:20:28.939846",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",
