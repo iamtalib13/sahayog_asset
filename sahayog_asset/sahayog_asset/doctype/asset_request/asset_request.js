@@ -1,24 +1,6 @@
 // Copyright (c) 2023, Sid and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Asset List", "form_render", function (frm, cdt, cdn) {
-//   let child_doc = locals[cdt][cdn];
-//   let status = child_doc.dispatched_status;
-//   console.log("dispatched status on refresh - ", status);
-//   // if (status !== "Pending") {
-//   //   frm.fields_dict[child_doc.doctype].grid.get_field(
-//   //     "dispatched_status"
-//   //   ).df.read_only = 1;
-//   // }
-//   // frm.refresh_field(child_doc.doctype);
-//   console.log("child refresh");
-//   var df = frappe.meta.get_docfield(
-//     "Asset List",
-//     "dispatched_status",
-//     cur_frm.doc.name
-//   );
-//   df.read_only = 1;
-// });
 
 frappe.ui.form.on("Asset List", {
   form_render(frm, cdt, cdn) {
@@ -66,13 +48,7 @@ frappe.ui.form.on("Asset List", {
     let status = child_doc.dispatched_status;
     console.log("dispatched status - ", status);
 
-    // if (status === "Dispatch" || status === "Self-Purchase") {
-    //   frappe.model.set_value(cdt, cdn, "dispatched_locked", "True");
-    //   frm.refresh_field("dispatched_locked");
-    // } else if (status === "Pending") {
-    //   frappe.model.set_value(cdt, cdn, "dispatched_locked", "False");
-    //   frm.refresh_field("dispatched_locked");
-    // }
+ 
   },
 });
 
