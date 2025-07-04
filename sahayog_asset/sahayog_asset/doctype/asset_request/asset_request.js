@@ -2515,16 +2515,15 @@ frappe.ui.form.on("Asset Request", {
           //var department = r.message[0].department;
 
           frm.set_value("employee_department", r.message[0].department);
-          console.log("Department : ", r.message[0].department);
-          frm.set_value("division", r.message[0].division);
-          frm.set_value("region", r.message[0].region);
+          frm.set_value("division", r.message[0].custom_division);
+          frm.set_value("region", r.message[0].custom_region);
           frm.set_value("employee_user", r.message[0].user_id);
           frm.set_value("branch", r.message[0].branch);
-          frm.set_value("district", r.message[0].district);
+          frm.set_value("district", r.message[0].custom_district);
           frm.set_value("emp_name", r.message[0].employee_name);
           frm.set_value("phone", r.message[0].cell_number);
           frm.set_value("designation", r.message[0].designation);
-          frm.set_value("zone", r.message[0].zone);
+          frm.set_value("zone", r.message[0].custom_zone);
           let reports_to = r.message[0].reports_to;
 
           console.log("reporting-", reports_to);
