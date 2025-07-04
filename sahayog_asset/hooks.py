@@ -188,3 +188,16 @@ doc_events = {
 # auth_hooks = [
 #	"sahayog_asset.auth.validate"
 # ]
+fixtures = [
+    {"dt": "Custom HTML Block", "filters": [
+        [
+            "name",
+            "in",
+            {
+				"Asset Dashboard"
+				
+			}
+        ]
+    ]},
+
+]
