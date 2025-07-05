@@ -249,81 +249,6 @@ def store_pending(doc):
 #     )
 #     return count[0][0] if count else 0
 
-
-@frappe.whitelist()
-def get_counts(employee_user):
-    statuses = [
-        "Pending",
-        "Dispatched",
-        "Received",
-        "Pending From Purchase",
-        "Pending From Store Manager",
-        "Rejected",
-        "Delivered",
-        "Draft",
-    ]
-    counts = {}
-
-    for status in statuses:
-        count = frappe.db.sql(
-            """SELECT COUNT(*)
-               FROM `tabAsset Request`
-               WHERE employee_user = %s
-               AND status = %s;""",
-            (employee_user, status),
-        )
-        counts[status.lower()] = count[0][0] if count else 0
-
-    return counts
-
-
-# for Reporting Manager
-@frappe.whitelist()
-def get_counts_request(employee_user):
-    statuses = ["Pending"]
-    counts = {}
-
-    for status in statuses:
-        count = frappe.db.sql(
-            """SELECT COUNT(*) AS count
-               FROM (
-                   SELECT ds.*, ar.status
-                   FROM `tabDocShare` ds
-                   JOIN `tabAsset Request` ar ON ds.share_name = ar.name
-                   WHERE ds.share_doctype = 'Asset Request'
-                   AND ds.user = %s
-                   AND ar.status = %s
-                   AND (
-                       (ar.stage_1_emp_status = 'Pending' AND ar.stage_1_emp_id = %s)
-                       OR
-                       (ar.stage_2_emp_status = 'Pending' AND ar.stage_2_emp_id = %s)
-                       OR
-                       (ar.stage_3_emp_status = 'Pending' AND ar.stage_3_emp_id = %s)
-                       OR
-                       (ar.stage_4_emp_status = 'Pending' AND ar.stage_4_emp_id = %s)
-                       OR
-                       (ar.stage_5_emp_status = 'Pending' AND ar.stage_5_emp_id = %s)
-                       OR
-                       (ar.stage_6_emp_status = 'Pending' AND ar.stage_6_emp_id = %s)
-                   )
-               ) AS subquery;""",
-            (
-                employee_user,
-                status,
-                employee_user,
-                employee_user,
-                employee_user,
-                employee_user,
-                employee_user,
-                employee_user,
-            ),
-        )
-        counts[status.lower()] = count[0][0] if count else 0
-
-    return counts
-
-
-# for Reporting Manager
 @frappe.whitelist()
 def get_approved_counts(employee_user):
     statuses = ["Pending"]
@@ -499,3 +424,156 @@ def get_all_count(employee_user):
         return True
     else:
         return False
+
+
+#permission query conditions and has_permission functions
+# These functions control access to the Asset Request doctype based on user roles and document properties.
+# They determine which records a user can see and whether they can perform actions on those records.
+def get_permission_query_conditions(user):
+    if not user:
+        return ""
+
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return ""  # Full access
+
+    if any(role in roles for role in [
+        "Admin Support Executive",
+        "Admin Support Manager",
+        "Admin Store Executive",
+        "Admin Store Manager"
+    ]):
+        return "`tabAsset Request`.`select_department` = 'Admin'"
+
+    if any(role in roles for role in [
+        "IT Support Executive",
+        "IT Store Executive",
+        "IT Store Manager"
+    ]):
+        return "`tabAsset Request`.`select_department` = 'IT'"
+
+    if "Stationery Store & Support Manager" in roles:
+        return "`tabAsset Request`.`select_department` = 'Stationery'"
+
+    # Default rule: show if user is employee_user OR in any stage_X_emp_id
+    return (
+        f"(`tabAsset Request`.`employee_user` = '{user}' "
+        f"OR `tabAsset Request`.`stage_1_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_2_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_3_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_4_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_5_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_6_emp_id` = '{user}' "
+        f"OR `tabAsset Request`.`stage_7_emp_id` = '{user}')"
+    )
+
+def has_permission(doc, user):
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return True
+
+    if any(role in roles for role in [
+        "Admin Support Executive",
+        "Admin Support Manager",
+        "Admin Store Executive",
+        "Admin Store Manager"
+    ]):
+        return doc.select_department == "Admin"
+
+    if any(role in roles for role in [
+        "IT Support Executive",
+        "IT Store Executive",
+        "IT Store Manager"
+    ]):
+        return doc.select_department == "IT"
+
+    if "Stationery Store & Support Manager" in roles:
+        return doc.select_department == "Stationery"
+
+    # Allow if user is employee_user or any stage_X_emp_id
+    return (
+        doc.employee_user == user or
+        doc.stage_1_emp_id == user or
+        doc.stage_2_emp_id == user or
+        doc.stage_3_emp_id == user or
+        doc.stage_4_emp_id == user or
+        doc.stage_5_emp_id == user or
+        doc.stage_6_emp_id == user or
+        doc.stage_7_emp_id == user
+    )
+
+
+@frappe.whitelist()
+def get_counts(employee_user):
+    statuses = [
+        "Pending",
+        "Dispatched",
+        "Received",
+        "Pending From Purchase",
+        "Pending From Store Manager",
+        "Rejected",
+        "Delivered",
+        "Draft",
+    ]
+    counts = {}
+
+    for status in statuses:
+        count = frappe.db.sql(
+            """SELECT COUNT(*)
+               FROM `tabAsset Request`
+               WHERE employee_user = %s
+               AND status = %s;""",
+            (employee_user, status),
+        )
+        counts[status.lower()] = count[0][0] if count else 0
+
+    return counts
+
+
+# for Reporting Manager
+@frappe.whitelist()
+def get_counts_request(employee_user):
+    statuses = ["Pending"]
+    counts = {}
+
+    for status in statuses:
+        count = frappe.db.sql(
+            """SELECT COUNT(*) AS count
+               FROM (
+                   SELECT ds.*, ar.status
+                   FROM `tabDocShare` ds
+                   JOIN `tabAsset Request` ar ON ds.share_name = ar.name
+                   WHERE ds.share_doctype = 'Asset Request'
+                   AND ds.user = %s
+                   AND ar.status = %s
+                   AND (
+                       (ar.stage_1_emp_status = 'Pending' AND ar.stage_1_emp_id = %s)
+                       OR
+                       (ar.stage_2_emp_status = 'Pending' AND ar.stage_2_emp_id = %s)
+                       OR
+                       (ar.stage_3_emp_status = 'Pending' AND ar.stage_3_emp_id = %s)
+                       OR
+                       (ar.stage_4_emp_status = 'Pending' AND ar.stage_4_emp_id = %s)
+                       OR
+                       (ar.stage_5_emp_status = 'Pending' AND ar.stage_5_emp_id = %s)
+                       OR
+                       (ar.stage_6_emp_status = 'Pending' AND ar.stage_6_emp_id = %s)
+                   )
+               ) AS subquery;""",
+            (
+                employee_user,
+                status,
+                employee_user,
+                employee_user,
+                employee_user,
+                employee_user,
+                employee_user,
+                employee_user,
+            ),
+        )
+        counts[status.lower()] = count[0][0] if count else 0
+
+    return counts
+
