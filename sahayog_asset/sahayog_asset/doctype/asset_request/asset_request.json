@@ -584,7 +584,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Done",
    "fieldname": "stage_7_request",
    "fieldtype": "Select",
    "label": "Stage 7 Request",
@@ -943,7 +942,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-05 13:49:32.191305",
+ "modified": "2025-07-05 14:00:17.195920",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
