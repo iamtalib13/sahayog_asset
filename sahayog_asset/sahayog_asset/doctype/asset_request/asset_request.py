@@ -114,19 +114,19 @@ class AssetRequest(Document):
     def set_employees_on_stages(self):
         # Get employee record based on the employee_id in AssetRequest
         employee = frappe.get_doc("Employee", self.employee_id)
-        
+
         # Retrieve the 'reports_to' field from the employee record
         reports_to = employee.reports_to
-        
+
         if reports_to:
             # Fetch the reporting employee details based on 'reports_to'
             reporting_emp = frappe.get_doc("Employee", reports_to)
-            
+
             # Retrieve employee_name, company_email, and designation from the reporting employee
             reporting_emp_name = reporting_emp.employee_name
             reporting_emp_email = reporting_emp.company_email
             reporting_emp_designation = reporting_emp.designation
-            
+
             # Create the user_id in the format reports_to@sahayog.com
             reporting_user_id = f"{reports_to}@sahayog.com"
 
@@ -135,6 +135,33 @@ class AssetRequest(Document):
             self.stage_1_emp_id = reporting_user_id
             self.stage_1_emp_email = reporting_emp_email
             self.rp_designation = reporting_emp_designation
+
+              # Set only if empty
+            if not self.stage_1_emp_status:
+                self.stage_1_emp_status = "Pending"
+
+        # --- Set Stage 2 Approver as fixed ---
+        self.stage_2_emp_id = "2800@sahayog.com"
+        stage2 = frappe.db.get_value("Employee", {"user_id": "2800@sahayog.com"}, ["employee_name","company_email"], as_dict=True)
+        if stage2:
+            self.stage_2_emp_name = stage2.employee_name
+            self.stage_2_emp_email = stage2.company_email
+        else:
+            self.stage_2_emp_name = "JITENDRA INDRARAJ RANGARI"
+            self.stage_2_emp_email = "jitendra.r@sahayogmultistate.com"
+
+        if not self.stage_2_emp_status:
+            self.stage_2_emp_status = "Pending"
+
+        # --- Skip Stages 3 to 6 ---
+        for i in range(3, 7):
+            setattr(self, f"stage_{i}_emp_status", "Skip")
+            setattr(self, f"stage_{i}_emp_id", "")
+            setattr(self, f"stage_{i}_emp_name", "")
+            setattr(self, f"stage_{i}_emp_email", "")
+
+        # Don't touch stage_7 (leave it for later logic or manual input)
+
 
 
 
