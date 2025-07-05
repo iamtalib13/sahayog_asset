@@ -3839,8 +3839,8 @@ frappe.ui.form.on("Asset Request", "refresh", function (frm) {
 frappe.ui.form.on("Asset Request", {
   refresh: function (frm) {
     if (
-      stage_1_emp_status === "Approved" &&
-      stage_2_emp_status === "Approved"
+      frm.doc.stage_1_emp_status === "Approved" &&
+      frm.doc.stage_2_emp_status === "Approved"
     ) {
       frm.set_value("stage_7_request", "Done");
     }
