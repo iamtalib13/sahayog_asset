@@ -364,6 +364,13 @@ frappe.ui.form.on("Asset Request", {
   },
 
   refresh: function (frm) {
+    if (
+      stage_1_emp_status === "Approved" &&
+      stage_2_emp_status === "Approved"
+    ) {
+      frm.set_value("stage_7_request", "Done");
+    }
+
     frm.trigger("populate_progress_html");
     if (
       frappe.user.has_role("System Manager") ||
