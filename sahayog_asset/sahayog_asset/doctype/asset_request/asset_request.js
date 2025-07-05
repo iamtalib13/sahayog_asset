@@ -2470,40 +2470,24 @@ frappe.ui.form.on("Asset Request", {
   },
   Set_Employee_Details: function (frm) {
     let user;
+
     if (frm.is_new()) {
       user = frappe.session.user;
-    } else if (!frm.is_new()) {
-      console.log("Eid-", frm.doc.employee_id);
+    } else {
       user = frm.doc.employee_id;
     }
 
-    // Get the numeric part of the user string
-    let eid = user.match(/\d+/)[0];
+    // Extract the string before @ (e.g., "3210", "ABPS123", "NT999")
+    let modifiedEmployeeId = user.split("@")[0];
 
-    // Initialize the modified employee_id
-    let modifiedEmployeeId = "";
-
-    // Check if the user string contains "ABPS" or "MCPS"
-    if (user.includes("ABPS")) {
-      modifiedEmployeeId = "ABPS" + eid;
-    } else if (user.includes("MCPS")) {
-      modifiedEmployeeId = "MCPS" + eid;
-    } else if (user.includes("NT")) {
-      modifiedEmployeeId = "NT" + eid;
-    } else {
-      // If neither "ABPS" nor "MCPS" is found, use the numeric part as is
-      modifiedEmployeeId = eid;
-    }
-
-    // Set the "employee_id" field with the modified value
+    // Set employee_id
     frm.set_value("employee_id", modifiedEmployeeId);
-    let empid = frm.doc.employee_id;
 
     frappe.call({
       method:
         "sahayog_asset.sahayog_asset.doctype.asset_request.get_emp_details.get_emp_details",
       args: {
-        emp_id: empid,
+        emp_id: modifiedEmployeeId,
       },
       callback: function (r) {
         // Check if the message array contains at least one object
