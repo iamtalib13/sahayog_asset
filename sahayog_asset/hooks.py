@@ -44,6 +44,13 @@ app_license = "MIT"
 # role_home_page = {
 #	"Role": "home_page"
 # }
+permission_query_conditions = {
+    "Asset Request": "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.get_permission_query_conditions",
+}
+
+has_permission = {
+    "Asset Request": "sahayog_asset.sahayog_asset.doctype.asset_request.asset_request.has_permission",
+}
 
 # Generators
 # ----------
