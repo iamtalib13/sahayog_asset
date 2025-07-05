@@ -25,7 +25,6 @@
   "branch",
   "column_break_um3go",
   "district",
-  "asset_department_section",
   "section_break_hitna",
   "list",
   "column_break_y1mfa",
@@ -585,6 +584,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "Done",
    "fieldname": "stage_7_request",
    "fieldtype": "Select",
    "label": "Stage 7 Request",
@@ -677,11 +677,6 @@
    "fieldname": "employee_details_section",
    "fieldtype": "Section Break",
    "label": "Employee Details"
-  },
-  {
-   "fieldname": "asset_department_section",
-   "fieldtype": "Section Break",
-   "label": "Asset Department"
   },
   {
    "default": "Pending",
@@ -948,7 +943,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-30 11:20:53.654981",
+ "modified": "2025-07-05 13:49:32.191305",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Asset Request",
@@ -965,7 +960,6 @@
    "report": 1,
    "role": "System Manager",
    "select": 1,
-   "set_user_permissions": 1,
    "share": 1,
    "write": 1
   },
@@ -980,7 +974,6 @@
    "report": 1,
    "role": "Employee",
    "select": 1,
-   "set_user_permissions": 1,
    "share": 1,
    "write": 1
   },
@@ -1008,6 +1001,7 @@
    "share": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
