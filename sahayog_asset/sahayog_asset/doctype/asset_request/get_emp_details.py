@@ -2,10 +2,10 @@ import frappe
 
 @frappe.whitelist()
 def get_emp_details(emp_id):
-    return frappe.db.get_value(
+    employee = frappe.get_all(
         "Employee",
-        {"employee_id": emp_id},
-        [
+        filters={"employee_id": emp_id},
+        fields=[
             "department",
             "custom_division",
             "custom_region",
@@ -16,7 +16,8 @@ def get_emp_details(emp_id):
             "cell_number",
             "designation",
             "custom_zone",
-            "reports_to"
+            "reports_to",
         ],
-        as_dict=True
+        limit=1
     )
+    return employee
