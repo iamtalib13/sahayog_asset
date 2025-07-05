@@ -1,7 +1,6 @@
 // Copyright (c) 2023, Sid and contributors
 // For license information, please see license.txt
 
-
 frappe.ui.form.on("Asset List", {
   form_render(frm, cdt, cdn) {
     let child_doc = locals[cdt][cdn];
@@ -47,8 +46,6 @@ frappe.ui.form.on("Asset List", {
     let child_doc = locals[cdt][cdn];
     let status = child_doc.dispatched_status;
     console.log("dispatched status - ", status);
-
- 
   },
 });
 
@@ -2514,18 +2511,19 @@ frappe.ui.form.on("Asset Request", {
           // Get the employee department field from the first object in the array
           //var department = r.message[0].department;
 
-          frm.set_value("employee_department", r.message[0].department);
-          frm.set_value("division", r.message[0].custom_division);
-          frm.set_value("region", r.message[0].custom_region);
-          frm.set_value("employee_user", r.message[0].user_id);
-          frm.set_value("branch", r.message[0].branch);
-          frm.set_value("district", r.message[0].custom_district);
-          frm.set_value("emp_name", r.message[0].employee_name);
-          frm.set_value("phone", r.message[0].cell_number);
-          frm.set_value("designation", r.message[0].designation);
-          frm.set_value("zone", r.message[0].custom_zone);
-          let reports_to = r.message[0].reports_to;
+          let data = r.message[0];
+          frm.set_value("employee_department", data.department);
+          frm.set_value("division", data.custom_division);
+          frm.set_value("region", data.custom_region);
+          frm.set_value("employee_user", data.user_id);
+          frm.set_value("branch", data.branch);
+          frm.set_value("district", data.custom_district);
+          frm.set_value("emp_name", data.employee_name);
+          frm.set_value("phone", data.cell_number);
+          frm.set_value("designation", data.designation);
+          frm.set_value("zone", data.custom_zone);
 
+          let reports_to = r.message[0].reports_to;
           console.log("reporting-", reports_to);
 
           //<Email Setup>
