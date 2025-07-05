@@ -8,7 +8,7 @@ def get_emp_details(emp_id):
 
     employee = frappe.get_all(
         "Employee",
-        filters={"employee_id": emp_id},
+        filters={"name": emp_id},
         fields=[
             "department",
             "custom_division",
