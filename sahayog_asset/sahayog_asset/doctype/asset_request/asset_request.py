@@ -435,7 +435,9 @@ def get_permission_query_conditions(user):
 
     roles = frappe.get_roles(user)
 
-    if user == "Administrator":
+    full_access_roles = ["Administrator", "Purchase Department"]
+
+    if any(role in full_access_roles for role in roles):
         return ""  # Full access
 
     if any(role in roles for role in [
@@ -456,7 +458,6 @@ def get_permission_query_conditions(user):
     if "Stationery Store & Support Manager" in roles:
         return "`tabAsset Request`.`select_department` = 'Stationery'"
 
-    # Default rule: show if user is employee_user OR in any stage_X_emp_id
     return (
         f"(`tabAsset Request`.`employee_user` = '{user}' "
         f"OR `tabAsset Request`.`stage_1_emp_id` = '{user}' "
@@ -471,7 +472,9 @@ def get_permission_query_conditions(user):
 def has_permission(doc, user):
     roles = frappe.get_roles(user)
 
-    if user == "Administrator":
+    full_access_roles = ["Administrator", "Purchase Department"]
+
+    if any(role in full_access_roles for role in roles):
         return True
 
     if any(role in roles for role in [
@@ -492,7 +495,6 @@ def has_permission(doc, user):
     if "Stationery Store & Support Manager" in roles:
         return doc.select_department == "Stationery"
 
-    # Allow if user is employee_user or any stage_X_emp_id
     return (
         doc.employee_user == user or
         doc.stage_1_emp_id == user or
@@ -503,7 +505,6 @@ def has_permission(doc, user):
         doc.stage_6_emp_id == user or
         doc.stage_7_emp_id == user
     )
-
 
 @frappe.whitelist()
 def get_counts(employee_user):
