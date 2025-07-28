@@ -540,12 +540,10 @@ frappe.ui.form.on("Purchase Requisition", {
               });
 
               // Set field values
-
               frm.set_value("status", "Dispatched");
 
               // Save the form
               frm.save();
-
               //</PR is Shared with RM using API Call>
             } else {
               frappe.msgprint("Already Dispatched");
@@ -794,14 +792,14 @@ frappe.ui.form.on("Purchase Requisition", {
       callback: function (response) {
         //Display a message to the user
         frappe.show_alert({
-          message: "Your Purchase Request Sent To Purchase Department Successfully ",
+          message:
+            "Your Purchase Request Sent To Purchase Department Successfully ",
           indicator: "green",
         });
         //frm.set_value("cto_request", "Done");
         //frm.set_value("cto_status", "Pending");
 
         frm.set_value("status", "Pending from Purchase");
-        
 
         frm.save();
       },
@@ -1092,4 +1090,62 @@ frappe.ui.form.on("Purchase Requisition", {
       frm.save();
     }
   },
+});
+
+frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
+  //for Dispatched Status
+  $(document).ready(function () {
+    $('div[data-fieldname="dispatched_status"] .static-area').each(function () {
+      var text = $(this).text().trim();
+      var $parent = $(this).parent();
+
+      if (text === "Pending") {
+        $parent.css({
+          color: "#E50914",
+          "font-weight": "bold",
+          "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+        });
+      } else if (text === "Dispatch") {
+        $parent.css({
+          color: "#1DB954",
+          "font-weight": "bold",
+          "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+        });
+
+        // Disable the select element
+        $parent
+          .find('select[data-fieldname="dispatched_status"]')
+          .attr("disabled", true);
+      } else if (text === "Self-Purchase") {
+        $parent.css({
+          color: "#1877F2",
+          "font-weight": "bold",
+          "background-color": "rgba(24, 119, 242, 0.1)", // light blue background
+        });
+
+        // Disable the select element
+        $parent
+          .find('select[data-fieldname="dispatched_status"]')
+          .attr("disabled", true);
+      }
+    });
+  });
+
+  //for Purchase Status
+  $('div[data-fieldname="purchase"] .static-area').each(function () {
+    var text = $(this).text().trim();
+    if (text === "Pending") {
+      $(this).parent().css({
+        color: "#E50914",
+        "font-weight": "bold",
+        "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+      });
+    } else if (text === "Dispatch") {
+      $(this).parent().css({
+        color: "#1DB954",
+        "font-weight": "bold",
+        "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+      });
+    }
+  });
 });
