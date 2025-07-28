@@ -2,12 +2,34 @@ import frappe
 from frappe.model.document import Document
 
 class PurchaseRequisition(Document):
-    def validate(self):
-        if self.status == "Dispatched":
-            # Check if all rows in the child table 'asset' have the 'purchase' field set to "Dispatch"
-            for row in self.asset:
-                if row.purchase != "Dispatch":
-                    frappe.throw(f"All rows in the 'asset' child table must have 'purchase' set to 'Dispatch'. Row with item '{row.item_name}' has '{row.purchase}'.")
+   def validate(self):
+    if self.status == "Dispatched":
+        dispatched_items = []
+        not_dispatched_items = []
+
+        for row in self.asset:
+            if row.purchase == "Dispatch":
+                dispatched_items.append(row.item_name)
+            else:
+                not_dispatched_items.append(row.item_name)
+
+        dispatched_count = len(dispatched_items)
+
+        # At least one must be dispatched
+        if dispatched_count == 0:
+            frappe.throw("At least one item must be marked as 'Dispatch' to set status to 'Dispatched'.")
+
+        # Show a message with details
+        total = len(self.asset)
+        not_dispatched_count = len(not_dispatched_items)
+
+        message = f"<b>Status set to Dispatched.</b><br><br>"
+        message += f"<b>Total Items:</b> {total}<br>"
+        message += f"<b>Dispatched Items ({dispatched_count}):</b> {', '.join(dispatched_items) or 'None'}<br>"
+        message += f"<b>Pending Dispatch ({not_dispatched_count}):</b> {', '.join(not_dispatched_items) or 'None'}"
+
+        frappe.msgprint(message)
+
 
     def before_save(self):
         if self.status == "Draft":
