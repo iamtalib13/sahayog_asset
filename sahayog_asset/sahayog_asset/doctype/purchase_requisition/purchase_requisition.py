@@ -2,33 +2,35 @@ import frappe
 from frappe.model.document import Document
 
 class PurchaseRequisition(Document):
-   def validate(self):
-    if self.status == "Dispatched":
-        dispatched_items = []
-        not_dispatched_items = []
+    def validate(self):
+        if self.status in ["Dispatched", "Partially Dispatched"]:
+            dispatched_items = []
+            not_dispatched_items = []
 
-        for row in self.asset:
-            if row.purchase == "Dispatch":
-                dispatched_items.append(row.item_name)
-            else:
-                not_dispatched_items.append(row.item_name)
+            # Ensure asset list is not empty
+            if not self.asset:
+                frappe.throw("Cannot set status to Dispatched — asset list is empty.")
 
-        dispatched_count = len(dispatched_items)
+            for row in self.asset:
+                if row.purchase == "Dispatch":
+                    dispatched_items.append(row.item_name)
+                else:
+                    not_dispatched_items.append(row.item_name)
 
-        # At least one must be dispatched
-        if dispatched_count == 0:
-            frappe.throw("At least one item must be marked as 'Dispatch' to set status to 'Dispatched'.")
+            dispatched_count = len(dispatched_items)
+            not_dispatched_count = len(not_dispatched_items)
+            total = len(self.asset)
 
-        # Show a message with details
-        total = len(self.asset)
-        not_dispatched_count = len(not_dispatched_items)
+            # Prevent dispatch if no item is marked for Dispatch
+            if dispatched_count == 0:
+                frappe.throw("Cannot set status to Dispatched or Partially Dispatched — no item is marked as 'Dispatch'.")
 
-        message = f"<b>Status set to Dispatched.</b><br><br>"
-        message += f"<b>Total Items:</b> {total}<br>"
-        message += f"<b>Dispatched Items ({dispatched_count}):</b> {', '.join(dispatched_items) or 'None'}<br>"
-        message += f"<b>Pending Dispatch ({not_dispatched_count}):</b> {', '.join(not_dispatched_items) or 'None'}"
+            message = f"<b>Status set to {self.status}.</b><br><br>"
+            message += f"<b>Total Items:</b> {total}<br>"
+            message += f"<b>Dispatched Items ({dispatched_count}):</b> {', '.join(dispatched_items) or 'None'}<br>"
+            message += f"<b>Pending Dispatch ({not_dispatched_count}):</b> {', '.join(not_dispatched_items) or 'None'}"
 
-        frappe.msgprint(message)
+            frappe.msgprint(message)
 
 
     def before_save(self):

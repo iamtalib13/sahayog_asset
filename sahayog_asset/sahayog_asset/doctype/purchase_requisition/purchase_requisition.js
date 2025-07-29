@@ -522,41 +522,94 @@ frappe.ui.form.on("Purchase Requisition", {
   },
   dispatch: function (frm) {
     frm.add_custom_button(__("Dispatch"), function () {
-      if (
-        frm.doc.status == "Pending from Purchase" ||
-        frm.doc.status == "Pending from CFO" ||
-        frm.doc.status == "Pending from Vendor"
-      ) {
+      const total_rows = frm.doc.asset.length;
+      let dispatch_count = 0;
+      let pending_rows = [];
+
+      // 1. Count Dispatch and collect Pending rows
+      frm.doc.asset.forEach((row) => {
+        if (row.purchase === "Dispatch") {
+          dispatch_count++;
+        } else if (row.purchase === "Pending") {
+          pending_rows.push(row);
+        }
+      });
+
+      // 2. Exit if no item marked as Dispatch
+      if (dispatch_count === 0) {
+        frappe.msgprint({
+          title: __("No Dispatch"),
+          message: __(
+            "Please mark at least one item as 'Dispatch' to proceed."
+          ),
+          indicator: "red",
+        });
+        return;
+      }
+
+      // 3. Check if pending rows have dispatched_status = "Dispatch"
+      let partial_dispatch_exists = pending_rows.some(
+        (row) => row.dispatched_status === "Dispatch"
+      );
+
+      // 4. Decide final_status
+      let final_status = "";
+      if (dispatch_count === total_rows) {
+        final_status = "Dispatched";
+      } else if (partial_dispatch_exists || dispatch_count > 0) {
+        final_status = "Partially Dispatched";
+      } else {
+        frappe.msgprint({
+          title: __("Invalid Dispatch"),
+          message: __("Cannot proceed as no valid partial dispatch found."),
+          indicator: "red",
+        });
+        return;
+      }
+
+      // 5. Check allowed statuses
+      const allowed_statuses = [
+        "Pending from Purchase",
+        "Pending from CFO",
+        "Pending from Vendor",
+        "Partially Dispatched",
+      ];
+
+      if (allowed_statuses.includes(frm.doc.status)) {
         frappe.confirm(
-          "We are assuming that you verified this Purchase Request <br> " +
-            "<b>Are you sure for Dispatch</b>",
+          "We are assuming that you verified this Purchase Request.<br><b>Are you sure for Dispatch?</b>",
           () => {
-            //<PR is Shared with RM using API Call>
-            if (frm.doc.status !== "Dispatched") {
-              // Document share was successful
-              frappe.show_alert({
-                message: " Dispatched Saved Successfully",
-                indicator: "green",
+            frm.set_value("status", final_status);
+
+            frm
+              .save()
+              .then(() => {
+                frappe.show_alert({
+                  message: `${final_status} and Saved Successfully`,
+                  indicator: "green",
+                });
+                frm.reload_doc();
+              })
+              .catch((err) => {
+                frappe.msgprint({
+                  title: __("Error"),
+                  message: __("Could not save the document. Please try again."),
+                  indicator: "red",
+                });
+                console.error(err);
               });
-
-              // Set field values
-              frm.set_value("status", "Dispatched");
-
-              // Save the form
-              frm.save();
-              //</PR is Shared with RM using API Call>
-            } else {
-              frappe.msgprint("Already Dispatched");
-            }
-          },
-          () => {
-            // action to perform if No is selected
           }
         );
       } else {
-        frappe.msgprint("Already dispatched", "Message", "red");
+        frappe.msgprint({
+          title: __("Already Dispatched"),
+          message: __("This document is already dispatched."),
+          indicator: "red",
+        });
       }
     });
+
+    // Button styling
     frm.change_custom_button_type("Dispatch", null, "success");
   },
   Pending_from_vendor: function (frm) {
