@@ -3842,8 +3842,9 @@ frappe.ui.form.on("Asset Request", "refresh", function (frm) {
 frappe.ui.form.on("Asset Request", {
   refresh: function (frm) {
     if (
-      frm.doc.stage_1_emp_status === "Approved" &&
-      frm.doc.stage_2_emp_status === "Approved"
+      (frm.doc.stage_1_emp_status === "Approved" &&
+        frm.doc.stage_2_emp_status === "Approved") ||
+      frm.doc.status === "Pending From Store Manager"
     ) {
       frm.set_value("stage_7_request", "Done");
     }
