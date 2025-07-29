@@ -3846,7 +3846,11 @@ frappe.ui.form.on("Asset Request", {
         frm.doc.stage_2_emp_status === "Approved") ||
       frm.doc.status === "Pending From Store Manager"
     ) {
-      frm.set_value("stage_7_request", "Done");
+      if (frm.doc.stage_7_request !== "Done") {
+        frm.set_value("stage_7_request", "Done").then(() => {
+          frm.save();
+        });
+      }
     }
   },
   add_item_button: function (frm) {
