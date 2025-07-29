@@ -153,7 +153,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nPending from CTO\nPending from Purchase\nPending from Vendor\nPending from CFO\nDispatched\nReceived\nRejected"
+   "options": "Draft\nPending from CTO\nPending from Purchase\nPending from Vendor\nPending from CFO\nDispatched\nPartially Dispatched\nReceived\nRejected"
   },
   {
    "depends_on": "eval:doc.select_department",
@@ -327,7 +327,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-28 13:11:47.131287",
+ "modified": "2025-07-29 11:02:09.959925",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",
@@ -414,6 +414,10 @@
   {
    "color": "Orange",
    "title": "Pending from CTO"
+  },
+  {
+   "color": "Cyan",
+   "title": "Partially Dispatched"
   }
  ],
  "track_changes": 1
