@@ -2059,97 +2059,94 @@ frappe.ui.form.on("Asset Request", {
 
     //START-------------------------------------------------------------------------------------------
     //<Stage 7>
-    else if (frm.doc.stage_7_request == "Done") {
-      if (frappe.user.has_role("Store Manager")) {
-        console.log("Store Manager");
-        //frm.set_df_property("dispatch_check", "hidden", 0);
-        var purchase_status = frappe.meta.get_docfield(
-          "Asset List",
-          "purchase",
-          cur_frm.doc.name
-        );
-        purchase_status.read_only = 1;
+    else if (frappe.user.has_role("Store Manager")) {
+      console.log("Store Manager");
+      //frm.set_df_property("dispatch_check", "hidden", 0);
+      var purchase_status = frappe.meta.get_docfield(
+        "Asset List",
+        "purchase",
+        cur_frm.doc.name
+      );
+      purchase_status.read_only = 1;
 
-        console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
-        if (
-          frm.doc.status == "Dispatched" ||
-          frm.doc.status == "Recieved" ||
-          frm.doc.status == "Delivered"
-        ) {
-          frm.set_df_property("asset", "read_only", 1);
-        } else if (frm.doc.status == "Received") {
-          frm.trigger("Asset_Delivered");
-        }
-        if (frm.doc.status == "Pending From Store Manager") {
-          console.log("pending from store Manager");
-          frm.set_df_property("asset", "read_only", 0);
-          frm.trigger("dispatch_button");
-          console.log("dispatch button triggered");
-        } else if (frm.doc.purchase_status == "Delivered To Store") {
-          frm.trigger("dispatch_button");
-        } else if (frm.doc.status == "Dispatched") {
-          frm.set_df_property("asset", "read_only", 1);
-        } else {
-          frm.set_df_property("asset", "read_only", 1);
-        }
-
-        if (
-          frm.doc.status == "Pending" &&
-          frm.doc.stage_7_emp_status !== "Pending From Purchase"
-        ) {
-          // frm.add_custom_button(__("Pending From Purchase"), function () {
-          //   var d = new frappe.ui.Dialog({
-          //     title: __("Pending From Purchase Reason"),
-          //     fields: [
-          //       {
-          //         label: __(
-          //           "Please Give Reason of unavailability for this Asset Request"
-          //         ),
-          //         fieldname: "stage_7_emp_unavailable_reason",
-          //         fieldtype: "Small Text",
-          //         reqd: 1, // Set the unavailability reason field as mandatory
-          //       },
-          //     ],
-          //     primary_action_label: __("Submit"),
-          //     primary_action: function () {
-          //       // Check if the unavailability reason is provided
-          //       if (!d.fields_dict.stage_7_emp_unavailable_reason.get_value()) {
-          //         frappe.msgprint(
-          //           __("Please provide an unavailability reason.")
-          //         );
-          //         return;
-          //       }
-          //       // Generate a random 4-digit number
-          //       var randomOTP = Math.floor(1000 + Math.random() * 9000);
-          //       frm.set_value("stage_7_emp_status", "Pending From Purchase");
-          //       frm.set_value("store_otp", randomOTP); // Set the random number to store_otp
-          //       frm.set_value(
-          //         "stage_7_emp_unavailable_reason",
-          //         d.fields_dict.stage_7_emp_unavailable_reason.get_value()
-          //       );
-          //       d.hide();
-          //       frm.set_value("status", "Pending From Purchase");
-          //       console.log("Pending from Button");
-          //       frm.trigger("share_with_purchase");
-          //       cur_frm.save();
-          //     },
-          //     secondary_action_label: __("Cancel"),
-          //     secondary_action: function () {
-          //       d.hide();
-          //     },
-          //   });
-          //   d.show();
-          // });
-        }
-        // frappe.msgprint("RP Matched");
-        frm.disable_save();
-        //<Send for Approval , this button is only for PR Owner>
-        // Check if the page has already been reloaded
-
-        // Get the dispatch_check button field element
-        var dispatchCheckButton = frm.get_field("dispatch_check").$wrapper;
-      } else {
+      console.log("Employee Matched at Stage 7 :" + frm.doc.stage_7_emp_id);
+      if (
+        frm.doc.status == "Dispatched" ||
+        frm.doc.status == "Recieved" ||
+        frm.doc.status == "Delivered"
+      ) {
+        frm.set_df_property("asset", "read_only", 1);
+      } else if (frm.doc.status == "Received") {
+        frm.trigger("Asset_Delivered");
       }
+      if (frm.doc.status == "Pending From Store Manager") {
+        console.log("pending from store Manager");
+        frm.set_df_property("asset", "read_only", 0);
+        frm.trigger("dispatch_button");
+        console.log("dispatch button triggered");
+      } else if (frm.doc.purchase_status == "Delivered To Store") {
+        frm.trigger("dispatch_button");
+      } else if (frm.doc.status == "Dispatched") {
+        frm.set_df_property("asset", "read_only", 1);
+      } else {
+        frm.set_df_property("asset", "read_only", 1);
+      }
+
+      if (
+        frm.doc.status == "Pending" &&
+        frm.doc.stage_7_emp_status !== "Pending From Purchase"
+      ) {
+        // frm.add_custom_button(__("Pending From Purchase"), function () {
+        //   var d = new frappe.ui.Dialog({
+        //     title: __("Pending From Purchase Reason"),
+        //     fields: [
+        //       {
+        //         label: __(
+        //           "Please Give Reason of unavailability for this Asset Request"
+        //         ),
+        //         fieldname: "stage_7_emp_unavailable_reason",
+        //         fieldtype: "Small Text",
+        //         reqd: 1, // Set the unavailability reason field as mandatory
+        //       },
+        //     ],
+        //     primary_action_label: __("Submit"),
+        //     primary_action: function () {
+        //       // Check if the unavailability reason is provided
+        //       if (!d.fields_dict.stage_7_emp_unavailable_reason.get_value()) {
+        //         frappe.msgprint(
+        //           __("Please provide an unavailability reason.")
+        //         );
+        //         return;
+        //       }
+        //       // Generate a random 4-digit number
+        //       var randomOTP = Math.floor(1000 + Math.random() * 9000);
+        //       frm.set_value("stage_7_emp_status", "Pending From Purchase");
+        //       frm.set_value("store_otp", randomOTP); // Set the random number to store_otp
+        //       frm.set_value(
+        //         "stage_7_emp_unavailable_reason",
+        //         d.fields_dict.stage_7_emp_unavailable_reason.get_value()
+        //       );
+        //       d.hide();
+        //       frm.set_value("status", "Pending From Purchase");
+        //       console.log("Pending from Button");
+        //       frm.trigger("share_with_purchase");
+        //       cur_frm.save();
+        //     },
+        //     secondary_action_label: __("Cancel"),
+        //     secondary_action: function () {
+        //       d.hide();
+        //     },
+        //   });
+        //   d.show();
+        // });
+      }
+      // frappe.msgprint("RP Matched");
+      frm.disable_save();
+      //<Send for Approval , this button is only for PR Owner>
+      // Check if the page has already been reloaded
+
+      // Get the dispatch_check button field element
+      var dispatchCheckButton = frm.get_field("dispatch_check").$wrapper;
     } //</Stage 7>
 
     //END-------------------------------------------------------------------------------------------
