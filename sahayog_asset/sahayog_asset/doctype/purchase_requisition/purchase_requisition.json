@@ -270,12 +270,12 @@
    "label": "CTO"
   },
   {
-   "default": "1299@sahayog.com",
    "fieldname": "cto_user",
    "fieldtype": "Data",
    "label": "CTO User"
   },
   {
+   "default": "Skip",
    "fieldname": "cto_status",
    "fieldtype": "Select",
    "label": "Status",
@@ -327,7 +327,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-29 11:02:09.959925",
+ "modified": "2025-08-19 11:15:05.421771",
  "modified_by": "Administrator",
  "module": "Sahayog Asset",
  "name": "Purchase Requisition",

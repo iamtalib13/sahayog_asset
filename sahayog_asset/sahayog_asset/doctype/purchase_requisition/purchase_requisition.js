@@ -148,20 +148,13 @@ frappe.ui.form.on("Purchase Requisition", {
                 frappe.confirm(
                   "<i>Do you want to send to Purchase Department?</i>",
                   () => {
-                    // action to perform if Yes is selected
-                    if (frm.doc.select_department === "IT") {
-                      frm.trigger("share_with_cto");
-                      frappe.show_alert({
-                        message: "Successfully Sent to CTO",
-                        indicator: "green",
-                      });
-                    } else {
-                      frm.trigger("share_with_purchase_dept");
-                      frappe.show_alert({
-                        message: "Successfully Sent to Purchase Department",
-                        indicator: "green",
-                      });
-                    }
+                    frappe.show_alert({
+                      message: "Successfully Sent to Purchase Department",
+                      indicator: "green",
+                    });
+                    frm.set_value("status", "Pending from Purchase");
+                    frm.set_value("request", "Done");
+                    frm.save();
                   },
                   () => {
                     // action to perform if No is selected
@@ -491,6 +484,88 @@ frappe.ui.form.on("Purchase Requisition", {
         $(this).css("background-color", "#a0d170");
       }
     );
+    //for Dispatched Status
+    $(document).ready(function () {
+      $('div[data-fieldname="dispatched_status"] .static-area').each(
+        function () {
+          var text = $(this).text().trim();
+          var $parent = $(this).parent();
+
+          if (text === "Pending") {
+            $parent.css({
+              color: "#E50914",
+              "font-weight": "bold",
+              "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+            });
+          } else if (text === "Dispatch") {
+            $parent.css({
+              color: "#1DB954",
+              "font-weight": "bold",
+              "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+            });
+
+            // Disable the select element
+            $parent
+              .find('select[data-fieldname="dispatched_status"]')
+              .attr("disabled", true);
+          } else if (text === "Self-Purchase") {
+            $parent.css({
+              color: "#1877F2",
+              "font-weight": "bold",
+              "background-color": "rgba(24, 119, 242, 0.1)", // light blue background
+            });
+
+            // Disable the select element
+            $parent
+              .find('select[data-fieldname="dispatched_status"]')
+              .attr("disabled", true);
+          }
+        }
+      );
+    });
+
+    //for Purchase Status
+    $('div[data-fieldname="purchase"] .static-area').each(function () {
+      var text = $(this).text().trim();
+      if (text === "Pending") {
+        $(this).parent().css({
+          color: "#E50914",
+          "font-weight": "bold",
+          "background-color": "rgba(229, 9, 20, 0.1)", // light red background
+        });
+      } else if (text === "Dispatch") {
+        $(this).parent().css({
+          color: "#1DB954",
+          "font-weight": "bold",
+          "background-color": "rgba(29, 185, 84, 0.1)", // light green background
+        });
+      }
+    });
+    if (frm.doc.select_department == "IT") {
+      frm.set_query("list", function () {
+        return {
+          filters: {
+            category: "IT",
+          },
+        };
+      });
+    } else if (frm.doc.select_department == "Admin") {
+      frm.set_query("list", function () {
+        return {
+          filters: {
+            category: "Admin",
+          },
+        };
+      });
+    } else if (frm.doc.select_department == "Stationery") {
+      frm.set_query("list", function () {
+        return {
+          filters: {
+            category: "Stationery",
+          },
+        };
+      });
+    }
   },
   onload_post_render: function (frm) {
     frm.fields_dict.quantity.$input.on("input", function (evt) {
@@ -828,131 +903,6 @@ frappe.ui.form.on("Purchase Requisition", {
       },
     });
   },
-
-  share_with_cto: function (frm) {
-    frappe.call({
-      method: "frappe.share.add",
-      args: {
-        doctype: frm.doctype,
-        name: frm.docname,
-        user: "1299@sahayog.com",
-        read: 1,
-        write: 1,
-        submit: 0,
-        share: 1,
-        notify: 1,
-      },
-      callback: function (response) {
-        //Display a message to the user
-        frappe.show_alert({
-          message:
-            "Your Purchase Request Sent To Purchase Department Successfully ",
-          indicator: "green",
-        });
-        //frm.set_value("cto_request", "Done");
-        //frm.set_value("cto_status", "Pending");
-
-        frm.set_value("status", "Pending from Purchase");
-
-        frm.save();
-      },
-    });
-  },
-
-  share_with_purchase_dept: function (frm) {
-    frappe.call({
-      method: "frappe.share.add",
-      args: {
-        doctype: frm.doctype,
-        name: frm.docname,
-        user: "689@sahayog.com",
-        read: 1,
-        write: 1,
-        submit: 0,
-        share: 1,
-        notify: 1,
-      },
-      callback: function (response) {
-        //Display a message to the user
-        frappe.show_alert({
-          message: "Your Purchase Request Sent Successfully ",
-          indicator: "green",
-        });
-      },
-    });
-    frappe.call({
-      method: "frappe.share.add",
-      args: {
-        doctype: frm.doctype,
-        name: frm.docname,
-        user: "40@sahayog.com",
-        read: 1,
-        write: 1,
-        submit: 0,
-        share: 1,
-        notify: 1,
-      },
-      callback: function (response) {
-        //Display a message to the user
-        frappe.show_alert({
-          message: "Your Purchase Request Sent Successfully ",
-          indicator: "green",
-        });
-      },
-    });
-    frappe.call({
-      method: "frappe.share.add",
-      args: {
-        doctype: frm.doctype,
-        name: frm.docname,
-        user: "2481@sahayog.com",
-        read: 1,
-        write: 1,
-        submit: 0,
-        share: 1,
-        notify: 1,
-      },
-      callback: function (response) {
-        //Display a message to the user
-        frappe.show_alert({
-          message: "Your Purchase Request Sent Successfully ",
-          indicator: "green",
-        });
-        frm.set_value("request", "Done");
-        frm.set_value("status", "Pending from Purchase");
-
-        frm.save();
-      },
-    });
-  },
-});
-
-frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
-  if (frm.doc.select_department == "IT") {
-    frm.set_query("list", function () {
-      return {
-        filters: {
-          category: "IT",
-        },
-      };
-    });
-  } else if (frm.doc.select_department == "Admin") {
-    frm.set_query("list", function () {
-      return {
-        filters: {
-          category: "Admin",
-        },
-      };
-    });
-  } else if (frm.doc.select_department == "Stationery") {
-    frm.set_query("list", function () {
-      return {
-        filters: {
-          category: "Stationery",
-        },
-      };
-    });
-  }
 });
 
 frappe.ui.form.on("Purchase Requisition", {
@@ -1143,62 +1093,4 @@ frappe.ui.form.on("Purchase Requisition", {
       frm.save();
     }
   },
-});
-
-frappe.ui.form.on("Purchase Requisition", "refresh", function (frm) {
-  //for Dispatched Status
-  $(document).ready(function () {
-    $('div[data-fieldname="dispatched_status"] .static-area').each(function () {
-      var text = $(this).text().trim();
-      var $parent = $(this).parent();
-
-      if (text === "Pending") {
-        $parent.css({
-          color: "#E50914",
-          "font-weight": "bold",
-          "background-color": "rgba(229, 9, 20, 0.1)", // light red background
-        });
-      } else if (text === "Dispatch") {
-        $parent.css({
-          color: "#1DB954",
-          "font-weight": "bold",
-          "background-color": "rgba(29, 185, 84, 0.1)", // light green background
-        });
-
-        // Disable the select element
-        $parent
-          .find('select[data-fieldname="dispatched_status"]')
-          .attr("disabled", true);
-      } else if (text === "Self-Purchase") {
-        $parent.css({
-          color: "#1877F2",
-          "font-weight": "bold",
-          "background-color": "rgba(24, 119, 242, 0.1)", // light blue background
-        });
-
-        // Disable the select element
-        $parent
-          .find('select[data-fieldname="dispatched_status"]')
-          .attr("disabled", true);
-      }
-    });
-  });
-
-  //for Purchase Status
-  $('div[data-fieldname="purchase"] .static-area').each(function () {
-    var text = $(this).text().trim();
-    if (text === "Pending") {
-      $(this).parent().css({
-        color: "#E50914",
-        "font-weight": "bold",
-        "background-color": "rgba(229, 9, 20, 0.1)", // light red background
-      });
-    } else if (text === "Dispatch") {
-      $(this).parent().css({
-        color: "#1DB954",
-        "font-weight": "bold",
-        "background-color": "rgba(29, 185, 84, 0.1)", // light green background
-      });
-    }
-  });
 });
