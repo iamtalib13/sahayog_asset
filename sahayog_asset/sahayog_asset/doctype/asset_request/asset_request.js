@@ -720,6 +720,7 @@ frappe.ui.form.on("Asset Request", {
       frm.doc.status === "Dispatched" ||
       frm.doc.status === "Received"
     ) {
+      console.log("Dispatched or Received status detected");
       frm.trigger("Dispatched_Received_intro");
     } else if (frm.doc.status === "Received") {
       frm.trigger("Dispatched_Received_intro");
@@ -2636,7 +2637,12 @@ frappe.ui.form.on("Asset Request", {
     <strong>Pending from Receiver</strong>
   `;
     }
-    if (frm.doc.status === "Received" && user === frm.doc.employee_user) {
+    let user = frappe.session.user;
+    if (
+      (frm.doc.status === "Received" && user === frm.doc.employee_user) ||
+      frappe.user.has_role("Administrator") ||
+      frappe.user.has_role("Store Manager")
+    ) {
       receivedMessage = `
       Received By: <span style="font-weight: bold;">${receivedBy}</span><br>
       Received Remark: <span style="font-weight: bold;">${receivedRemark}</span><br>

@@ -7,6 +7,15 @@ class AssetRequest(Document):
         # Run the logic only if the document status is "Draft"
         #self.set_approval_and_skip_levels()
     
+    def on_update(self):
+        if (
+            self.has_value_changed("stage_2_emp_status")
+            and self.stage_2_emp_status == "Approved"
+        ):
+         {
+            self.db_set("status", "Pending From Store Manager", notify=False)
+         }
+        
     def set_approval_and_skip_levels(self):
         pending_status = "Pending"
         skip_status = "Skip"
