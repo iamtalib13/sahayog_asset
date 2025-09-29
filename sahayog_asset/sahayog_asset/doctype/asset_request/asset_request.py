@@ -445,8 +445,12 @@ def get_permission_query_conditions(user):
     roles = frappe.get_roles(user)
     full_access_roles = ["Administrator", "Purchase Department"]
 
+    # Full access
     if any(role in full_access_roles for role in roles):
-        return ""  # Full access
+        return ""
+
+    # Department-based access + own records
+    conditions = [f"`tabAsset Request`.`employee_user` = '{user}'"]
 
     # Admin department
     if any(role in roles for role in [
@@ -455,7 +459,7 @@ def get_permission_query_conditions(user):
         "Admin Store Executive",
         "Admin Store Manager"
     ]):
-        return "`tabAsset Request`.`select_department` = 'Admin' OR `tabAsset Request`.`employee_user` = '{0}'".format(user)
+        conditions.append("`tabAsset Request`.`select_department` = 'Admin'")
 
     # IT department
     if any(role in roles for role in [
@@ -463,61 +467,55 @@ def get_permission_query_conditions(user):
         "IT Store Executive",
         "IT Store Manager"
     ]):
-        return "`tabAsset Request`.`select_department` = 'IT' OR `tabAsset Request`.`employee_user` = '{0}'".format(user)
+        conditions.append("`tabAsset Request`.`select_department` = 'IT'")
 
     # Stationery department
     if "Stationery Store & Support Manager" in roles:
-        return "`tabAsset Request`.`select_department` = 'Stationery' OR `tabAsset Request`.`employee_user` = '{0}'".format(user)
+        conditions.append("`tabAsset Request`.`select_department` = 'Stationery'")
 
-    # Default: show records assigned to stages or employee_user
-    return (
-        f"(`tabAsset Request`.`employee_user` = '{user}' "
-        f"OR `tabAsset Request`.`stage_1_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_2_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_3_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_4_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_5_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_6_emp_id` = '{user}' "
-        f"OR `tabAsset Request`.`stage_7_emp_id` = '{user}')"
-    )
+    # Access based on stage_x_emp_id
+    for stage in range(1, 8):
+        conditions.append(f"`tabAsset Request`.`stage_{stage}_emp_id` = '{user}'")
+
+    return "(" + " OR ".join(conditions) + ")"
 
 
 def has_permission(doc, user):
     roles = frappe.get_roles(user)
-
     full_access_roles = ["Administrator", "Purchase Department"]
 
+    # Full access
     if any(role in full_access_roles for role in roles):
         return True
 
+    # Own records always
+    if doc.employee_user == user:
+        return True
+    for stage in range(1, 8):
+        if getattr(doc, f"stage_{stage}_emp_id", None) == user:
+            return True
+
+    # Department-based access
     if any(role in roles for role in [
         "Admin Support Executive",
         "Admin Support Manager",
         "Admin Store Executive",
         "Admin Store Manager"
-    ]):
-        return doc.select_department == "Admin"
+    ]) and doc.select_department.lower() == "admin":
+        return True
 
     if any(role in roles for role in [
         "IT Support Executive",
         "IT Store Executive",
         "IT Store Manager"
-    ]):
-        return doc.select_department == "IT"
+    ]) and doc.select_department.lower() == "it":
+        return True
 
-    if "Stationery Store & Support Manager" in roles:
-        return doc.select_department == "Stationery"
+    if "Stationery Store & Support Manager" in roles and doc.select_department.lower() == "stationery":
+        return True
 
-    return (
-        doc.employee_user == user or
-        doc.stage_1_emp_id == user or
-        doc.stage_2_emp_id == user or
-        doc.stage_3_emp_id == user or
-        doc.stage_4_emp_id == user or
-        doc.stage_5_emp_id == user or
-        doc.stage_6_emp_id == user or
-        doc.stage_7_emp_id == user
-    )
+    return False
+
 
 @frappe.whitelist()
 def get_counts(employee_user):
