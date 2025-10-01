@@ -926,7 +926,12 @@ frappe.ui.form.on("Asset Request", {
           frm.change_custom_button_type("Send for Approval", null, "primary");
           //</Send for Approval , this button is only for Asset Requester Owner>
         } else if (frm.doc.status == "Dispatched") {
-          if (user === frm.doc.employee_user) {
+          // Convert both user and employee_user to lowercase for comparison
+          if (
+            user &&
+            frm.doc.employee_user &&
+            user.toLowerCase() === frm.doc.employee_user.toLowerCase()
+          ) {
             frm.add_custom_button(__("Receive"), function () {
               var d = new frappe.ui.Dialog({
                 title: __("Received Remark"),
@@ -937,7 +942,7 @@ frappe.ui.form.on("Asset Request", {
                     fieldtype: "Small Text",
                     reqd: 1, // Set the rejection reason field as mandatory
                     description: __(
-                      "Wrtie Courier Name & Builty No / Vehicle No. / Mode of Transport"
+                      "Write Courier Name & Builty No / Vehicle No. / Mode of Transport"
                     ), // Description for the field
                   },
                 ],
@@ -948,6 +953,7 @@ frappe.ui.form.on("Asset Request", {
                     frappe.msgprint(__("Please provide a Received Remark."));
                     return;
                   }
+
                   // Generate a random 4-digit number
                   var randomOTP = Math.floor(1000 + Math.random() * 9000);
 
