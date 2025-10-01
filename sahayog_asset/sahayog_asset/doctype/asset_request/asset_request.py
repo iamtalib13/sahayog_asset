@@ -441,7 +441,9 @@ def get_all_count(employee_user):
 def get_permission_query_conditions(user):
     if not user:
         return ""
-
+    
+    # Convert user email to lowercase for case-insensitive comparison
+    user_lower = user.lower()
     roles = frappe.get_roles(user)
     full_access_roles = ["Administrator", "Purchase Department"]
 
@@ -449,8 +451,8 @@ def get_permission_query_conditions(user):
     if any(role in full_access_roles for role in roles):
         return ""
 
-    # Department-based access + own records
-    conditions = [f"`tabAsset Request`.`employee_user` = '{user}'"]
+    # Department-based access + own records (case-insensitive)
+    conditions = [f"LOWER(`tabAsset Request`.`employee_user`) = '{user_lower}'"]
 
     # Admin department
     if any(role in roles for role in [
@@ -473,14 +475,18 @@ def get_permission_query_conditions(user):
     if "Stationery Store & Support Manager" in roles:
         conditions.append("`tabAsset Request`.`select_department` = 'Stationery'")
 
-    # Access based on stage_x_emp_id
+    # Access based on stage_x_emp_id (case-insensitive)
     for stage in range(1, 8):
-        conditions.append(f"`tabAsset Request`.`stage_{stage}_emp_id` = '{user}'")
+        conditions.append(f"LOWER(`tabAsset Request`.`stage_{stage}_emp_id`) = '{user_lower}'")
 
     return "(" + " OR ".join(conditions) + ")"
 
-
 def has_permission(doc, user):
+    if not user:
+        return False
+    
+    # Convert user email to lowercase for case-insensitive comparison
+    user_lower = user.lower()
     roles = frappe.get_roles(user)
     full_access_roles = ["Administrator", "Purchase Department"]
 
@@ -488,31 +494,40 @@ def has_permission(doc, user):
     if any(role in full_access_roles for role in roles):
         return True
 
-    # Own records always
-    if doc.employee_user == user:
+    # Own records always (case-insensitive)
+    if doc.employee_user and doc.employee_user.lower() == user_lower:
         return True
+    
+    # Check stage-based access (case-insensitive)
     for stage in range(1, 8):
-        if getattr(doc, f"stage_{stage}_emp_id", None) == user:
+        stage_user = getattr(doc, f"stage_{stage}_emp_id", None)
+        if stage_user and stage_user.lower() == user_lower:
             return True
 
     # Department-based access
-    if any(role in roles for role in [
-        "Admin Support Executive",
-        "Admin Support Manager",
-        "Admin Store Executive",
-        "Admin Store Manager"
-    ]) and doc.select_department.lower() == "admin":
-        return True
+    if doc.select_department:
+        dept_lower = doc.select_department.lower()
+        
+        # Admin department access
+        if any(role in roles for role in [
+            "Admin Support Executive",
+            "Admin Support Manager",
+            "Admin Store Executive",
+            "Admin Store Manager"
+        ]) and dept_lower == "admin":
+            return True
 
-    if any(role in roles for role in [
-        "IT Support Executive",
-        "IT Store Executive",
-        "IT Store Manager"
-    ]) and doc.select_department.lower() == "it":
-        return True
+        # IT department access
+        if any(role in roles for role in [
+            "IT Support Executive",
+            "IT Store Executive",
+            "IT Store Manager"
+        ]) and dept_lower == "it":
+            return True
 
-    if "Stationery Store & Support Manager" in roles and doc.select_department.lower() == "stationery":
-        return True
+        # Stationery department access
+        if "Stationery Store & Support Manager" in roles and dept_lower == "stationery":
+            return True
 
     return False
 
