@@ -179,7 +179,7 @@ frappe.ui.form.on("Asset Request", {
 
   before_save: function (frm) {
     frm.trigger("zero_trim_child_table");
-    frm.trigger("Set_Employee_Details");
+    // frm.trigger("Set_Employee_Details");
     if (frm.doc.stage_5_emp_status !== "Pending") {
       frm.trigger("set_Approval_and_Skip_Levels");
     }
@@ -412,17 +412,6 @@ frappe.ui.form.on("Asset Request", {
       frm.trigger("Employee_Details");
     } else if (!frm.is_new()) {
       frm.trigger("Employee_Details");
-      if (
-        frappe.user.has_role("System Manager") ||
-        frappe.user.has_role("IT Support Executive") ||
-        frappe.user.has_role("Admin Support Executive") ||
-        frappe.user.has_role("Stationery Store & Support Manager")
-      ) {
-        if (!frm.doc.stage_1_emp_id) {
-          frm.trigger("Set_Employee_Details");
-          //frm.save();
-        }
-      }
     }
     // if (frappe.user.has_role("Analytics")) {
     //   frm.set_df_property("asset", "read_only", 1);
@@ -441,15 +430,42 @@ frappe.ui.form.on("Asset Request", {
           return;
         }
 
-        // 🔥 NULL → employee_id → trigger (3 steps)
-        frm.set_value("employee_id", null);
-        setTimeout(() => {
-          frm.set_value("employee_id", employeeid);
-        }, 100);
-        setTimeout(() => {
-          frm.trigger("Set_Employee_Details"); // ✅ YOUR EXACT NAME
-        }, 200);
-        // frm.save();
+        // Handle Submitted Documents (docstatus = 1)
+        if (frm.doc.docstatus === 1) {
+            frappe.call({
+                method: "sahayog_asset.sahayog_asset.doctype.asset_request.get_emp_details.get_emp_details",
+                args: {
+                    emp_id: employeeid,
+                    asset_request: frm.doc.name // Pass docname to update directly in backend
+                },
+                freeze: true,
+                freeze_message: "Updating Employee Details...",
+                callback: function(r) {
+                    if(r.message) {
+                        frappe.msgprint({
+                            title: __('Success'),
+                            message: __('Employee details updated successfully.'),
+                            indicator: 'green'
+                        });
+                        frm.reload_doc();
+                    }
+                }
+            });
+            return; 
+        }
+
+        // Handle Draft Documents
+        // 🔥 Set flag so save triggers in callback
+        frm.__employee_correcting = true;
+
+        // 🔥 NULL → employee_id → trigger (3 steps) using Promise Chain
+        frm.set_value("employee_id", null)
+          .then(() => {
+            return frm.set_value("employee_id", employeeid);
+          })
+          .then(() => {
+            frm.trigger("Set_Employee_Details");
+          });
       });
     }
 
@@ -2498,7 +2514,7 @@ frappe.ui.form.on("Asset Request", {
     ]);
   },
   Set_Employee_Details: function (frm) {
-    console.log("🚀 SetEmployeeDetails STARTED - NO DIVISION");
+    console.log("🚀 SetEmployeeDetails STARTED");
 
     let empid = frm.doc.employee_id;
     console.log("🔍 Employee ID:", empid);
@@ -2513,13 +2529,14 @@ frappe.ui.form.on("Asset Request", {
       return;
     }
 
-    // 🔥 PRE-FILL ALL EXCEPT division
+    // 🔥 PRE-FILL ALL
     console.log("🔧 Pre-filling safe defaults...");
     frm.set_value("emp_name", "Loading...");
     frm.set_value("designation", "Employee");
     frm.set_value("employee_department", "Operations");
     frm.set_value("region", "Head Office");
     frm.set_value("district", "");
+    frm.set_value("division", "");
     frm.set_value("branch", "GONDIA HO");
     frm.set_value("phone", "");
 
@@ -2531,20 +2548,21 @@ frappe.ui.form.on("Asset Request", {
       freeze: true,
       freeze_message: "Loading Employee Details...",
       callback: function (r) {
-        if (r.message && r.message.employee_name) {
-          frm.set_value("emp_name", r.message.employee_name);
+        if (r.message && r.message.emp_name) {
+          frm.set_value("emp_name", r.message.emp_name);
           frm.set_value("designation", r.message.designation || "Employee");
           frm.set_value(
             "employee_department",
-            r.message.department || "Operations",
+            r.message.employee_department || "Operations",
           );
-          frm.set_value("region", r.message.custom_region || "Head Office");
-          frm.set_value("district", r.message.custom_district || "");
+          frm.set_value("region", r.message.region || "Head Office");
+          frm.set_value("district", r.message.district || "");
+          frm.set_value("division", r.message.division || "");
           frm.set_value("branch", r.message.branch || "GONDIA HO");
-          frm.set_value("phone", r.message.cell_number || "");
+          frm.set_value("phone", r.message.phone || "");
 
           frappe.show_alert({
-            message: `✅ Loaded: ${r.message.employee_name}`,
+            message: `✅ Loaded: ${r.message.emp_name}`,
             indicator: "green",
           });
 
