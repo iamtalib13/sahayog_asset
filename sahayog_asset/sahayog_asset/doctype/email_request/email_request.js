@@ -782,7 +782,7 @@ frappe.ui.form.on("Email Request", {
   },
 
   draft_intro_messages: function (frm) {
-    if (frappe.user.has_role("HR Support Executive")) {
+    if (frappe.user.has_role("HR Support Executive") && frm.doc.request_type !== "Delete") {
       frm.set_intro(
         "Please submit the Email Request for approval to <b>Harshavardhan Ghutke Sir</b>",
         "red"
