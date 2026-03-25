@@ -899,11 +899,14 @@ frappe.ui.form.on("Email Request", {
           frappe.confirm(
             "Are you sure you want to submit?",
             () => {
-              // action to perform if Yes is selected
-              // perform desired action such as routing to new form or fetching etc.
+              // Check if the request type is "Delete" to skip approval
+              if (frm.doc.request_type === "Delete") {
+                frm.set_value("status", "Pending From IT");
+              } else {
+                frm.set_value("status", "Approval Pending");
+                frm.set_value("level_1_status", "Pending");
+              }
 
-              frm.set_value("status", "Approval Pending");
-              frm.set_value("level_1_status", "Pending");
               frm.refresh_field("status");
               frm.refresh_field("level_1_status");
 
