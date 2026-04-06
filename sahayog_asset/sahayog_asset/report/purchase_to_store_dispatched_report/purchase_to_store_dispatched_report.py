@@ -5,27 +5,12 @@ def execute(filters=None):
     if not filters:
         filters = {}
 
-    data, columns = [], []
-
     columns = get_columns()
-    cs_data = get_cs_data(filters)
+    data = get_data(filters)
 
-    if not cs_data:
+    if not data:
         frappe.msgprint("No Records Found")
         return columns, data
-
-    for d in cs_data:
-        row = {
-            "id": d.name,
-            "asset_name": d.item_name,
-            "quantity": int(d.quantity),
-            "branch": d.branch,
-            "emp_name": d.emp_name,
-            "select_department": d.select_department,
-            "date": d.date,
-            "division": d.division,
-        }
-        data.append(row)
 
     return columns, data
 
@@ -50,7 +35,7 @@ def get_columns():
             "label": "Asset Name",
             "fieldtype": "Link",
             "options": "Sahayog Item",
-            "width": "500",
+            "width": "200",
         },
         {
             "fieldname": "quantity",
@@ -61,8 +46,9 @@ def get_columns():
         {
             "fieldname": "select_department",
             "label": "Asset Department",
-            "fieldtype": "Data",
-            "width": "90",
+            "fieldtype": "Link",
+            "options": "Asset Department",
+            "width": "120",
         },
         {
             "fieldname": "emp_name",
@@ -73,25 +59,28 @@ def get_columns():
         {
             "fieldname": "branch",
             "label": "Branch",
-            "fieldtype": "Data",
+            "fieldtype": "Link",
+            "options": "Branch",
             "width": "100",
         },
         {
             "fieldname": "division",
             "label": "Division",
-            "fieldtype": "Data",
+            "fieldtype": "Link",
+            "options": "Division",
             "width": "100",
         },
     ]
 
 
-def get_cs_data(filters):
-    # Build the SQL query
-    sql_query = """
+def get_data(filters):
+    conditions = get_conditions(filters)
+    
+    sql_query = f"""
      SELECT
-        ar.name, ar.emp_name, ar.date,
-        ar.branch, ar.select_department,ar.division,
-        al.item_name, al.quantity 
+        ar.name as id, ar.emp_name, ar.date,
+        ar.branch, ar.select_department, ar.division,
+        al.item_name as asset_name, al.quantity 
     FROM
         `tabAsset Request` AS ar
     LEFT JOIN
@@ -99,10 +88,33 @@ def get_cs_data(filters):
     ON
         ar.name = al.parent
     WHERE
-        al.purchase = 'Dispatch';
+        al.purchase = 'Dispatch'
+        {conditions}
+    ORDER BY ar.date DESC;
     """
 
-    # Execute the SQL query
-    data = frappe.db.sql(sql_query, as_dict=True)
+    data = frappe.db.sql(sql_query, filters, as_dict=True)
+    
+    for d in data:
+        if d.quantity is not None:
+            d.quantity = int(d.quantity)
+        else:
+            d.quantity = 0
 
     return data
+
+def get_conditions(filters):
+    conditions = ""
+    
+    if filters.get("from_date"):
+        conditions += " AND ar.date >= %(from_date)s"
+    if filters.get("to_date"):
+        conditions += " AND ar.date <= %(to_date)s"
+    if filters.get("branch"):
+        conditions += " AND ar.branch = %(branch)s"
+    if filters.get("division"):
+        conditions += " AND ar.division = %(division)s"
+    if filters.get("select_department"):
+        conditions += " AND ar.select_department = %(select_department)s"
+        
+    return conditions
