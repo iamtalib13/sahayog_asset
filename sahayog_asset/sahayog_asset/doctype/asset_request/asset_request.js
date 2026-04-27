@@ -7,6 +7,17 @@ frappe.ui.form.on("Asset List", {
     let dispatchedStatus = child_doc.dispatched_status; // Assuming 'dispatched_status' is the field you want to check
     let fieldname = "dispatched_status"; // Replace with your actual field name
 
+    if (frappe.user.has_role("System Manager")) {
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "item_description",
+        true
+      );
+      frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
+        "item_purpose",
+        true
+      );
+    }
+
     if (dispatchedStatus !== "Pending") {
       console.log("Not pending");
       frm.fields_dict["asset"].grid.grid_rows_by_docname[cdn].toggle_editable(
@@ -157,6 +168,16 @@ frappe.ui.form.on("Asset Request", {
       //   indicator: "red",
       //   message: __("Please Add At Least One Asset Item"),
       // });
+    }
+  },
+
+  employee_id: function (frm) {
+    if (
+      frm.is_new() &&
+      frappe.user.has_role("System Manager") &&
+      frm.doc.employee_id
+    ) {
+      frm.trigger("Set_Employee_Details");
     }
   },
 
@@ -374,6 +395,7 @@ frappe.ui.form.on("Asset Request", {
   },
 
   refresh: function (frm) {
+    const isSystemManager = frappe.user.has_role("System Manager");
     frm.trigger("populate_progress_html");
     if (
       frappe.user.has_role("System Manager") ||
@@ -391,9 +413,13 @@ frappe.ui.form.on("Asset Request", {
     frm.trigger("disbale_add_new");
     frm.trigger("add_form_color");
     if (frm.is_new()) {
-      frm.trigger("Set_Employee_Details");
+      frm.set_df_property("employee_id", "read_only", isSystemManager ? 0 : 1);
+      if (!isSystemManager || !frm.doc.employee_id) {
+        frm.trigger("Set_Employee_Details");
+      }
       frm.trigger("Employee_Details");
     } else if (!frm.is_new()) {
+      frm.set_df_property("employee_id", "read_only", 1);
       frm.trigger("Employee_Details");
       if (
         frappe.user.has_role("System Manager") ||
@@ -437,7 +463,10 @@ frappe.ui.form.on("Asset Request", {
     frm.trigger("select_department");
     // START Apply dynamic CSS styles using querySelector
     // Get all elements matching the selector
-    if (!frappe.user.has_role("Administrator")) {
+    if (
+      !frappe.user.has_role("Administrator") &&
+      !frappe.user.has_role("System Manager")
+    ) {
       // Your code here
       frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
     }
@@ -757,7 +786,10 @@ frappe.ui.form.on("Asset Request", {
       frm.toggle_display("item_description", 0);
       frm.toggle_display("item_purpose", 0);
 
-      if (!frappe.user.has_role("Administrator")) {
+      if (
+        !frappe.user.has_role("Administrator") &&
+        !frappe.user.has_role("System Manager")
+      ) {
         // Your code here
         frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
         frm.fields_dict["asset"].grid.wrapper
@@ -2250,6 +2282,25 @@ frappe.ui.form.on("Asset Request", {
     }
 
     frm.trigger("hide_childtable_Edit_Setting");
+
+    if (frappe.user.has_role("System Manager")) {
+      frm.enable_save();
+      frm.set_df_property("asset", "read_only", 0);
+      if (frm.get_field("asset") && frm.get_field("asset").grid) {
+        const assetGrid = frm.get_field("asset").grid;
+        assetGrid.cannot_add_rows = false;
+        $(assetGrid.wrapper)
+          .find(".grid-add-row, .grid-remove-rows, .grid-remove-all-rows")
+          .show();
+        if (assetGrid.grid_rows && assetGrid.grid_rows.length) {
+          assetGrid.grid_rows.forEach((row) => {
+            row.toggle_editable("item_description", true);
+            row.toggle_editable("item_purpose", true);
+          });
+        }
+      }
+      frm.refresh_field("asset");
+    }
   },
   // async populate_progress_html(frm) {
   //   // Dynamically generate the HTML content using JavaScript
@@ -2422,7 +2473,9 @@ frappe.ui.form.on("Asset Request", {
   },
 
   disbale_add_new: function (frm) {
-    frm.get_field("asset").grid.cannot_add_rows = true;
+    frm.get_field("asset").grid.cannot_add_rows = !frappe.user.has_role(
+      "System Manager"
+    );
   },
 
   hide_timeline: function (frm) {
@@ -2479,9 +2532,17 @@ frappe.ui.form.on("Asset Request", {
     let user;
 
     if (frm.is_new()) {
-      user = frappe.session.user;
+      if (frappe.user.has_role("System Manager") && frm.doc.employee_id) {
+        user = frm.doc.employee_id;
+      } else {
+        user = frappe.session.user;
+      }
     } else {
-      user = frm.doc.employee_id;
+      user = frm.doc.employee_id || frappe.session.user;
+    }
+
+    if (!user) {
+      return;
     }
 
     // Extract the string before @ (e.g., "3210", "ABPS123", "NT999")
@@ -2522,7 +2583,10 @@ frappe.ui.form.on("Asset Request", {
   },
 
   select_department: function (frm) {
-    if (!frappe.user.has_role("Administrator")) {
+    if (
+      !frappe.user.has_role("Administrator") &&
+      !frappe.user.has_role("System Manager")
+    ) {
       // Your code here
       frm.fields_dict["asset"].grid.wrapper.find(".grid-add-row").hide();
     }
