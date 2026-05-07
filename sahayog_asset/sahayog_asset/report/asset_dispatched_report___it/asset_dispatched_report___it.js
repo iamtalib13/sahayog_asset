@@ -21,5 +21,11 @@ frappe.query_reports["Asset Dispatched Report - IT"] = {
         "\nDraft\nPending\nRejected\nDispatched\nPartially Dispatched\nReceived\nPending From Purchase\nPending From Store Manager\nDelivered",
       default: "",
     },
+    {
+      fieldname: "item",
+      label: __("Item"),
+      fieldtype: "Link",
+      options: "Sahayog Item",
+    },
   ],
 };
