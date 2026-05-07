@@ -148,13 +148,17 @@ def get_data(filters):
 	return frappe.db.sql(query, filters, as_dict=True)
 
 def get_conditions(filters):
-	conditions = ""
-	if filters.get("status"):
-		conditions += " AND ar.status = %(status)s"
+        conditions = ""
+        if filters.get("status"):
+                conditions += " AND ar.status = %(status)s"
 
-	if filters.get("from_date"):
-		conditions += " AND ar.date >= %(from_date)s"
-	if filters.get("to_date"):
-		conditions += " AND ar.date <= %(to_date)s"
+        if filters.get("item"):
+                conditions += " AND al.item_name = %(item)s"
 
-	return conditions
+        if filters.get("from_date"):
+                conditions += " AND ar.date >= %(from_date)s"
+        if filters.get("to_date"):
+                conditions += " AND ar.date <= %(to_date)s"
+
+        return conditions
+
