@@ -23,3 +23,4 @@ frappe.query_reports["Asset Dispatched Report - IT"] = {
     },
   ],
 };
+//

@@ -158,5 +158,3 @@ def get_conditions(filters):
 		conditions += " AND ar.date <= %(to_date)s"
 
 	return conditions
-
-# 
