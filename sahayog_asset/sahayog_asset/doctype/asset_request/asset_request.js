@@ -830,7 +830,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 0: Employe Who Request Asset>
     if (
-      user === frm.doc.employee_user ||
+      (user &&
+        frm.doc.employee_user &&
+        user.toLowerCase() === frm.doc.employee_user.toLowerCase()) ||
       frappe.user.has_role("Administrator") ||
       frappe.user.has_role("IT Support Executive") ||
       frappe.user.has_role("Admin Support Executive") ||
@@ -840,7 +842,11 @@ frappe.ui.form.on("Asset Request", {
 
       if (!frm.is_new()) {
         if (frm.doc.status == "Draft") {
-          if (user === frm.doc.employee_user) {
+          if (
+            user &&
+            frm.doc.employee_user &&
+            user.toLowerCase() === frm.doc.employee_user.toLowerCase()
+          ) {
             console.log(
               "Employee Matched at Stage 0 :" + frm.doc.employee_user
             );
@@ -1024,7 +1030,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 1>
     if (
-      user === frm.doc.stage_1_emp_id &&
+      user &&
+      frm.doc.stage_1_emp_id &&
+      user.toLowerCase() === frm.doc.stage_1_emp_id.toLowerCase() &&
       frm.doc.stage_1_emp_status == "Pending"
     ) {
       frm.set_df_property("asset", "read_only", 1);
@@ -1200,7 +1208,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 2>
     else if (
-      user === frm.doc.stage_2_emp_id &&
+      user &&
+      frm.doc.stage_2_emp_id &&
+      user.toLowerCase() === frm.doc.stage_2_emp_id.toLowerCase() &&
       frm.doc.stage_2_emp_status !== "Skip" &&
       frm.doc.stage_2_emp_status == "Pending"
     ) {
@@ -1375,7 +1385,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 3>
     else if (
-      user === frm.doc.stage_3_emp_id &&
+      user &&
+      frm.doc.stage_3_emp_id &&
+      user.toLowerCase() === frm.doc.stage_3_emp_id.toLowerCase() &&
       frm.doc.stage_3_emp_status !== "Skip" &&
       frm.doc.stage_3_emp_status == "Pending"
     ) {
@@ -1509,7 +1521,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 4>
     else if (
-      user === frm.doc.stage_4_emp_id &&
+      user &&
+      frm.doc.stage_4_emp_id &&
+      user.toLowerCase() === frm.doc.stage_4_emp_id.toLowerCase() &&
       frm.doc.stage_4_emp_status !== "Skip" &&
       frm.doc.stage_4_emp_status == "Pending"
     ) {
@@ -1736,7 +1750,9 @@ frappe.ui.form.on("Asset Request", {
     //START-------------------------------------------------------------------------------------------
     //<Stage 5>
     else if (
-      user === frm.doc.stage_5_emp_id &&
+      user &&
+      frm.doc.stage_5_emp_id &&
+      user.toLowerCase() === frm.doc.stage_5_emp_id.toLowerCase() &&
       frm.doc.stage_5_emp_status !== "Skip" &&
       frm.doc.stage_5_emp_status == "Pending"
     ) {
@@ -1893,7 +1909,11 @@ frappe.ui.form.on("Asset Request", {
 
     //START-------------------------------------------------------------------------------------------
     //<Stage 6>
-    else if (user === frm.doc.stage_6_emp_id) {
+    else if (
+      user &&
+      frm.doc.stage_6_emp_id &&
+      user.toLowerCase() === frm.doc.stage_6_emp_id.toLowerCase()
+    ) {
       if (frm.doc.stage_6_emp_status == "Approved") {
         console.log("already approved");
         frm.set_df_property("asset", "read_only", 1);
@@ -2709,7 +2729,10 @@ frappe.ui.form.on("Asset Request", {
     }
     let user = frappe.session.user;
     if (
-      (frm.doc.status === "Received" && user === frm.doc.employee_user) ||
+      (frm.doc.status === "Received" &&
+        user &&
+        frm.doc.employee_user &&
+        user.toLowerCase() === frm.doc.employee_user.toLowerCase()) ||
       frappe.user.has_role("Administrator") ||
       frappe.user.has_role("Store Manager")
     ) {
@@ -3376,7 +3399,9 @@ frappe.ui.form.on("Asset Request", {
     let user = frappe.session.user;
 
     if (
-      user === frm.doc.stage_7_emp_id ||
+      (user &&
+        frm.doc.stage_7_emp_id &&
+        user.toLowerCase() === frm.doc.stage_7_emp_id.toLowerCase()) ||
       user === "3511@sahayog.com" ||
       user === "3991@sahayog.com"
     ) {
